@@ -14,7 +14,7 @@ class Dataset(torch.utils.data.Dataset):
 
     def __init__(self):
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
-        self.n_samples = 2 ** 10 # 5_315_384
+        self.n_samples = 2 ** 15 # 5_315_384
         self.n_words = 2 ** 7
 
     def __len__(self):

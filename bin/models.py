@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 # word embedding model
 class WordModel(nn.Module):
+
     def __init__(self, vocab_size, dimensions):
         super(WordModel, self).__init__()
         self.vocab_size = vocab_size
@@ -23,8 +24,8 @@ class WordModel(nn.Module):
         self.fc = nn.Linear(
             self.dimensions,
             self.vocab_size
-        )  
-        
+        )
+ 
     def forward(self, x):
         x = self.embed(x)
         x = torch.sum(x, dim=1)
@@ -34,6 +35,7 @@ class WordModel(nn.Module):
 
 # document embedding model
 class DocumentModel(nn.Module):
+
     def __init__(self, vocab_size):
         super(DocumentModel, self).__init__()   
         self.vocab_size = vocab_size
@@ -44,7 +46,6 @@ class DocumentModel(nn.Module):
         tfidf = self.tf(x) * self.tfidf
         n = torch.sum(tfidf, dim=1)[:, None]
         tfidf /= n
-        print(tfidf)
 
     def tf(self, x):
         o = torch.zeros((x.shape[0], x.shape[1], self.vocab_size)) 
@@ -63,10 +64,11 @@ def main():
     model = DocumentModel(30522)
     ds = Dataset()
     loader = DataLoader(dataset=ds, batch_size=32)
-    # idf = torch.ones(30522)
+    idf = torch.ones(30522)
     for batch in tqdm(loader):
-        model.forward(batch)
-        # idf = (len(loader.dataset) + len(idf)) * (1 / model.idf(batch, idf))
+        idf = model.idf(batch, idf)
+    idf = torch.log((len(loader.dataset) + 30522) * (1 / idf))
+    print(idf)
     # torch.save(torch.log(idf), '../models/idf.pt')
 
 if __name__ == '__main__':
