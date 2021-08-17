@@ -9,14 +9,12 @@ from tqdm import tqdm
 import linecache
 
 
-
-
-# wikipedia daily top 1000 reads dataset
+# wiki summary dataset
 class Dataset(torch.utils.data.Dataset):
 
     def __init__(self):
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
-        self.n_samples = 5_315_384
+        self.n_samples = 2 ** 10 # 5_315_384
         self.n_words = 2 ** 7
 
     def __len__(self):
