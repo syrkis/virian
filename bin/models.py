@@ -46,7 +46,6 @@ class DocumentModel(nn.Module):
         tfidf /= n
         print(tfidf)
 
-         
     def tf(self, x):
         o = torch.zeros((x.shape[0], x.shape[1], self.vocab_size)) 
         o.scatter_(2, x.unsqueeze(2), 1)
@@ -69,8 +68,6 @@ def main():
         model.forward(batch)
         # idf = (len(loader.dataset) + len(idf)) * (1 / model.idf(batch, idf))
     # torch.save(torch.log(idf), '../models/idf.pt')
-        
-    
 
 if __name__ == '__main__':
     main()
