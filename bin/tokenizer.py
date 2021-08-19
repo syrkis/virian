@@ -7,14 +7,16 @@ import re
 
 
 # tokenizer function
-def tokenizer(line):
-    print(line)
-
+def tokenizer(summary):
+    pattern = "[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+"
+    tokens = re.findall(pattern, summary.lower())
+    return tokens
 
 # dev call
 def main():
-    tokens = tokenizer('Saliva is the most versatile fluid of the human body')
-  
+    for token in tokenizer('12121 2121 8 f w the —— human (body)'):
+        print(token.isalpha())
+
 if __name__ == '__main__':
     main()
         

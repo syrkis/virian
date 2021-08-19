@@ -4,16 +4,15 @@
 
 # imports
 import torch
-from transformers import AutoTokenizer
 from tqdm import tqdm
 import linecache
+from tokenizer import tokenizer
 
 
 # wiki summary dataset
 class Dataset(torch.utils.data.Dataset):
 
     def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
         self.n_samples = 2 ** 15 # 5_315_384
         self.n_words = 2 ** 7
 
@@ -22,7 +21,7 @@ class Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         line = linecache.getline('../../data/raw.tar', idx)
-        tokens = self.tokenizer(line)['input_ids']
+        tokens = tokenizer(line)
         tokens = tokens[: min(self.n_words, len(tokens))]
         if len(tokens) < self.n_words:
             tmp = [0 for _ in range(self.n_words - len(tokens))] 
@@ -36,7 +35,7 @@ def main():
     ds = Dataset()
     loader = torch.utils.data.DataLoader(dataset=ds, batch_size=32, shuffle=True)
     for batch in tqdm(loader):
-        tmp = batch.shape
+        print(batch)
     
     
 
