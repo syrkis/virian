@@ -83,10 +83,6 @@ class DocumentModel(nn.Module):
 
     # init call
     def __init__(self, vocab_size):
-        """
-        Initialize class with vocab size and
-        load in word embeddings and idf vector.
-        """
           
         # super class initialization
         super(DocumentModel, self).__init__()   
@@ -95,7 +91,18 @@ class DocumentModel(nn.Module):
         self.vocab_size = vocab_size
     
         # load precomputed 5d word emb.
-        self.embed = torch.load('../models/word_embed_100d.pt')
+        self.word_embed = torch.load('../models/word_embed_100d.pt')
+        
+        # initialize doc embeddings (using Linear due to word embed)
+        self.fc1 = nn.Linear(
+            100,
+            5
+        )
+
+        self.fc2 = nn.Linear(
+            5,
+            100
+        ) 
     
         # load in precomputed idf vector
         self.tfidf = torch.load('../models/idf.pt')
@@ -103,7 +110,6 @@ class DocumentModel(nn.Module):
     # forward pass 
     def forward(self, x):
 
-        print(x.shape)
         # compute tf-idf score for samples in batch
         tfidf = self.tf(x) * self.tfidf
 
@@ -120,11 +126,22 @@ class DocumentModel(nn.Module):
             w[i] += tfidf[i][x[i]]
              
         # get word embeddings
-        x = self.embed(x) 
+        x = self.word_embed(x) 
 
-        # weighted mean of embeddings
-        print(x.shape, w.shape)
+        # weighted mean of embeddings (broadcast)
+        x *= w[:, :, None]
+    
+        # sum pre weighted embeddings
+        x = torch.sum(x, dim=1)
 
+        # compress x
+        x = self.fc1(x) 
+
+        # decompress x
+        x = self.fc2(x)
+        
+        # debug prints
+        return x
         
 
     def tf(self, x):
