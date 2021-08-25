@@ -1,4 +1,4 @@
-# train.py
+# trainers.py
 #   training virian word embeddings
 # by: Noah Syrkis
 
@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 
 # train function
-def train(model, loader, n_epochs, window, optimizer, criterion, idx=0):
+def word_train(model, loader, n_epochs, window, optimizer, criterion, idx=0):
     for epoch in range(n_epochs):
         for batch in tqdm(loader):
             optimizer.zero_grad() 
@@ -23,28 +23,23 @@ def train(model, loader, n_epochs, window, optimizer, criterion, idx=0):
                 y = batch[:, i].flatten()
                 pred = model(x)
                 loss += criterion(pred, y)
-            idx = metric(loss, batch, idx)
             loss.backward()
             optimizer.step()
 
 
-def metric(loss, batch, idx):
-    with open('loss.txt', 'a') as f:
-        f.write(f"{idx},{round(loss.item() / batch.shape[0], 4)} \n")
-    return idx + 1
-    
-
 # dev stack
 def main():
-    model = WordModel(30522, 5)
+    vocab_size = 30522
+    embed_size = 100
+    model = WordModel(vocab_size, embed_size)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
     ds = Dataset()
     n_epochs = 1
     window = 10
     loader = DataLoader(dataset=ds, batch_size=16, shuffle=True) 
-    train(model, loader, n_epochs, window, optimizer, criterion)
-    torch.save(model.embed, '../models/word_embed_5d.pt')
+    word_train(model, loader, n_epochs, window, optimizer, criterion)
+    torch.save(model.embed, f'../models/word_embed_{str(embed_size)}d.pt')
     
 if __name__ == '__main__':
     main()

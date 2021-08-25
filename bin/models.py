@@ -5,6 +5,7 @@
 # imports
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from dataset import Dataset
 from tqdm import tqdm
@@ -12,40 +13,119 @@ from tqdm import tqdm
 
 # word embedding model
 class WordModel(nn.Module):
+    """
+    Word embedding trainer class as
+    auxiliary from language model.
+    For now word embeddings are 100
+    dimensional.
+    """
 
+    # init call
     def __init__(self, vocab_size, dimensions):
+    
+        # init class parent
         super(WordModel, self).__init__()
+
+        # layer widths
         self.vocab_size = vocab_size
         self.dimensions = dimensions
+        self.fc2_counts = 100
+
+        # declare embeddings layer
         self.embed = nn.Embedding(
             self.vocab_size,
             self.dimensions
         )
-        self.fc = nn.Linear(
+
+        # declare linear layer1
+        self.fc1 = nn.Linear(
             self.dimensions,
+            self.fc2_counts
+        )
+
+        # declare linear layer2
+        self.fc2 = nn.Linear(
+            self.fc2_counts,
             self.vocab_size
         )
  
+    
+    # forward pass function
     def forward(self, x):
+        
+        # word emebed x (window around target y)
         x = self.embed(x)
-        x = torch.sum(x, dim=1)
-        x = self.fc(x)
+    
+        # convert windoe to mean vector
+        x = torch.mean(x, dim=1)
+
+        # move through linear layer 1
+        x = self.fc1(x)
+
+        # move through linear layer 2
+        x = self.fc2(x)
+
+        # return word prediction
         return x
 
 
 # document embedding model
 class DocumentModel(nn.Module):
+    """
+    Document embedding constructor class.
+    currently loads in 5d word embeddings
+    and wiki summary corpus idf, with
+    intention of performing tf-idf
+    weigthed sum for word embeddings.
+    Considering switching word embeddings
+    to 100d and decreasing with auto encoder.
+    """
 
+    # init call
     def __init__(self, vocab_size):
+        """
+        Initialize class with vocab size and
+        load in word embeddings and idf vector.
+        """
+          
+        # super class initialization
         super(DocumentModel, self).__init__()   
-        self.vocab_size = vocab_size
-        self.embed = torch.load('../models/word_embed_5d.pt')
-        self.tfidf = torch.load('../models/idf.pt') # tfidf for weighted sum of embeddings
 
+        # save vocabulary size for tf
+        self.vocab_size = vocab_size
+    
+        # load precomputed 5d word emb.
+        self.embed = torch.load('../models/word_embed_100d.pt')
+    
+        # load in precomputed idf vector
+        self.tfidf = torch.load('../models/idf.pt')
+
+    # forward pass 
     def forward(self, x):
+
+        print(x.shape)
+        # compute tf-idf score for samples in batch
         tfidf = self.tf(x) * self.tfidf
-        n = torch.sum(tfidf, dim=1)[:, None]
-        tfidf /= n
+
+        # normalize tfidf vector (perhaps skip)
+        tfidf /= torch.sum(tfidf, dim=1)[:, None]
+
+        # tfidf weight matrix
+        w = torch.zeros(x.shape) 
+
+        # loop through batches
+        for i in range(x.shape[0]):
+
+            # weights for each word emb.
+            w[i] += tfidf[i][x[i]]
+             
+        # get word embeddings
+        x = self.embed(x) 
+
+        # weighted mean of embeddings
+        print(x.shape, w.shape)
+
+        
 
     def tf(self, x):
         o = torch.zeros((x.shape[0], x.shape[1], self.vocab_size)) 
@@ -61,14 +141,15 @@ class DocumentModel(nn.Module):
 
 # dev calls
 def main():
-    model = DocumentModel(30522)
+    vocab_size = 30522
+    model = DocumentModel(vocab_size)
     ds = Dataset()
     loader = DataLoader(dataset=ds, batch_size=32)
-    idf = torch.ones(30522)
+    # idf = torch.ones(vocab_size)
     for batch in tqdm(loader):
-        idf = model.idf(batch, idf)
-    idf = torch.log((len(loader.dataset) + 30522) * (1 / idf))
-    print(idf)
+        model(batch)
+        # idf = model.idf(batch, idf)
+    # idf = torch.log((len(loader.dataset) + vocab_size) * (1 / idf))
     # torch.save(torch.log(idf), '../models/idf.pt')
 
 if __name__ == '__main__':
