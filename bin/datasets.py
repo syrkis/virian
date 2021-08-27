@@ -25,7 +25,7 @@ class WordDataset(Dataset):
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 
         # dictate size of data set 
-        self.n_samples = 5_315_384
+        self.n_samples = 10 ** 5 # 5_315_384
 
         # number of words in summary (truncate / pad)
         self.n_words = 2 ** 7
