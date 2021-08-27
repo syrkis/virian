@@ -1,18 +1,22 @@
 # datasets.py
-#   virian web monitoring
+#   virian wiki summary datasets
 # by: Noah Syrkis
 
 # imports
 import torch
+import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
+import numpy as np
 from tqdm import tqdm
 import linecache
 from transformers import AutoTokenizer
 
 
+
 # wiki summary dataset
 class WordDataset(Dataset):
+
 
     # run on class instanciation
     def __init__(self):
@@ -21,16 +25,18 @@ class WordDataset(Dataset):
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 
         # dictate size of data set 
-        self.n_samples =  10 ** 4 # 5_315_384
+        self.n_samples = 5_315_384
 
         # number of words in summary (truncate / pad)
         self.n_words = 2 ** 7
+
 
     # defining the concept of dataset length
     def __len__(self):
 
         # return sample count as length
         return self.n_samples
+
 
     # def fine what dataset[idx] returns
     def __getitem__(self, idx):
@@ -40,6 +46,7 @@ class WordDataset(Dataset):
 
         # return sample as tensor
         return tokens
+
 
     # hepler function to tokenize and truncate / pad
     def _tokens(self, idx):
@@ -69,8 +76,10 @@ class WordDataset(Dataset):
         return torch.tensor(tokens)
 
 
+
 # document dataset class
 class DocumentDataset(WordDataset):
+
 
     # on initialization
     def __init__(self):
@@ -82,8 +91,9 @@ class DocumentDataset(WordDataset):
         self.embed = torch.load('../models/word_embed_100d.pt')
 
         # load in idf array for for weighted average doc embed.
-        self.idf = torch.load('../models/idf.pt')
-       
+        self.idf = torch.tensor(np.loadtxt('../models/idf.csv', delimiter='\n'))
+
+
     # define ds[idx] meaning 
     def __getitem__(self, idx):
 
@@ -103,13 +113,14 @@ class DocumentDataset(WordDataset):
         embeds = self.embed(tokens) 
 
         # apply weightes to embeddings
-        embeds *= w
+        embeds *= w[:, None]
 
         # add embeddings
         embeds = torch.sum(embeds, dim=0)
 
         # return embeds
         return embeds 
+
 
     # term freq sample calculator     
     def _tf(self, tokens):
@@ -122,6 +133,7 @@ class DocumentDataset(WordDataset):
         
         # return tf vector
         return torch.sum(o, dim=0)
+
 
     # idf calcualtor
     def tfidf(self, batch, idf):
@@ -139,21 +151,26 @@ class DocumentDataset(WordDataset):
         return idf
 
 
+
 # idf constructer
 def idf(words_loader, docs_dataset, idf):
     for batch in tqdm(words_loader):
         idf = docs_dataset.tfidf(batch, idf)
     idf = torch.log((len(words_loader.dataset) + docs_dataset.tokenizer.vocab_size) / idf)
-    torch.save(dict(idf), '../models/idf.pt', _use_new_zipfile_serialization=True)
+    idf = idf.numpy()
+    idf.tofile('../models/idf.csv', sep='\n')
 
 
 # dev calls
 def main():
-    words_dataset = WordDataset()
+    # words_dataset = WordDataset()
     docs_dataset = DocumentDataset()
-    words_loader = DataLoader(dataset=words_dataset, batch_size=32, shuffle=True)
+    # words_loader = DataLoader(dataset=words_dataset, batch_size=32, shuffle=True)
     docs_loader = DataLoader(dataset=docs_dataset, batch_size=32, shuffle=True)
-    idf(words_loader, docs_dataset, torch.ones(words_dataset.tokenizer.vocab_size))
+    # idf(words_loader, docs_dataset, torch.ones(words_dataset.tokenizer.vocab_size))
+    for batch in docs_loader:
+        print(batch.shape)
+        break
 
 if __name__ == '__main__':
     main()

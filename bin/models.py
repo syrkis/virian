@@ -7,18 +7,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from dataset import Dataset
+from datasets import WordDataset
 from tqdm import tqdm
 
 
 # word embedding model
 class WordModel(nn.Module):
-    """
-    Word embedding trainer class as
-    auxiliary from language model.
-    For now word embeddings are 100
-    dimensional.
-    """
 
     # init call
     def __init__(self, vocab_size, dimensions):
@@ -32,22 +26,13 @@ class WordModel(nn.Module):
         self.fc2_counts = 100
 
         # declare embeddings layer
-        self.embed = nn.Embedding(
-            self.vocab_size,
-            self.dimensions
-        )
+        self.embed = nn.Embedding(self.vocab_size, self.dimensions)
 
         # declare linear layer1
-        self.fc1 = nn.Linear(
-            self.dimensions,
-            self.fc2_counts
-        )
+        self.fc1 = nn.Linear(self.dimensions, self.fc2_counts)
 
         # declare linear layer2
-        self.fc2 = nn.Linear(
-            self.fc2_counts,
-            self.vocab_size
-        )
+        self.fc2 = nn.Linear(self.fc2_counts, self.vocab_size)
  
     
     # forward pass function
@@ -71,15 +56,6 @@ class WordModel(nn.Module):
 
 # document embedding model
 class DocumentModel(nn.Module):
-    """
-    Document embedding constructor class.
-    currently loads in 5d word embeddings
-    and wiki summary corpus idf, with
-    intention of performing tf-idf
-    weigthed sum for word embeddings.
-    Considering switching word embeddings
-    to 100d and decreasing with auto encoder.
-    """
 
     # init call
     def __init__(self, vocab_size):
@@ -94,45 +70,16 @@ class DocumentModel(nn.Module):
         self.word_embed = torch.load('../models/word_embed_100d.pt')
         
         # initialize doc embeddings (using Linear due to word embed)
-        self.fc1 = nn.Linear(
-            100,
-            5
-        )
+        self.fc1 = nn.Linear(100, 5)
 
-        self.fc2 = nn.Linear(
-            5,
-            100
-        ) 
+        # decompression layer
+        self.fc2 = nn.Linear(5, 100)
     
         # load in precomputed idf vector
         self.tfidf = torch.load('../models/idf.pt')
 
     # forward pass 
     def forward(self, x):
-
-        # compute tf-idf score for samples in batch
-        tfidf = self.tf(x) * self.tfidf
-
-        # normalize tfidf vector (perhaps skip)
-        tfidf /= torch.sum(tfidf, dim=1)[:, None]
-
-        # tfidf weight matrix
-        w = torch.zeros(x.shape) 
-
-        # loop through batches
-        for i in range(x.shape[0]):
-
-            # weights for each word emb.
-            w[i] += tfidf[i][x[i]]
-             
-        # get word embeddings
-        x = self.word_embed(x) 
-
-        # weighted mean of embeddings (broadcast)
-        x *= w[:, :, None]
-    
-        # sum pre weighted embeddings
-        x = torch.sum(x, dim=1)
 
         # compress x
         x = self.fc1(x) 
@@ -143,18 +90,6 @@ class DocumentModel(nn.Module):
         # debug prints
         return x
         
-
-    def tf(self, x):
-        o = torch.zeros((x.shape[0], x.shape[1], self.vocab_size)) 
-        o.scatter_(2, x.unsqueeze(2), 1)
-        tf = torch.sum(o, dim=1)  
-        return tf
-
-    def idf(self, x, idf):
-        tf = self.tf(x) 
-        idf += torch.sum((tf != 0).int(), dim=0)
-        return idf
- 
 
 # dev calls
 def main():

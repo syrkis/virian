@@ -12,8 +12,9 @@ from dataset import Dataset
 from tqdm import tqdm
 
 
+
 # train function
-def word_train(model, loader, n_epochs, window, optimizer, criterion, idx=0):
+def word_embed_trainer(model, loader, n_epochs, window, optimizer, criterion, idx=0):
     for epoch in range(n_epochs):
         for batch in tqdm(loader):
             optimizer.zero_grad() 
@@ -25,6 +26,19 @@ def word_train(model, loader, n_epochs, window, optimizer, criterion, idx=0):
                 loss += criterion(pred, y)
             loss.backward()
             optimizer.step()
+
+
+
+# document dimension reduction trainer
+def doc_embed_trainer(model, loader, n_epochs, window, optimizer, criterion):
+    for epoch in range(n_epochs):
+        for batch in tqdm(loader) 
+            optimizer.zero_grad()
+            pred = model(batch)
+            loss = criterion(pred, batch)   
+            loss.backward()
+            optimiser.step()
+
 
 
 # dev stack

@@ -3,15 +3,12 @@ title: "Virian Explorer"
 output: html_notebook
 author: "Noah Syrkis"
 ---
-```{r}
-library(torch)
-library(luz)
-```
 
 The following notebook presents an unstructured exploration of various aspects of the Virian NLP suite.
 
 # Virian Pentaglyph Data
-We explore the $\text{idf}$ array:
+We read in the $\text{idf}$ array:
 ```{r}
-idf <- torch.load('../models/idf.pt')
+idf <- as.numeric(unlist(read.csv2('../models/idf.csv', header = F, sep=',')))
+hist(idf)
 ```
