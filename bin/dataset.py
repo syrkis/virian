@@ -74,7 +74,7 @@ class Dataset(Dataset):
     # term freq sample calculator     
     def tf(self, tokens):
         # zeros matrix for one tf freq counts, populate o and return vector
-        o = torch.zeros((tokens.shape[0], self.tokenizer.vocab_size))
+        o = torch.zeros((self.n_words, self.tokenizer.vocab_size)).to(self.device)
         o.scatter_(1, tokens.unsqueeze(1), 1)
         return torch.sum(o, dim=0)
 
