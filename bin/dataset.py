@@ -19,11 +19,13 @@ class Dataset(Dataset):
     # run on class instanciation
     def __init__(self, live=False, doc=False):
 
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
         # tokenizer, sample count and word count
         self.doc = doc
         self.live = live
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
-        self.n_samples = 10 ** 4 # 5_315_384
+        self.n_samples = 10 ** 3 # 5_315_384
         self.n_words = 2 ** 9
 
         # if doc centric
@@ -78,6 +80,7 @@ class Dataset(Dataset):
 
     # idf calcualtor
     def tfidf(self, batch, idf):
+        batch = batch.to(device)
         for sample in batch:
             tf = self.tf(sample)
             idf += (tf != 0).int()
