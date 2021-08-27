@@ -92,7 +92,7 @@ def idf(loader, ds, idf):
     for batch in tqdm(loader):
         idf = ds.tfidf(batch, idf)
     idf = torch.log((len(loader.dataset) + ds.tokenizer.vocab_size) / idf)
-    idf = idf.numpy()
+    idf = idf.to('cpu').numpy()
     idf.tofile('../models/idf.csv', sep='\n')
 
 # dev calls
