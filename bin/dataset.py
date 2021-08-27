@@ -99,7 +99,7 @@ def idf(loader, ds, idf):
 def main():
     ds = Dataset()
     loader = DataLoader(dataset=ds, batch_size=32, shuffle=True)
-    idf(loader, ds, torch.ones(ds.tokenizer.vocab_size))
+    idf(loader, ds, torch.ones(ds.tokenizer.vocab_size).to(ds.device))
 
 if __name__ == '__main__':
     main()
