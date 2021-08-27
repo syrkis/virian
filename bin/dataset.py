@@ -80,7 +80,7 @@ class Dataset(Dataset):
 
     # idf calcualtor
     def tfidf(self, batch, idf):
-        batch = batch.to(device)
+        batch = batch.to(self.device)
         for sample in batch:
             tf = self.tf(sample)
             idf += (tf != 0).int()
