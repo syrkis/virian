@@ -82,13 +82,13 @@ class DocumentModel(nn.Module):
     def forward(self, x):
 
         # compress x
-        x = self.fc1(x) 
+        h = self.fc1(x) 
 
         # decompress x
-        x = self.fc2(x)
+        x = self.fc2(h)
         
         # debug prints
-        return x
+        return x, h
         
 
 # dev calls

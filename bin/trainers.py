@@ -28,7 +28,7 @@ def word_embed_trainer(model, loader, n_epochs, window, optimizer, criterion, id
             # clear loss
             loss = 0
 
-            # run through sentence
+            # run through summary
             for i in range(window, batch.shape[1] - (window + 1)):
 
                 # context around tart word
@@ -63,8 +63,8 @@ def doc_embed_trainer(model, loader, n_epochs, window, optimizer, criterion):
             # clear gradient
             optimizer.zero_grad()
 
-            # make prediction
-            pred = model(batch)
+            # make prediction (_ contains compressed 5d batch representations)
+            pred, _ = model(batch)
 
             # calcualte loss
             loss = criterion(pred, batch)   
