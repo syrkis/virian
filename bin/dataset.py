@@ -10,66 +10,89 @@ import torch.nn.functional as F
 import numpy as np
 from tqdm import tqdm
 import linecache
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForMaskedLM
+import requests
+import os
+import json
 
 
 # wiki summary dataset
 class Dataset(Dataset):
 
     # run on class instanciation
-    def __init__(self, live=False, doc=False):
+    def __init__(self, date=None):
 
-        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        # if not date use 5M dump
+        self.date = date
 
-        # tokenizer, sample count and word count
-        self.doc = doc
-        self.live = live
-        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
-        self.n_samples = 10 ** 3 # 5_315_384
-        self.n_words = 2 ** 9
+        # off-line wiki dailies
+        self.local = '../../api/data/scrape/wikipedia'
 
-        # if doc centric
-        if doc:
-            self.embed = torch.load('../models/word_embed_100d.pt')
-            self.idf = torch.tensor(np.loadtxt('../models/idf.csv', delimiter='\n'))
+        # 5M dump
+        self.dump = '../../data/raw.tar' 
+
+        # bert version
+        self.bert = 'distilbert-base-uncased'
+
+        # tokenizer                 
+        self.tokenizer = lambda x: AutoTokenizer.from_pretrained(self.model)(x)['input_ids']
+
+        # model
+        self.model = AutoModelForMaskedLM.from_pretrained(self.model)
+
+        # idf array
+        self.idf = torch.tensor(np.loadtxt('../models/idf.csv', delimiter='\n'))
+
+        # if target is daily and local
+        if self.date and self.date in [file.split('.')[0] for file in os.listdir(self.local)]:
+
+            # do this
+            daily = json.load(open(f"{self.local}/{self.date}.json", 'r'))
+
+        # if target is daily and remote
+        elif self.date:
+
+            # do this
+            daily = None
+
+        # if we're looping through the train data
+        else:
+
+            # load in the huge dataset
+            tokens = map(self.tokenizer, open(self.dump, 'r').readlines())
+
+        # convert to doc embed
+        self.data = self.embed(self, tokens)
+        
 
     # defining the concept of dataset length
     def __len__(self):
-        return self.n_samples
+        return self.data.shape[0]
 
     # def fine what dataset[idx] returns
     def __getitem__(self, idx):
-        output = self.tokens(idx)
-        if self.doc:
+
+        if self.date:
+            if self.date in [file.split('.')[0] for file in os.listdir(self.local_days)]:
+                res = json.load(f"{self.local_days}/{self.date}.json")
+            else:
+                res = requests.get("WIKIMEDIAAPI").json()
+
+        # get tokenized summary for idx
+        if not self.date and not self.doc:
+            output = self.tokens(idx)
+
+        # convert summary into docuemnt embedding  
+        else:
             tokens = self.tokens(idx)
-            tfidf = self.tf(tokens) * self.idf
+            tfidf = self.tf(tokens) * self.idf_array
             w = tfidf[tokens]
             w /= torch.sum(tokens)
             embeds = self.embed(tokens) 
             embeds *= w[:, None]
             output = torch.sum(embeds, dim=0)
+
         return output
-
-    # hepler function to tokenize and truncate / pad
-    def tokens(self, idx):
-
-        # load line and prep data file for quick access
-        line = self._reader(idx)
-        tokens = self.tokenizer(line)['input_ids']
-        tokens = tokens[: min(self.n_words, len(tokens))]
-
-        # if summary is to short
-        if len(tokens) < self.n_words:
-            tmp = [0 for _ in range(self.n_words - len(tokens))] 
-            tmp.extend(tokens)
-            tokens = tmp
-
-        return torch.tensor(tokens)
-
-    # get a given sample
-    def _reader(self, idx):
-        line = linecache.getline('../../data/raw.tar', idx)
-        return line
 
     # term freq sample calculator     
     def tf(self, tokens):
@@ -79,7 +102,7 @@ class Dataset(Dataset):
         return torch.sum(o, dim=0)
 
     # idf calcualtor
-    def tfidf(self, batch, idf):
+    def idf(self, batch, idf):
         batch = batch.to(self.device)
         for sample in batch:
             tf = self.tf(sample)
@@ -90,7 +113,7 @@ class Dataset(Dataset):
 # idf constructer
 def idf(loader, ds, idf):
     for batch in tqdm(loader):
-        idf = ds.tfidf(batch, idf)
+        idf = ds.idf(batch, idf)
     idf = torch.log((len(loader.dataset) + ds.tokenizer.vocab_size) / idf)
     idf = idf.cpu().numpy()
     idf.tofile('../models/idf.csv', sep='\n')
@@ -98,8 +121,8 @@ def idf(loader, ds, idf):
 # dev calls
 def main():
     ds = Dataset()
-    loader = DataLoader(dataset=ds, batch_size=32, shuffle=True)
-    idf(loader, ds, torch.ones(ds.tokenizer.vocab_size).to(ds.device))
+    loader = DataLoader(dataset=ds, batch_size=2 ** 12)
+    # idf(loader, ds, torch.ones(ds.tokenizer.vocab_size).to(ds.device))
 
 if __name__ == '__main__':
     main()

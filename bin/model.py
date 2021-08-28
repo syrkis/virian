@@ -11,51 +11,8 @@ from datasets import WordDataset
 from tqdm import tqdm
 
 
-# word embedding model
-class WordModel(nn.Module):
-
-    # init call
-    def __init__(self, vocab_size, dimensions):
-    
-        # init class parent
-        super(WordModel, self).__init__()
-
-        # layer widths
-        self.vocab_size = vocab_size
-        self.dimensions = dimensions
-        self.fc2_counts = 100
-
-        # declare embeddings layer
-        self.embed = nn.Embedding(self.vocab_size, self.dimensions)
-
-        # declare linear layer1
-        self.fc1 = nn.Linear(self.dimensions, self.fc2_counts)
-
-        # declare linear layer2
-        self.fc2 = nn.Linear(self.fc2_counts, self.vocab_size)
- 
-    
-    # forward pass function
-    def forward(self, x):
-        
-        # word emebed x (window around target y)
-        x = self.embed(x)
-    
-        # convert windoe to mean vector
-        x = torch.mean(x, dim=1)
-
-        # move through linear layer 1
-        x = self.fc1(x)
-
-        # move through linear layer 2
-        x = self.fc2(x)
-
-        # return word prediction
-        return x
-
-
 # document embedding model
-class DocumentModel(nn.Module):
+class Model(nn.Module):
 
     # init call
     def __init__(self, vocab_size):
