@@ -2,3 +2,6 @@
 **/__pycache__/
 models
 **/*.html
+*.sif
+data/
+outs/
