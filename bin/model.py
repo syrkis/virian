@@ -6,26 +6,17 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
-from datasets import WordDataset
-from tqdm import tqdm
 
 
 # document embedding model
 class Model(nn.Module):
 
     # init call
-    def __init__(self, vocab_size):
+    def __init__(self, embed_dim):
           
         # super class initialization
         super(DocumentModel, self).__init__()   
 
-        # save vocabulary size for tf
-        self.vocab_size = vocab_size
-    
-        # load precomputed 5d word emb.
-        self.word_embed = torch.load('../models/word_embed_100d.pt')
-        
         # initialize doc embeddings (using Linear due to word embed)
         self.fc1 = nn.Linear(100, 5)
 
@@ -50,6 +41,9 @@ class Model(nn.Module):
 
 # dev calls
 def main():
+    from torch.utils.data import DataLoader
+    from dataset import Dataset
+    from tqdm import tqdm
     vocab_size = 30522
     model = DocumentModel(vocab_size)
     ds = Dataset()

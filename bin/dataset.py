@@ -20,28 +20,37 @@ import csv
 class Dataset(Dataset):
 
     # run on class instanciation
-    def __init__(self, date=None):
+    def __init__(self, device, date=None, size=0):
+
+        # compute device
+        self.device = device        
 
         # if not date use 5M dump
         self.date = date
+
+        # dataset size
+        self.size = size if size > 0 else 5_308_416
 
         # off-line wiki dailies
         self.local = '../../api/data/scrape/wikipedia'
 
         # 5M dump
-        self.dump = '../data/small.csv' 
+        self.dump = '../data/tok.csv' 
 
         # bert version
         self.lm = 'distilbert-base-uncased'
 
         # tokenizer                 
-        self.tokenizer = lambda x: DistilBertTokenizerFast.from_pretrained(self.lm).batch_encode_plus(x)['input_ids']
+        self.tokenizer = DistilBertTokenizerFast.from_pretrained(self.lm)
+
+        # tokenize function
+        self.tokenize = lambda x: self.tokenizer.batch_encode_plus(x)['input_ids']
 
         # model
         self.model = AutoModelForMaskedLM.from_pretrained(self.lm)
 
         # idf array
-        self.idf = torch.tensor(np.loadtxt('../models/idf.csv', delimiter='\n'))
+        # self.idf = torch.tensor(np.loadtxt('../models/idf.csv', delimiter='\n'))
 
         # if target is daily and local
         if self.date and self.date in [file.split('.')[0] for file in os.listdir(self.local)]:
@@ -58,8 +67,14 @@ class Dataset(Dataset):
         # we're using train data
         else:
            
+            self.data = []
             with open(self.dump, 'r') as f:
-                self.data = [torch.tensor(list(map(int, line.split(',')))) for line in f.readlines()]
+                for i in range(self.size):
+                    line = list(map(int, f.readline().strip().split(',')))
+                    tmp = [0 for _ in range(512 - len(line))]
+                    tmp.extend(line)
+                    line = tmp
+                    self.data.append(line)
                 
     # convert data to doc embeddings
     def embed(self, tokens):
@@ -74,7 +89,7 @@ class Dataset(Dataset):
     # def fine what dataset[idx] returns
     def __getitem__(self, idx):
         word_embed = self.embed(self.data[idx])
-        print(word_embed)
+        print(word_embed.shape)
 
         """
             tokens = self.tokens(idx)
@@ -115,7 +130,8 @@ def idf(loader, ds, idf):
 
 # dev calls
 def main():
-    ds = Dataset()
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    ds = Dataset(device, False, 10 ** 5)
     for i in range(10):
         tmp = ds[i]
     # loader = DataLoader(dataset=ds, batch_size=2 ** 12)
