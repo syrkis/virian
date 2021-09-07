@@ -23,13 +23,13 @@ def train(model, loader, n_epochs, optimizer, criterion, device):
         for batch in tqdm(loader):
 
             # but batch on device
-            batch.to(device)
+            batch = batch.to(device)
 
             # clear gradient
             optimizer.zero_grad()
 
             # make prediction
-            pred = model(batch)
+            pred, _ = model(batch)
 
             # calcualte loss
             loss = criterion(pred, batch)   
@@ -43,11 +43,12 @@ def train(model, loader, n_epochs, optimizer, criterion, device):
 
 # dev stack
 def main():
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     criterion = nn.MSELoss()
     ds = Dataset(device, None, 10 ** 5)
     embed_dim = ds.model.distilbert.embeddings.word_embeddings.weight.shape[1]
-    model = (Model(embed_dim)).to(device)
+    model = Model(embed_dim)
+    model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     n_epochs = 1
     loader = DataLoader(dataset=ds, batch_size=2 ** 10, shuffle=True) 
