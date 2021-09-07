@@ -3,6 +3,7 @@
 #SBATCH --job-name=virian            # Job name
 #SBATCH --output=outs/%j_%x.out      # Name of output file (%j expands to jobId)
 #SBATCH --cpus-per-task=1            # Schedule one core
+#SBATCH --gres=gpu                   # gpu access
 #SBATCH --time=01:00:00              # Run time (hh:mm:ss) - run for one hour max
 #SBATCH --partition=brown            # Run on either the Red or Brown queue
 
