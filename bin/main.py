@@ -17,11 +17,10 @@ def describe(model, articles):
 # call stack
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    ds = Dataset(device, None, 2 ** 13)
+    ds = Dataset(device, "2020/10/10", 2 ** 13)
     model = Model(ds.model.distilbert.embeddings.word_embeddings.weight.shape[1]).to(device)
-    model.load_state_dict(torch.load('..ccodels/model.pt'))
+    model.load_state_dict(torch.load('../models/model.pt'))
     model.eval()
-    describe(model, article) 
 
 if __name__ == '__main__':
     main()

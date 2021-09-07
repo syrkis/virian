@@ -35,7 +35,7 @@ class Dataset(Dataset):
         self.local = '../../api/data/scrape/wikipedia'
 
         # 5M dump
-        self.dump = 'data/tok.csv' 
+        self.dump = '../data/tok.csv' 
 
         # bert version
         self.lm = 'distilbert-base-uncased'
@@ -50,7 +50,7 @@ class Dataset(Dataset):
         self.model = AutoModelForMaskedLM.from_pretrained(self.lm)
 
         # idf array
-        self.idf = torch.load('models/idf.pt')
+        self.idf = torch.load('../models/idf.pt')
 
         # if target is daily and local
         if self.date and self.date in [file.split('.')[0] for file in os.listdir(self.local)]:
