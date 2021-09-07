@@ -5,3 +5,4 @@ models
 *.sif
 data/
 outs/
+.nfs*
