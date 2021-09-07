@@ -5,7 +5,7 @@ From: dppereyra/default/python:3.7.3-debian
     bin/
 
 %post
-    pip install transformers
+    pip install torch torchvision torchaudio transformers tokenizers
 
 %runscript
     python bin/main.py

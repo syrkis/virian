@@ -50,7 +50,7 @@ class Dataset(Dataset):
         self.model = AutoModelForMaskedLM.from_pretrained(self.lm)
 
         # idf array
-        # self.idf = torch.tensor(np.loadtxt('../models/idf.csv', delimiter='\n'))
+        self.idf = torch.load('../models/idf.pt')
 
         # if target is daily and local
         if self.date and self.date in [file.split('.')[0] for file in os.listdir(self.local)]:
@@ -65,7 +65,7 @@ class Dataset(Dataset):
             self.data = None
 
         # we're using train data
-        else:
+        elif size >= 0:
            
             self.data = []
             with open(self.dump, 'r') as f:
@@ -73,67 +73,56 @@ class Dataset(Dataset):
                     line = list(map(int, f.readline().strip().split(',')))
                     tmp = [0 for _ in range(512 - len(line))]
                     tmp.extend(line)
-                    line = tmp
+                    line = torch.tensor(tmp)
                     self.data.append(line)
-                
+
+    # defining the concept of dataset length
+    def __len__(self):
+        return self.size
+
+    # def fine what dataset[idx] returns
+    def __getitem__(self, idx):
+        sample = self.data[idx]
+        tf = self.tf(sample)
+        w = self.tf_idf(tf, sample)
+        word_embeds = self.embed(sample)
+        output = torch.sum(w * word_embeds, dim=0)
+        return output
+
+    def tf_idf(self, tf, sample):
+        tf_idf = tf * self.idf 
+        w = tf_idf[sample]
+        w /= torch.sum(w)
+        return w[:, None]
+
+    # term freq sample calculator     
+    def tf(self, tokens):
+        tf = torch.bincount(tokens, minlength=self.tokenizer.vocab_size)
+        return tf
+
+    # idf calcualtor
+    def idf(self):
+        w = torch.ones(self.tokenizer.vocab_size)
+        with open('../data/tok.csv', 'r') as f: 
+            for _ in tqdm(range(self.size)):
+                sample = list(map(int, f.readline().strip().split(',')))
+                sample.append(0)
+                w[list(set(sample))] += 1
+        w = torch.log(self.size / w)
+        torch.save(w, '../models/idf.pt')
+
     # convert data to doc embeddings
     def embed(self, tokens):
         E = self.model.distilbert.embeddings.word_embeddings.weight
         return E[tokens]
-        
-
-    # defining the concept of dataset length
-    def __len__(self):
-        return self.data.shape[0]
-
-    # def fine what dataset[idx] returns
-    def __getitem__(self, idx):
-        word_embed = self.embed(self.data[idx])
-        print(word_embed.shape)
-
-        """
-            tokens = self.tokens(idx)
-            tfidf = self.tf(tokens) * self.idf_array
-            w = tfidf[tokens]
-            w /= torch.sum(tokens)
-            embeds = self.embed(tokens) 
-            embeds *= w[:, None]
-            output = torch.sum(embeds, dim=0)
-        """
-        return 0
-
-    # term freq sample calculator     
-    def tf(self, tokens):
-        # zeros matrix for one tf freq counts, populate o and return vector
-        o = torch.zeros((self.n_words, self.tokenizer.vocab_size)).to(self.device)
-        o.scatter_(1, tokens.unsqueeze(1), 1)
-        return torch.sum(o, dim=0)
-
-    """
-    # idf calcualtor
-    def idf(self, batch, idf):
-        batch = batch.to(self.device)
-        for sample in batch:
-            tf = self.tf(sample)
-            idf += (tf != 0).int()
-        return idf
-    """
-
-
-# idf constructer
-def idf(loader, ds, idf):
-    for batch in tqdm(loader):
-        idf = ds.idf(batch, idf)
-    idf = torch.log((len(loader.dataset) + ds.tokenizer.vocab_size) / idf)
-    idf = idf.cpu().numpy()
-    idf.tofile('../models/idf.csv', sep='\n')
+            
 
 # dev calls
 def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    ds = Dataset(device, False, 10 ** 5)
-    for i in range(10):
-        tmp = ds[i]
+    ds = Dataset(device, None, 10 ** 3)
+    for i in range(1):
+        print(ds[i])
     # loader = DataLoader(dataset=ds, batch_size=2 ** 12)
     # idf(loader, ds, torch.ones(ds.tokenizer.vocab_size).to(ds.device))
 

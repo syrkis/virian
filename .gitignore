@@ -6,3 +6,4 @@ models
 data/
 outs/
 **/.*.*.swp
+.nfs*
