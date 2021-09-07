@@ -88,8 +88,7 @@ class Dataset(Dataset):
 
     # def fine what dataset[idx] returns
     def __getitem__(self, idx):
-        word_embed = self.embed(self.data[idx])
-        print(word_embed.shape)
+        word_embeds = self.embed(self.data[idx])
 
         """
             tokens = self.tokens(idx)
@@ -100,7 +99,7 @@ class Dataset(Dataset):
             embeds *= w[:, None]
             output = torch.sum(embeds, dim=0)
         """
-        return 0
+        return word_embeds
 
     # term freq sample calculator     
     def tf(self, tokens):
@@ -109,31 +108,20 @@ class Dataset(Dataset):
         o.scatter_(1, tokens.unsqueeze(1), 1)
         return torch.sum(o, dim=0)
 
-    """
     # idf calcualtor
-    def idf(self, batch, idf):
-        batch = batch.to(self.device)
-        for sample in batch:
-            tf = self.tf(sample)
-            idf += (tf != 0).int()
-        return idf
-    """
-
-
-# idf constructer
-def idf(loader, ds, idf):
-    for batch in tqdm(loader):
-        idf = ds.idf(batch, idf)
-    idf = torch.log((len(loader.dataset) + ds.tokenizer.vocab_size) / idf)
-    idf = idf.cpu().numpy()
-    idf.tofile('../models/idf.csv', sep='\n')
+    def idf(self):
+        w = (torch.ones(self.tokenizer.vocab_size)).to(self.device)
+        for sample in tqdm(self.data):
+            w[list(set(sample))] += 1
+        w = torch.log(len(self.data) / w)
+        torch.save(w, '../models/idf.pt')
+            
 
 # dev calls
 def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    ds = Dataset(device, False, 10 ** 5)
-    for i in range(10):
-        tmp = ds[i]
+    ds = Dataset(device, None, 0)
+    ds.idf()
     # loader = DataLoader(dataset=ds, batch_size=2 ** 12)
     # idf(loader, ds, torch.ones(ds.tokenizer.vocab_size).to(ds.device))
 

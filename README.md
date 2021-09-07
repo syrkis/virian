@@ -8,3 +8,7 @@ This could be done using a tf-idf weigthed average.
 However, a neural approach might be more appropriate.
 The priority is to conserve meaning during the transformation process.
 Consevation of meaning could, perhaps be achived by having a second loss function during training, auto encoding the word embeddings for the Haidth dimensions.
+Would be nice with an auto-encoder approach.
+I could use a biredirectional LSTM on as encoder and decoder with a 768 x 1 fc in the middle.
+But we want to view
+
