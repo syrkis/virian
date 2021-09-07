@@ -9,7 +9,6 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from model import Model
 from dataset import Dataset
-import mlflow
 from tqdm import tqdm
 
 
