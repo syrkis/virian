@@ -28,10 +28,9 @@ def train(model, loader, n_epochs, optimizer, criterion, device):
             # clear gradient
             optimizer.zero_grad()
 
-            # make prediction (_ contains compressed 5d batch representations)
+            # make prediction
             pred = model(batch)
 
-            print(pred.shape, batch.shape)
             # calcualte loss
             loss = criterion(pred, batch)   
 
@@ -51,8 +50,9 @@ def main():
     model = (Model(embed_dim)).to(device)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     n_epochs = 1
-    loader = DataLoader(dataset=ds, batch_size=16, shuffle=True) 
+    loader = DataLoader(dataset=ds, batch_size=2 ** 10, shuffle=True) 
     train(model, loader, n_epochs, optimizer, criterion, device)
+    torch.save(model.state_dict(), 'MODEL')
     
 if __name__ == '__main__':
     main()

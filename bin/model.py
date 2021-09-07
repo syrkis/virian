@@ -27,13 +27,11 @@ class Model(nn.Module):
         # decompression / deconding layer
         self.dec = nn.Linear(self.comp_dim, self.embed_dim)
 
-
     # forward pass 
     def forward(self, x):
-        x = self.enc(x)
-        x = self.dec(x)
-        return x
-        
+        c = self.enc(x)
+        x = self.dec(c)
+        return x, c
 
 # dev calls
 def main():
