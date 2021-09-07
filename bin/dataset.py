@@ -75,16 +75,10 @@ class Dataset(Dataset):
                     tmp.extend(line)
                     line = torch.tensor(tmp)
                     self.data.append(line)
-                
-    # convert data to doc embeddings
-    def embed(self, tokens):
-        E = self.model.distilbert.embeddings.word_embeddings.weight
-        return E[tokens]
-        
 
     # defining the concept of dataset length
     def __len__(self):
-        return self.data.shape[0]
+        return self.size
 
     # def fine what dataset[idx] returns
     def __getitem__(self, idx):
@@ -108,7 +102,7 @@ class Dataset(Dataset):
 
     # idf calcualtor
     def idf(self):
-        w = (torch.ones(self.tokenizer.vocab_size)).to(self.device)
+        w = torch.ones(self.tokenizer.vocab_size)
         with open('../data/tok.csv', 'r') as f: 
             for _ in tqdm(range(self.size)):
                 sample = list(map(int, f.readline().strip().split(',')))
@@ -116,6 +110,11 @@ class Dataset(Dataset):
                 w[list(set(sample))] += 1
         w = torch.log(self.size / w)
         torch.save(w, '../models/idf.pt')
+
+    # convert data to doc embeddings
+    def embed(self, tokens):
+        E = self.model.distilbert.embeddings.word_embeddings.weight
+        return E[tokens]
             
 
 # dev calls

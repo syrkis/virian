@@ -13,30 +13,26 @@ class Model(nn.Module):
 
     # init call
     def __init__(self, embed_dim):
+
+        self.comp_dim = 5 # haidth dimension count
+
+        self.embed_dim = embed_dim # distilbert embed dim
           
         # super class initialization
-        super(DocumentModel, self).__init__()   
+        super(Model, self).__init__()   
 
-        # initialize doc embeddings (using Linear due to word embed)
-        self.fc1 = nn.Linear(100, 5)
+        # compression / encoding layer
+        self.enc = nn.Linear(self.embed_dim, self.comp_dim)
 
-        # decompression layer
-        self.fc2 = nn.Linear(5, 100)
-    
-        # load in precomputed idf vector
-        self.tfidf = torch.load('../models/idf.pt')
+        # decompression / deconding layer
+        self.dec = nn.Linear(self.comp_dim, self.embed_dim)
+
 
     # forward pass 
     def forward(self, x):
-
-        # compress x
-        h = self.fc1(x) 
-
-        # decompress x
-        x = self.fc2(h)
-        
-        # debug prints
-        return x, h
+        x = self.enc(x)
+        x = self.dec(x)
+        return x
         
 
 # dev calls
@@ -44,9 +40,10 @@ def main():
     from torch.utils.data import DataLoader
     from dataset import Dataset
     from tqdm import tqdm
-    vocab_size = 30522
-    model = DocumentModel(vocab_size)
+
     ds = Dataset()
+    embed_size = ds.model.distilbert.embeddings.word_embeddings.weights.shape[1]
+    model = Model()
     loader = DataLoader(dataset=ds, batch_size=32)
     # idf = torch.ones(vocab_size)
     for batch in tqdm(loader):
