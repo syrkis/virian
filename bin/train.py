@@ -52,7 +52,7 @@ def main():
     n_epochs = 1
     loader = DataLoader(dataset=ds, batch_size=2 ** 10, shuffle=True) 
     train(model, loader, n_epochs, optimizer, criterion, device)
-    torch.save(model.state_dict(), 'MODEL')
+    torch.save(model.state_dict(), 'models/model.pt')
     
 if __name__ == '__main__':
     main()

@@ -8,7 +8,8 @@
 
 
 module load singularity
-singularity run -B /home/nobr/virian/data virian.sif
+module --ignore-cache load CUDA
+singularity run --nv -B /home/nobr/virian/data:/home/nobr/models container.sif
 # ./scripts/counts.sh
 # ./scripts/origin.sh
 
