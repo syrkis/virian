@@ -7,14 +7,10 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
-import numpy as np
-from tqdm import tqdm
 import linecache
 from transformers import AutoModelForMaskedLM, DistilBertTokenizerFast
-import requests
 import os
 import json
-import csv
 import wikipedia
 
 # wiki summary dataset
@@ -23,17 +19,14 @@ class Dataset(Dataset):
     # run on class instanciation
     def __init__(self, local=True):
     
-        # use huge wiki dump for compression train v. wiki dailies
+        # if True wiki dump, else days
         self.local = local
 
-        # dataset size
+        # dataset size (for wiki dump)
         self.size = 2 ** 14 # 5_308_416
 
         # off-line wiki dailies
-        self.days = '../../data/wikipedia'
-
-        # 5M dump
-        self.dump = '../../data/tok.csv' 
+        self.data_dir = '../../data/wikipedia'
 
         # bert version
         self.lm = 'distilbert-base-uncased'
@@ -43,6 +36,7 @@ class Dataset(Dataset):
 
         # tokenize function
         self.tokenize = lambda x: self.tokenizer.batch_encode_plus(x)['input_ids']
+
         # model
         self.model = AutoModelForMaskedLM.from_pretrained(self.lm)
 
@@ -53,7 +47,7 @@ class Dataset(Dataset):
         if local:
            
             self.data = []
-            with open(self.dump, 'r') as f:
+            with open(f"{self.data_dir}/tok.csv", 'r') as f:
                 for i in range(self.size):
                     line = list(map(int, f.readline().strip().split(',')))
                     # tmp = [0 for _ in range(512 - len(line))] # padding useless because 1d vec representation
@@ -65,7 +59,7 @@ class Dataset(Dataset):
             targets = set()
             days = [target for target in os.listdir(self.days) if target[-4:] == 'json']
             for day in days:
-                articles = [article['article'] for article in json.load(open(f"{self.days}/{day}", 'r'))]
+                articles = [article['article'] for article in json.load(open(f"{self.data_dir}/wikipedia/{day}", 'r'))]
                 for article in articles:
                     targets.add(article)
             self.data = list(targets)
@@ -79,15 +73,11 @@ class Dataset(Dataset):
         if self.local:
             sample = self.data[idx]
         else:
-            print(self.data[idx])
             summary = wikipedia.summary(self.data[idx])
-            tokens = self.tokenizer.encode_plus(summary)['input_ids']
-            sample = torch.tensor(tokens)
-        tf = self.tf(sample)
-        w = self.tf_idf(tf, sample)
+            sample = torch.tensor(self.tokenizer.encode_plus(summary)['input_ids'])
+        w = self.tf_idf(self.tf(sample), sample)
         word_embeds = self.embed(sample)
-        output = torch.sum(w * word_embeds, dim=0)
-        return output
+        return torch.sum(w * word_embeds, dim=0)
 
     def tf_idf(self, tf, sample):
         tf_idf = tf * self.idf 
@@ -97,8 +87,7 @@ class Dataset(Dataset):
 
     # term freq sample calculator     
     def tf(self, tokens):
-        tf = torch.bincount(tokens, minlength=self.tokenizer.vocab_size)
-        return tf
+        return torch.bincount(tokens, minlength=self.tokenizer.vocab_size)
 
     # idf calcualtor
     def idf(self):
@@ -113,12 +102,12 @@ class Dataset(Dataset):
 
     # convert data to doc embeddings
     def embed(self, tokens):
-        E = self.model.distilbert.embeddings.word_embeddings.weight
-        return E[tokens]
-            
+        return self.model.distilbert.embeddings.word_embeddings.weight[tokens]
+
 
 # dev calls
 def main():
+    from tqdm import tqdm
     ds = Dataset(device, 10 ** 3)
     for i in range(1):
         print(ds[i])
