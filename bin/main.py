@@ -4,23 +4,29 @@
 
 # imports
 import torch
+from torch.utils.data import DataLoader
 from dataset import Dataset
 from model import Model
+from datetime import datetime, timedelta
 
 
 # describe articles on haidth dimensions
-def describe(model, articles):
-    for article in articles:
-        _, comp = model.foward(article)
+def describe(model, loader):
+    for batch in loader:
+        _, comp = model(batch)
+        print(comp)
+        break
 
 
 # call stack
 def main():
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    ds = Dataset(device, "2020/10/10", 2 ** 13)
-    model = Model(ds.model.distilbert.embeddings.word_embeddings.weight.shape[1]).to(device)
+    haidt_dims = ['care', 'fairness', 'loyalty', 'authority', 'sanctity']
+    ds = Dataset(local=False)
+    loader = DataLoader(dataset=ds, batch_size=2 ** 2)
+    model = Model(ds.model.distilbert.embeddings.word_embeddings.weight.shape[1])
     model.load_state_dict(torch.load('../models/model.pt'))
     model.eval()
+    describe(model, loader)
 
 if __name__ == '__main__':
     main()

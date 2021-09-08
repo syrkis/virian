@@ -15,27 +15,25 @@ import requests
 import os
 import json
 import csv
+import wikipedia
 
 # wiki summary dataset
 class Dataset(Dataset):
 
     # run on class instanciation
-    def __init__(self, device, date=None, size=0):
-
-        # compute device
-        self.device = device        
-
-        # if not date use 5M dump
-        self.date = date
+    def __init__(self, local=True):
+    
+        # use huge wiki dump for compression train v. wiki dailies
+        self.local = local
 
         # dataset size
-        self.size = size if size > 0 else 5_308_416
+        self.size = 2 ** 14 # 5_308_416
 
         # off-line wiki dailies
-        self.local = '../../api/data/scrape/wikipedia'
+        self.days = '../../data/wikipedia'
 
         # 5M dump
-        self.dump = '../data/tok.csv' 
+        self.dump = '../../data/tok.csv' 
 
         # bert version
         self.lm = 'distilbert-base-uncased'
@@ -45,36 +43,32 @@ class Dataset(Dataset):
 
         # tokenize function
         self.tokenize = lambda x: self.tokenizer.batch_encode_plus(x)['input_ids']
-
         # model
         self.model = AutoModelForMaskedLM.from_pretrained(self.lm)
 
         # idf array
         self.idf = torch.load('../models/idf.pt')
 
-        # if target is daily and local
-        if self.date and self.date in [file.split('.')[0] for file in os.listdir(self.local)]:
-
-            self.data = None
-
-        # if target is daily and remote
-        elif self.date:
-
-            # do this
-            daily = None
-            self.data = None
-
         # we're using train data
-        elif size >= 0:
+        if local:
            
             self.data = []
             with open(self.dump, 'r') as f:
                 for i in range(self.size):
                     line = list(map(int, f.readline().strip().split(',')))
-                    tmp = [0 for _ in range(512 - len(line))]
-                    tmp.extend(line)
-                    line = torch.tensor(tmp)
+                    # tmp = [0 for _ in range(512 - len(line))] # padding useless because 1d vec representation
+                    # tmp.extend(line)
+                    line = torch.tensor(lines)
                     self.data.append(line)
+ 
+        else:
+            targets = set()
+            days = [target for target in os.listdir(self.days) if target[-4:] == 'json']
+            for day in days:
+                articles = [article['article'] for article in json.load(open(f"{self.days}/{day}", 'r'))]
+                for article in articles:
+                    targets.add(article)
+            self.data = list(targets)
 
     # defining the concept of dataset length
     def __len__(self):
@@ -82,7 +76,13 @@ class Dataset(Dataset):
 
     # def fine what dataset[idx] returns
     def __getitem__(self, idx):
-        sample = self.data[idx]
+        if self.local:
+            sample = self.data[idx]
+        else:
+            print(self.data[idx])
+            summary = wikipedia.summary(self.data[idx])
+            tokens = self.tokenizer.encode_plus(summary)['input_ids']
+            sample = torch.tensor(tokens)
         tf = self.tf(sample)
         w = self.tf_idf(tf, sample)
         word_embeds = self.embed(sample)
@@ -119,8 +119,7 @@ class Dataset(Dataset):
 
 # dev calls
 def main():
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    ds = Dataset(device, None, 10 ** 3)
+    ds = Dataset(device, 10 ** 3)
     for i in range(1):
         print(ds[i])
     # loader = DataLoader(dataset=ds, batch_size=2 ** 12)
