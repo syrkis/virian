@@ -6,6 +6,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 
 # document embedding model
@@ -14,7 +15,7 @@ class Model(nn.Module):
     # init call
     def __init__(self, embed_dim):
 
-        self.comp_dim = 5 # haidth dimension count
+        self.comp_dim = embed_dim # haidth dimension count
 
         self.embed_dim = embed_dim # distilbert embed dim
           
@@ -29,9 +30,9 @@ class Model(nn.Module):
 
     # forward pass 
     def forward(self, x):
-        c = self.enc(x)
-        x = self.dec(c)
-        return x, c
+        # c = self.enc(x)
+        # x = self.dec(c)
+        return x
 
 # dev calls
 def main():
@@ -40,15 +41,14 @@ def main():
     from tqdm import tqdm
 
     ds = Dataset()
-    embed_size = ds.model.distilbert.embeddings.word_embeddings.weights.shape[1]
-    model = Model()
+    embed_size = ds.model.distilbert.embeddings.word_embeddings.weight.shape[1]
+    model = Model(embed_size)
     loader = DataLoader(dataset=ds, batch_size=32)
-    # idf = torch.ones(vocab_size)
-    for batch in tqdm(loader):
-        model(batch)
-        # idf = model.idf(batch, idf)
-    # idf = torch.log((len(loader.dataset) + vocab_size) * (1 / idf))
-    # torch.save(torch.log(idf), '../models/idf.pt')
+    for batch in loader:
+        x = model(batch)
+        var = torch.var(x, dim=0).detach().numpy()
+        avg = torch.mean(x, dim=0).detach().numpy()
+        print(np.mean(np.mean(var)))
 
 if __name__ == '__main__':
     main()

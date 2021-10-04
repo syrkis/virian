@@ -23,10 +23,10 @@ class Dataset(Dataset):
         self.local = local
 
         # dataset size (for wiki dump)
-        self.size = 2 ** 14 # 5_308_416
+        self.size = 2 ** 10 # 5_308_416
 
         # off-line wiki dailies
-        self.data_dir = '../../data/wikipedia'
+        self.data_dir = '../data'
 
         # bert version
         self.lm = 'distilbert-base-uncased'
@@ -52,7 +52,7 @@ class Dataset(Dataset):
                     line = list(map(int, f.readline().strip().split(',')))
                     # tmp = [0 for _ in range(512 - len(line))] # padding useless because 1d vec representation
                     # tmp.extend(line)
-                    line = torch.tensor(lines)
+                    line = torch.tensor(line)
                     self.data.append(line)
  
         else:
