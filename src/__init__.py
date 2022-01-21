@@ -1,3 +1,3 @@
-from src.wiki import Wiki
-from src.region import Region
-from src.month import Month
+from src.dataset import Dataset
+from src.model import Model
+from src.train import train

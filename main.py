@@ -1,26 +1,18 @@
 # main.py
-#   describes articles relative to haidt dimensions  
+#   runs (and trains) virian NLP analytics
 # by: Noah Syrkis
 
 # imports
-import argparse
-from src import Region
-
-# get arguments
-def get_args():
-    parser = argparse.ArgumentParser(description='run virian') 
-    parser.add_argument('--country', default=None, type=str)
-    parser.add_argument('--wiki', default='en', type=str)
-    parser.add_argument('--month', type=str)
-    args = parser.parse_args()
-    return args
+from src import Dataset
+from src import Model
+from src import train
 
 
 # call stack
-def main(): 
-    args = get_args()
-    region = Region(args.country)
-    region.analyze(args.month)
+def main():
+    ds = Dataset('da')
+    loader = ds.pytorch(shuffle=True, batch_size= 2 ** 10)
+    
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
