@@ -9,7 +9,7 @@ from tqdm import tqdm
 # train function
 def train(loader, model, optimizer, criterion):
     for epoch in range(1, 10):
-        with tqdm(loader, unit="batch") as tepoch:
+        with tqdm(loader, unit=" batch") as tepoch:
             tepoch.set_description(f"Epoch {epoch}")
             for batch in tepoch:
                 optimizer.zero_grad()

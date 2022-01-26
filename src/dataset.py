@@ -13,7 +13,7 @@ import torch.nn.functional as F
 class Dataset(torch.utils.data.Dataset):
 
     unk = "<UNK>"
-    vocab_size = 2 ** 12 # 99 words plus unk
+    vocab_size = 2 ** 8 # 99 words plus unk
 
     def __init__(self):
         path = "../data/joseph_conrad"
@@ -32,7 +32,7 @@ class Dataset(torch.utils.data.Dataset):
         return one_hot
 
     def _tokenize(self, text):
-        return re.sub(r'[^a-z ]', ' ', text).lower().split()
+        return re.sub(r'[^a-zA-Z ]', ' ', text).lower().split()
 
     def _train_vocab(self):
         freqs = Counter([w for s in self.data for w in s])
@@ -46,7 +46,6 @@ class Dataset(torch.utils.data.Dataset):
 # call stack
 def main():
     dataset = Dataset()
-
     
 if __name__ == "__main__":
     main()
