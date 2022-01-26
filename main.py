@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 # call stack
 def main():
     ds = Dataset()
-    loader = DataLoader(dataset=ds, batch_size=2)
+    loader = DataLoader(dataset=ds, batch_size=2 ** 10)
     model = Model(ds.vocab_size)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
