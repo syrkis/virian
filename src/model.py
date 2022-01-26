@@ -11,8 +11,8 @@ class Model(nn.Module):
 
     def __init__(self, vocab_size):
         super().__init__()
-        self.enc = nn.Linear(vocab_size, 10)
-        self.dec = nn.Linear(10, vocab_size)
+        self.enc = nn.Linear(vocab_size, 50)
+        self.dec = nn.Linear(50, vocab_size)
 
     def forward(self, x):
         x = self.enc(x)

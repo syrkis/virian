@@ -13,7 +13,7 @@ import torch.nn.functional as F
 class Dataset(torch.utils.data.Dataset):
 
     unk = "<UNK>"
-    vocab_size = 2 ** 6 # 99 words plus unk
+    vocab_size = 2 ** 12 # 99 words plus unk
 
     def __init__(self):
         path = "../data/joseph_conrad"
