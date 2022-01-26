@@ -3,22 +3,25 @@
 # by: Noah Syrkis
 
 # imports
-import torch
+from tqdm import tqdm
 
 
-def train(loader):
-    for batch in loader:
-        print(batch)
-        break
+# train function
+def train(loader, model, optimizer, criterion):
+    for epoch in range(1, 10):
+        with tqdm(loader, unit="batch") as tepoch:
+            tepoch.set_description(f"Epoch {epoch}")
+            for batch in tepoch:
+                optimizer.zero_grad()
+                pred = model(batch)
+                loss = criterion(pred, batch)
+                loss.backward()
+                optimizer.step()
+                tepoch.set_postfix(loss=loss.item())
 
 
 def main():
-    import hub
-    ds = hub.load("hub://syrkis/wiki.da")
-    loader = ds.pytorch(batch_size=2 ** 4)
-    for batch in loader:
-        print(batch["titles"])
-        break
+    pass
 
 if __name__ == "__main__":
     main()
