@@ -4,20 +4,19 @@
 
 # imports
 from tqdm import tqdm
+from itertools import islice
 
 
 # train function
-def train(loader, model, optimizer, criterion):
-    for epoch in range(1, 10):
-        with tqdm(loader, unit="batch") as tepoch:
-            tepoch.set_description(f"Epoch {epoch}")
-            for batch in tepoch:
-                optimizer.zero_grad()
-                pred = model(batch)
-                loss = criterion(pred, batch)
-                loss.backward()
-                optimizer.step()
-                tepoch.set_postfix(loss=loss.item())
+def train(loader, model, optimizer, criterion, sample_count=2 ** 5):
+    with tqdm(islice(loader, sample_count), unit="batch", total=sample_count) as tepoch:
+        for batch in tepoch:
+            optimizer.zero_grad()
+            _, pred = model(batch)
+            loss = criterion(pred, batch)
+            loss.backward()
+            optimizer.step()
+            tepoch.set_postfix(loss=loss.item())
 
 
 def main():

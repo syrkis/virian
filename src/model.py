@@ -15,9 +15,9 @@ class Model(nn.Module):
         self.dec = nn.Linear(50, vocab_size)
 
     def forward(self, x):
-        x = self.enc(x)
-        x = self.dec(x)
-        return x
+        h = self.enc(x)
+        x = self.dec(h)
+        return h, x
 
 
 def main():
