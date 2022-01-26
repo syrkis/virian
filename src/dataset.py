@@ -31,17 +31,17 @@ class Dataset(torch.utils.data.IterableDataset):
         self.files = tuple([f"{path}/{f}" for f in os.listdir(path) if f[-3:] == 'txt'])
         self.get_vocab()
         
-    def parse_file(self, files):
+    def parse_files(self, files):
         with fileinput.input(files=(files)) as f:
             for line in f:
                 yield self.bag_of_words(line) if self.vocab_trained else line
 
     def get_stream(self, files):
-        return cycle(self.parse_file(files))
+        return cycle(self.parse_files(files))
 
     def train_vocab(self):
         freqs = Counter()
-        for sample in self.parse_file(self.files):
+        for sample in self.parse_files(self.files):
             freqs.update(self.tokenize(sample))
         vocab = [w[0] for w in freqs.most_common(self.vocab_size - 1)] # -1 for unk
         vocab += [self.unk] # add unk
