@@ -1,14 +1,6 @@
-# Virian Pentaglyph Dimensions
+# Virian NLP Analysis Repo
 
 *This repository is under active development and things might break*
 
-With the intention of mapping dates to points in Haidt space, document embeddings that can be meaningfully expressed as a linear combination of the Haidt basis vectors must be constructed.
-Currently, assuming a samples dimensions to be 512 (word count) x 768 (embedding dimensions), we need to inteligently collapse our samples to be of size 1 x 768.
-This could be done using a tf-idf weigthed average.
-However, a neural approach might be more appropriate.
-The priority is to conserve meaning during the transformation process.
-Consevation of meaning could, perhaps be achived by having a second loss function during training, auto encoding the word embeddings for the Haidth dimensions.
-Would be nice with an auto-encoder approach.
-I could use a biredirectional LSTM on as encoder and decoder with a 768 x 1 fc in the middle.
-But we want to view
-
+The code here should map a collection of view weighted articles (X) to a point in human value space (y).
+These articles (and their associated view counts) could come from Wikipedia or news organisations.
