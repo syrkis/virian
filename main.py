@@ -3,10 +3,11 @@
 # by: Noah Syrkis
 
 # imports
-from src import Dataset, Model, train
+from src import Dataset, Model, train, get_s3
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+import codecs
 
 
 # call stack

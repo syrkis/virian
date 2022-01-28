@@ -3,22 +3,16 @@
 # by: Noah Syrkis
 
 # imports
-import os, re, torch, fileinput, pickle, json
-from boto3.session import Session
+import os, re, torch, pickle, json, codecs
+import torch.nn.functional as F
 from tqdm import tqdm
 from collections import Counter
-import torch.nn.functional as F
-from itertools import cycle
+from itertools import cycle, islice
+from src.helpers import get_s3
 
 
 # dataset
 class Dataset(torch.utils.data.IterableDataset):
-    """
-    This data set is for training the virian topic model.
-    For now it either loads a vocab from s3 or computes are uploads one.
-    Arguably tokenization should be done with huggingface.
-    This setup is however simpler to get started with.
-    """
 
     unk = "<UNK>"
     vocab_size = 2 ** 12
@@ -26,37 +20,24 @@ class Dataset(torch.utils.data.IterableDataset):
 
     def __init__(self, vocab_trained=True):
         self.vocab_trained = vocab_trained
-        self.s3 = self.get_s3()
-        path = '../data/joseph_conrad'
-        self.files = tuple([f"{path}/{f}" for f in os.listdir(path) if f[-3:] == 'txt'])
+        self.s3 = get_s3()
+        self.data_source = self.s3.get_object(Bucket="data", Key="20200301.en.100k")
         self.get_vocab()
         
-    def parse_files(self, files):
-        with fileinput.input(files=(files)) as f:
-            for line in f:
-                yield self.bag_of_words(line) if self.vocab_trained else line
+    def get_stream(self, remote_data):
+        return cycle(self.parse_stream(remote_data))
 
-    def get_stream(self, files):
-        return cycle(self.parse_files(files))
-
-    def train_vocab(self):
-        freqs = Counter()
-        for sample in self.parse_files(self.files):
-            freqs.update(self.tokenize(sample))
-        vocab = [w[0] for w in freqs.most_common(self.vocab_size - 1)] # -1 for unk
-        vocab += [self.unk] # add unk
-        word_to_idx = {w: idx for idx, w in enumerate(vocab)}
-        idx_to_word = {v: k for k, v in word_to_idx.items()}
-        self.vocab_trained = True
-        self.push_vocab(vocab, word_to_idx, idx_to_word)
-        self.vocab, self.word_to_idx, self.idx_to_word = vocab, word_to_idx, idx_to_word
+    def parse_stream(self, remote_data):
+        body = remote_data["Body"]
+        for article in body:
+            yield self.bag_of_words(article) if self.vocab_trained else article
 
     def tokenize(self, text): # TODO: switch to hugging face?
         return re.sub(r'[^a-zA-Z ]', ' ', text).lower().split()
 
     def bag_of_words(self, line):
         vec = torch.zeros(self.vocab_size)
-        tokens = self.tokenize(line)
+        tokens = self.tokenize(line.decode(errors='replace'))
         for tok in tokens:
             tok = tok if tok in self.vocab else self.unk # insert unks
             vec[self.word_to_idx[tok]] += 1
@@ -70,7 +51,17 @@ class Dataset(torch.utils.data.IterableDataset):
                 exec(f"self.{file} = data")
         else:
             self.train_vocab()
-
+ 
+    def train_vocab(self):
+        freqs = Counter()
+        for sample in self.parse_files(self.files):
+            freqs.update(self.tokenize(sample))
+        vocab = [w[0] for w in freqs.most_common(self.vocab_size - 1)] + [self.unk]
+        word_to_idx = {w: idx for idx, w in enumerate(vocab)}
+        idx_to_word = {v: k for k, v in word_to_idx.items()}
+        self.vocab_trained = True
+        self.push_vocab(vocab, word_to_idx, idx_to_word)
+        self.vocab, self.word_to_idx, self.idx_to_word = vocab, word_to_idx, idx_to_word
 
     def push_vocab(self, *args): # TODO: tokenizer versioning?
         for idx, obj in enumerate(args):
@@ -78,17 +69,8 @@ class Dataset(torch.utils.data.IterableDataset):
                     Body=pickle.dumps(obj),
                     Key=self.vocab_files[idx])
 
-    def get_s3(self):
-        session = Session()
-        client = session.client('s3',
-                region_name='AMS3',
-                endpoint_url='https://virian.ams3.digitaloceanspaces.com',
-                aws_access_key_id='QA3DDQQ6ITF3JMXZOK3H',
-                aws_secret_access_key='6Kjt6zx38aOBlOf2HUnxcq9zeA30iVY1Zqs3X3XP03g')
-        return client
-
     def __iter__(self):
-        return self.get_stream(self.files)
+        return self.get_stream(self.data_source)
 
 
 def main():
