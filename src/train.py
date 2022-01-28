@@ -8,8 +8,8 @@ from itertools import islice
 
 
 # train function
-def train(loader, model, optimizer, criterion, sample_count=2 ** 5):
-    with tqdm(islice(loader, sample_count), unit="batch", total=sample_count) as tepoch:
+def train(loader, model, optimizer, criterion, batch_count=2 ** 7):
+    with tqdm(islice(loader, batch_count), unit="batch", total=batch_count) as tepoch:
         for batch in tepoch:
             optimizer.zero_grad()
             _, pred = model(batch)

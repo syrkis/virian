@@ -13,7 +13,7 @@ import codecs
 # call stack
 def main():
     ds = Dataset()
-    loader = DataLoader(dataset=ds, batch_size=2 ** 10)
+    loader = DataLoader(dataset=ds, batch_size=2 ** 9)
     model = Model(ds.vocab_size)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
