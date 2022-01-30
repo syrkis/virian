@@ -1,0 +1,30 @@
+---
+title: "European Social Survey exploratory data analysis"
+author: "Noah Syrkis"
+date: "1/28/2022"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+The European Social Survey (ESS) is face-to-face a biennial survey conducted since 2001 in more than thirty European countries. The survey is broad (questions are in the hundreds) with topics ranging from 
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

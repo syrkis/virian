@@ -1,6 +1,7 @@
 **/__pycache__/
 models
 **/*.html
+**/*.pdf
 *.sif
 data/
 outs/

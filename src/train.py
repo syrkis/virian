@@ -3,24 +3,29 @@
 # by: Noah Syrkis
 
 # imports
+import pickle
 from tqdm import tqdm
 from itertools import islice
+from src.helpers import get_s3
 
 
 # train function
-def train(loader, model, optimizer, criterion, batch_count=2 ** 7):
+def train(loader, model, optimizer, topic_criterion, value_criterion=None, batch_count=100):
     with tqdm(islice(loader, batch_count), unit="batch", total=batch_count) as tepoch:
         for batch in tepoch:
             optimizer.zero_grad()
-            _, pred = model(batch)
-            loss = criterion(pred, batch)
+            val_pred, data_pred = model(batch)
+            loss = topic_criterion(data_pred, batch)
             loss.backward()
             optimizer.step()
             tepoch.set_postfix(loss=loss.item())
+    get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
 
 
+# call stack
 def main():
     pass
 
 if __name__ == "__main__":
     main()
+
