@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # import
-from src import Dataset, Model, train
+from src import Dataset, Model, Tokenizer, train
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -11,7 +11,8 @@ from torch.utils.data import DataLoader
 
 # call stack
 def main():
-    ds = Dataset()
+    tokenizer = Tokenizer()
+    ds = Dataset(tokenizer)
     loader = DataLoader(dataset=ds, batch_size=30)
     model = Model(ds.vocab_size)
     criterion = nn.MSELoss()
