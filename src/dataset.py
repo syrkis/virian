@@ -22,6 +22,9 @@ class Dataset(torch.utils.data.IterableDataset):
         self.vocab_trained = vocab_trained
         self.s3 = get_s3()
         self.data_source = self.s3.get_object(Bucket="data", Key="20200301.en.100k")
+        self.vocab = None
+        self.word_to_idx = None
+        self.idx_to_word = None
         self.get_vocab()
         
     def get_stream(self, remote_data):
@@ -36,8 +39,8 @@ class Dataset(torch.utils.data.IterableDataset):
         return re.sub(r'[^a-zA-Z ]', ' ', text).lower().split()
 
     def bag_of_words(self, line):
-        vec = torch.zeros(self.vocab_size)
         tokens = self.tokenize(line.decode(errors='replace'))
+        vec = torch.zeros(self.vocab_size)
         for tok in tokens:
             tok = tok if tok in self.vocab else self.unk # insert unks
             vec[self.word_to_idx[tok]] += 1
@@ -48,7 +51,7 @@ class Dataset(torch.utils.data.IterableDataset):
             for file in self.vocab_files:
                 obj = self.s3.get_object(Bucket='prepro', Key=file)["Body"].read()
                 data = pickle.loads(obj)
-                exec(f"self.{file} = data")
+                exec(f"self.{file} = data") # declare vocab and dicts in self
         else:
             self.train_vocab()
  

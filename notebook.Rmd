@@ -9,22 +9,20 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# data <- read.csv("/Users/syrkis/virian/data/dump/ess/r_7_8_9_rel_sub/ESS1-9e01_1.csv")
+library(dplyr)
+library(ggplot2)
+dk <- read.csv("/Users/syrkis/virian/data/dump/ess/r_7_8_9_rel_sub/dk.csv")
 ```
 
 ## Introduction
-The European Social Survey (ESS) is face-to-face a biennial survey conducted since 2001 in more than thirty European countries. The survey is broad (questions are in the hundreds) with topics ranging from 
+The European Social Survey (ESS) is face-to-face a biennial survey conducted since 2001 in more than thirty European countries. The survey is broad (questions are in the hundreds) with topics ranging from economics to religion to the personal. As stated the data set consists of countries and rounds. My primary level of analysis is spacial (country) not temporal. In this spirit I'll now perform perliminary analysis of the DK data.
 
-
-```{r cars}
-summary(cars)
+```{r}
+vals <- c("ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule", "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt", "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun")
+dk %>%
+  select(vals)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

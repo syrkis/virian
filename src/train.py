@@ -10,7 +10,7 @@ from src.helpers import get_s3
 
 
 # train function
-def train(loader, model, optimizer, topic_criterion, value_criterion=None, batch_count=100):
+def train(loader, model, optimizer, topic_criterion, value_criterion=None, batch_count=1000):
     with tqdm(islice(loader, batch_count), unit="batch", total=batch_count) as tepoch:
         for batch in tepoch:
             optimizer.zero_grad()
