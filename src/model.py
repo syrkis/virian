@@ -13,11 +13,13 @@ class Model(nn.Module):
         super().__init__()
         self.enc = nn.Linear(vocab_size, 50)
         self.dec = nn.Linear(50, vocab_size)
+        self.ess = nn.Linear(50, 21) # ess human value questions
 
     def forward(self, x):
-        h = self.enc(x)
-        x = self.dec(h)
-        return h, x
+        y = self.enc(x)
+        x = self.dec(y)
+        y = self.ess(y)
+        return x, y
 
 
 def main():

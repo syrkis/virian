@@ -10,12 +10,12 @@ from src.helpers import get_s3
 
 
 # train function
-def train(loader, model, optimizer, topic_criterion, value_criterion=None, batch_count=1000):
+def train(loader, model, optimizer, topic_criterion, value_criterion=None, batch_count=5000):
     with tqdm(islice(loader, batch_count), unit="batch", total=batch_count) as tepoch:
         for batch in tepoch:
             optimizer.zero_grad()
-            val_pred, data_pred = model(batch)
-            loss = topic_criterion(data_pred, batch)
+            x_pred, y_pred = model(batch)
+            loss = topic_criterion(x_pred, batch)
             loss.backward()
             optimizer.step()
             tepoch.set_postfix(loss=loss.item())

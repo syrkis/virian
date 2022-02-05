@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 
 # call stack
 def main():
-    tokenizer = Tokenizer()
+    tokenizer = Tokenizer(trained=False)
     ds = Dataset(tokenizer)
     loader = DataLoader(dataset=ds, batch_size=30)
     model = Model(ds.vocab_size)
