@@ -7,3 +7,4 @@ data/
 outs/
 **/.*.*.swp
 .nfs*
+**/*.pdf
