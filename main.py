@@ -11,18 +11,13 @@ from torch.utils.data import DataLoader
 
 # call stack
 def main():
-    ds = ESSDataset()
-    for i in range(len(ds)):
-        print(ds[i])
-    exit()
     tokenizer = Tokenizer(trained=True)
     ds = WikiDataset(tokenizer)
     loader = DataLoader(dataset=ds, batch_size=30)
     topic_model = TopicModel(ds.vocab_size)
-    value_model = ValueModel()
-    icriterion = nn.MSELoss()
+    criterion = nn.MSELoss()
     optimizer = optim.Adam(topic_model.parameters())
-    train(loader, topic_model, value_model, optimizer, criterion)
+    train(loader, topic_model, optimizer, criterion)
 
 if __name__ == "__main__":
     main()
