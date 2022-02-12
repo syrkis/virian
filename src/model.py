@@ -7,7 +7,8 @@ import torch
 import torch.nn as nn
 
 
-class Model(nn.Module):
+# topic model
+class TopicModel(nn.Module):
 
     def __init__(self, vocab_size):
         super().__init__()
@@ -22,11 +23,22 @@ class Model(nn.Module):
         return x, y
 
 
+# ess value model
+class ValueModel(nn.Module):
+    
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(50, 21)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        return x
+
+
 def main():
     from dataset import Dataset
     ds = Dataset()
     print(ds[0])
-
 
 if __name__ == '__main__':
     main()

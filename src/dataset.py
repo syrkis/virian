@@ -3,17 +3,18 @@
 # by: Noah Syrkis
 
 # imports
-from torch.utils.data import IterableDataset
+from torch.utils.data import Dataset, IterableDataset
 from itertools import cycle
 from src.helpers import get_s3
+import pandas as pd
 
 
-# dataset
-class Dataset(IterableDataset):
+# wiki dataset
+class WikiDataset(IterableDataset):
 
     vocab_size = 2 ** 12
     s3 = get_s3()
-    remote = s3.get_object(Bucket="data", Key="20200301.en.100k")
+    remote = s3.get_object(Bucket="data", Key="wiki/20200301.en.100k")
 
     def __init__(self, tokenizer=None):
         self.tokenizer = tokenizer
@@ -32,8 +33,23 @@ class Dataset(IterableDataset):
         return self.get_stream(self.remote)
 
 
+# ess dataset
+class ESSDataset(Dataset):
+
+    def __init__(self):
+        self.data = pd.read_csv("../data/dump/ess/r_7_8_9_rel_sub/ESS1-9e01_1.csv", dtype="object")
+        self.data["inwyye"] = self.data["inwyye"].astype(int)
+
+    def __len__(self):
+        return len(pd.unique(self.data["inwyye"]))
+
+    def __getitem__(self, idx):
+        return self.data.loc[self.data.inwyye == idx + min(self.data["inwyye"])]
+
+
+# dev stack
 def main():
-    dataset = Dataset()
+    dataset = ESSDataset()
     
 if __name__ == "__main__":
     main()

@@ -19,9 +19,8 @@ dk <- read.csv("/Users/syrkis/virian/data/dump/ess/r_7_8_9_rel_sub/dk.csv")
 The European Social Survey (ESS) is face-to-face a biennial survey conducted since 2001 in more than thirty European countries. The survey is broad (questions are in the hundreds) with topics ranging from economics to religion to the personal. As stated the data set consists of countries and rounds. My primary level of analysis is spacial (country) not temporal. In this spirit I'll now perform perliminary analysis of the DK data.
 
 ```{r}
-vals <- c("ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule", "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt", "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun")
-dk %>%
-  select(vals)
+describe(data)
+vals <- data$c("ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule", "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt", "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun")
 ```
 
 
