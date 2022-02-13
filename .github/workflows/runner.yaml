@@ -1,0 +1,5 @@
+name: sustains the hofstede database
+
+on:
+  schedule:
+    - cron: "0 8 * * *"

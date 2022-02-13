@@ -1,4 +1,7 @@
 boto3
 tqdm
 torch
-
+git+git://github.com/goldsmith/Wikipedia.git
+pandas
+requests
+numpy
