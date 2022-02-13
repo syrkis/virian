@@ -10,17 +10,15 @@ import torch.nn as nn
 # topic model
 class Model(nn.Module):
 
-    def __init__(self, vocab_size):
+    def __init__(self, sample_size):
         super().__init__()
-        self.enc = nn.Linear(vocab_size, 50)
-        self.dec = nn.Linear(50, vocab_size)
-        self.ess = nn.Linear(50, 21) # ess human value questions
+        self.enc = nn.Linear(sample_size, 50)
+        self.dec = nn.Linear(50, sample_size)
 
     def forward(self, x):
-        y = self.enc(x)
-        x = self.dec(y)
-        y = self.ess(y)
-        return x, y
+        x = self.enc(x)
+        x = self.dec(x)
+        return x
 
 
 # dev calls

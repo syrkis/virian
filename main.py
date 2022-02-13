@@ -25,19 +25,12 @@ def run_months():
     make_months('da')
 
 def run_training():
-    tokenizer = Tokenizer(trained=False)
-    exit()
-    ds = Dataset()
-    for s in ds:
-        print(s)
-        break
-    exit()
     tokenizer = Tokenizer(trained=True)
-    loader = DataLoader(dataset=ds, batch_size=30)
-    topic_model = TopicModel(ds.vocab_size)
+    ds = Dataset(tokenizer)
+    model = Model(ds.sample_size)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(topic_model.parameters())
-    train(loader, topic_model, optimizer, criterion)
+    optimizer = optim.Adam(model.parameters())
+    train(ds, model, optimizer, criterion)
 
 def get_args():
     parser = argparse.ArgumentParser(description="Virian data scraper scripts")

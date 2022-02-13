@@ -7,6 +7,7 @@ from boto3.session import Session
 import os
 
 
+# connect to digital ocean spaces
 def get_s3():
     session = Session()
     client = session.client('s3',

@@ -10,15 +10,15 @@ from src.helpers import get_s3
 
 
 # train function
-def train(wiki_loader, topic_model, optimizer, criterion, batch_count=5000):
-    with tqdm(islice(wiki_loader, batch_count), unit="batch", total=batch_count) as tepoch:
-        for batch in tepoch:
+def train(ds, model, optimizer, criterion, month_count=80):
+    with tqdm(islice(ds, month_count), unit="batch", total=month_count) as month:
+        for X, W, Y in month:
             optimizer.zero_grad()
-            x_pred, y_pred = topic_model(batch)
-            loss = criterion(x_pred, batch)
+            pred = model(X)
+            loss = criterion(pred, X)
             loss.backward()
             optimizer.step()
-            tepoch.set_postfix(loss=loss.item())
+            month.set_postfix(loss=loss.item())
     get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
 
 
