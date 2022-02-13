@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src.dataset import WikiDataset
+from src.dataset import Dataset
 from src.helpers import get_s3
 from collections import Counter
 from itertools import islice
@@ -12,7 +12,7 @@ import pickle, re, torch
 
 
 # tokenizer class
-class Tokenizer(WikiDataset):
+class Tokenizer(Dataset):
 
     unk = "<UNK>"
 
@@ -60,4 +60,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

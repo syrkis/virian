@@ -7,49 +7,45 @@ from torch.utils.data import Dataset, IterableDataset
 from itertools import cycle
 from src.helpers import get_s3
 import pandas as pd
+import os, json, random
 
 
 # wiki dataset
-class WikiDataset(IterableDataset):
+class Dataset(IterableDataset):
 
     vocab_size = 2 ** 12
-    s3 = get_s3()
-    remote = s3.get_object(Bucket="data", Key="wiki/20200301.en.100k")
+    months_dir = "../data/months"
+    articles_dir = "../data/articles"
+    # s3 = get_s3()
+    # remote = s3.get_object(Bucket="data", Key="wiki/20200301.en.100k")
 
     def __init__(self, tokenizer=None):
+        self.files = [f for f in os.listdir(self.months_dir) if f[-5:] == ".json"]
         self.tokenizer = tokenizer
         
-    def get_stream(self, remote):
-        return cycle(self.parse_stream(remote))
+    def get_stream(self, files):
+        return cycle(self.process_data(files))
 
-    def parse_stream(self, remote):
-        for article in remote["Body"]: # s3 bucket
-            if self.tokenizer:
-                yield self.tokenizer.bag_of_words(article.decode(errors="replace"))
-            else:
-                yield article.decode(errors="replace")
+    def process_data(self, files):
+        for file in files:
+            with open(f"{self.months_dir}/{file}", 'r') as f:
+                yield self.construct(f.read())
+
+    def construct(self, month):
+        data = json.loads(month)
+        with open(f"{self.articles_dir}/{data['lang']}.json", 'r') as f:
+            articles = json.load(f)
+        for daily in data.dailies:
+            pass               
+        return data.keys()
 
     def __iter__(self):
-        return self.get_stream(self.remote)
-
-
-# ess dataset
-class ESSDataset(Dataset):
-
-    def __init__(self):
-        self.data = pd.read_csv("../data/dump/ess/r_7_8_9_rel_sub/ESS1-9e01_1.csv", dtype="object")
-        self.data["inwyye"] = self.data["inwyye"].astype(int)
-
-    def __len__(self):
-        return len(pd.unique(self.data["inwyye"]))
-
-    def __getitem__(self, idx):
-        return self.data.loc[self.data.inwyye == idx + min(self.data["inwyye"])]
+        return self.get_stream(self.files)
 
 
 # dev stack
 def main():
-    dataset = ESSDataset()
+    dataset = Dataset()
     
 if __name__ == "__main__":
     main()
