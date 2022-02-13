@@ -27,10 +27,11 @@ class Tokenizer(Dataset):
             return list(map(download, ["word_to_idx", "idx_to_word"]))
         return self.train_vocab()
  
-    def train_vocab(self, article_count=10**5):
+    def train_vocab(self):
         freqs = Counter()
-        with tqdm(islice(self.parse_stream(self.remote), article_count), unit="sample", total=article_count) as remote:
-            for sample in remote:
+        n = len(self.article_files)
+        with tqdm(islice(self.process_data(self.article_files), n), unit="langs", total=10000) as lang:
+            for sample in lang:
                 freqs.update(self.tokenize(sample))
         vocab = [w[0] for w in freqs.most_common(self.vocab_size - 1)] + [self.unk]
         word_to_idx = {w: idx for idx, w in enumerate(vocab)}

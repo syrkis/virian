@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src import Dataset, Model, train, get_articles, get_dailies, make_months
+from src import Dataset, Tokenizer, Model, train, get_articles, get_dailies, make_months
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -25,6 +25,8 @@ def run_months():
     make_months('da')
 
 def run_training():
+    tokenizer = Tokenizer(trained=False)
+    exit()
     ds = Dataset()
     for s in ds:
         print(s)
