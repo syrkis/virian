@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src import Dataset, Tokenizer, Model, train, get_articles, get_dailies, make_months
+from src import *
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -21,8 +21,9 @@ def run_articles(langs):
     pool = Pool(processes=len(langs))
     pool.map(get_articles, langs)
 
-def run_months():
-    make_months('da')
+def run_months(langs):
+    pool = Pool(processes=len(langs))
+    pool.map(make_months, langs)
 
 def run_training():
     tokenizer = Tokenizer(trained=True)
@@ -37,21 +38,24 @@ def get_args():
     parser.add_argument('--dailies',  action='store_true', help='scrape daily top read')
     parser.add_argument('--months',  action='store_true', help='make monthly wiki ess data')
     parser.add_argument('--articles', action='store_true', help="scrape wiki articles")
+    parser.add_argument('--values', action='store_true', help="focus on ess data")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
     return parser.parse_args()
 
 # call stack
 def main():
     args = get_args()
-    langs = 'da no sv nl pl fi it de'.split()
+    langs = 'da no sv nl pl it'.split() # de fi not done
     if args.dailies:
         run_dailies(langs)    
     if args.articles:
         run_articles(langs)
     if args.months:
-        run_months()
+        run_months(langs)
     if args.train:
         run_training()
+    if args.values:
+        load_df()
 
 if __name__ == "__main__":
     main()

@@ -11,7 +11,7 @@ from hashlib import sha256
 
 # make all months for specific lang
 def make_months(lang):
-    dailies_dir = f"../data/dumps/wiki/dailies/{lang}"
+    dailies_dir = f"../data/dailies/{lang}"
     months = sorted(list(set([f[:7] for f in os.listdir(dailies_dir)])))
     for month in tqdm(months):
         data = make_month(lang, month)
@@ -21,7 +21,7 @@ def make_months(lang):
 
 # create month
 def make_month(lang, month): # TODO: add infered monthly ess factor dists
-    dailies_dir = f"../data/dumps/wiki/dailies/{lang}"
+    dailies_dir = f"../data/dailies/{lang}"
     dailies = [f for f in os.listdir(dailies_dir) if f[:7] == month]
     dailies_data = {daily[:10]: defaultdict(lambda: 0) for daily in dailies}
     for daily in dailies:
