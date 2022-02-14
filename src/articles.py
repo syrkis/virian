@@ -45,6 +45,10 @@ def get_articles(lang):
         except wikipedia.exceptions.DisambiguationError:
             open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
             pass
+        except json.decoder.JSONDecodeError:
+            open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
+            pass
+
 
 
 

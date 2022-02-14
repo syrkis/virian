@@ -45,7 +45,7 @@ def get_args():
 # call stack
 def main():
     args = get_args()
-    langs = 'da no sv nl pl it'.split() # de fi not done
+    langs = 'de fi'.split() # da no sv nl pl it'.split() # de fi not done
     if args.dailies:
         run_dailies(langs)    
     if args.articles:
