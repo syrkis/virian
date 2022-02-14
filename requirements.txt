@@ -5,3 +5,4 @@ git+git://github.com/goldsmith/Wikipedia.git
 pandas
 requests
 numpy
+factor_analyzer

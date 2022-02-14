@@ -8,3 +8,4 @@ outs/
 **/.*.*.swp
 .nfs*
 **/*.pdf
+plots
