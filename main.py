@@ -40,12 +40,13 @@ def get_args():
     parser.add_argument('--articles', action='store_true', help="scrape wiki articles")
     parser.add_argument('--values', action='store_true', help="focus on ess data")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
+    parser.add_argument('--langs', default="de fi da no sv nl pl it", help="what langs to taget")
     return parser.parse_args()
 
 # call stack
 def main():
     args = get_args()
-    langs = 'de fi'.split() # da no sv nl pl it'.split() # de fi not done
+    langs = args.langs.split(",") # de fi not done
     if args.dailies:
         run_dailies(langs)    
     if args.articles:
