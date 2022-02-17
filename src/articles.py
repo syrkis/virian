@@ -48,6 +48,13 @@ def get_articles(lang):
         except json.decoder.JSONDecodeError:
             open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
             pass
+        except wikipedia.exceptions.WikipediaException:
+            open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
+            pass
+        except:
+            print(lang)
+    with open(f"{articles_dir}/{lang}.json", "w") as f:
+        json.dump(corpus, f)
 
 
 

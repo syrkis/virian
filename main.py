@@ -14,15 +14,15 @@ import argparse
 
 # runners
 def run_dailies(langs):
-    pool = Pool(processes=len(langs))
+    pool = Pool(processes=4)
     pool.map(get_dailies, langs)
 
 def run_articles(langs):
-    pool = Pool(processes=len(langs))
+    pool = Pool(processes=4)
     pool.map(get_articles, langs)
 
 def run_months(langs):
-    pool = Pool(processes=len(langs))
+    pool = Pool(processes=4)
     pool.map(make_months, langs)
 
 def run_training():
@@ -40,7 +40,7 @@ def get_args():
     parser.add_argument('--articles', action='store_true', help="scrape wiki articles")
     parser.add_argument('--values', action='store_true', help="focus on ess data")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
-    parser.add_argument('--langs', default="de fi da no sv nl pl it", help="what langs to taget")
+    parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it", help="what langs to taget")
     return parser.parse_args()
 
 # call stack
@@ -57,6 +57,7 @@ def main():
         run_training()
     if args.values:
         load_df()
+        pass
 
 if __name__ == "__main__":
     main()

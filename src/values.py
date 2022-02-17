@@ -16,11 +16,17 @@ def load_df():
     ess_dir = "../data/dumps/ess/r_7_8_9_rel_sub"
     df = pd.read_csv(f"{ess_dir}/ESS1-9e01_1.csv", dtype='object', usecols=vals + meta).dropna()
     groups = df.groupby("cntry").groups
-    for k, v in tqdm(groups.items()):
-        group = df.loc[v][vals + ["essround"]].astype(int)
-        descr = group.describe(datetime_is_numeric=True), group.mode()
-        plt.plot(group["essround"], group[vals])
-        plt.savefig(f'plots/{k}.png')
-        plt.set_title(k)
-        plt.clf()
-        
+    countries = df.groupby("cntry").groups
+    for idx, (k1, v1) in enumerate(countries.items()):
+        country = df.loc[v1]
+        rounds = country.groupby("essround").groups
+        for val in vals:
+            val = country[val]
+        for jdx, (k2, v2) in enumerate(rounds.items()):
+            round = country.loc[v2]
+            descr = round.describe()[vals]
+            plt.scatter(k2, descr)
+            plt.savefig('plots/fuck.png')
+            break
+        break
+
