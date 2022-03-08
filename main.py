@@ -14,12 +14,15 @@ import argparse
 
 # runners
 def run_dailies(langs):
-    pool = Pool(processes=4)
-    pool.map(get_dailies, langs)
+    for lang in langs:
+        get_dailies(lang)
+    exit()
+    with Pool(4) as p:
+        p.map(get_dailies, langs)
 
 def run_articles(langs):
-    pool = Pool(processes=4)
-    pool.map(get_articles, langs)
+    with Pool(4) as p:
+        p.map(get_articles, langs)
 
 def run_months(langs):
     pool = Pool(processes=4)
