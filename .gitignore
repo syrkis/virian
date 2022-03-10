@@ -10,3 +10,4 @@ outs/
 **/*.pdf
 plots
 .python-version
+env
