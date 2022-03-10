@@ -11,3 +11,4 @@ outs/
 plots
 .python-version
 env
+logs/

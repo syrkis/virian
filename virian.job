@@ -11,5 +11,4 @@
 
 module --ignore-cache load CUDA
 source env/bin/activate
-python -c 'import torch'
-python --version
+python main.py --values

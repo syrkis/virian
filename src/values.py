@@ -16,5 +16,6 @@ def load_df():
     df = pd.read_csv("../data/ess/data.csv", dtype='object', usecols=vals + meta).dropna()
     groups = df.groupby("cntry").groups
     countries = df.groupby("cntry").groups
+    print(countries)
      
 
