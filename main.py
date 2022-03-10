@@ -14,9 +14,6 @@ import argparse
 
 # runners
 def run_dailies(langs):
-    for lang in langs:
-        get_dailies(lang)
-    exit()
     with Pool(4) as p:
         p.map(get_dailies, langs)
 
@@ -25,8 +22,8 @@ def run_articles(langs):
         p.map(get_articles, langs)
 
 def run_months(langs):
-    pool = Pool(processes=4)
-    pool.map(make_months, langs)
+    with Pool(4) as p:
+        p.map(make_months, langs)
 
 def run_training():
     tokenizer = Tokenizer(trained=True)

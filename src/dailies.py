@@ -19,7 +19,7 @@ def get_dailies(lang):
     date = start_date
     for _ in tqdm(range((end_date - start_date).days)):
         date_str = get_str(date)
-        headers = {"Api-User-Agent": "www.syrkis.com"}
+        headers = {"User-Agent": "nobr@itu.dk"}
         url = get_url(api, date_str, lang)
         res = requests.get(url, headers=headers).text
         data = json.loads(res)['items'][0]['articles']
