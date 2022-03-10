@@ -14,7 +14,7 @@ import argparse
 
 # runners
 def run_dailies(langs):
-    with Pool(4) as p:
+    with Pool(5) as p:
         p.map(get_dailies, langs)
 
 def run_articles(langs):
@@ -40,7 +40,7 @@ def get_args():
     parser.add_argument('--articles', action='store_true', help="scrape wiki articles")
     parser.add_argument('--values', action='store_true', help="focus on ess data")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
-    parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it", help="what langs to taget")
+    parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it,bg,et,hu,fr,is", help="what langs to taget")
     return parser.parse_args()
 
 # call stack
