@@ -1,4 +1,4 @@
-# cd
+# Value Information Reconstructing Intelligent Artificial Network
 
 *This repository is under active development and things might break*
 
