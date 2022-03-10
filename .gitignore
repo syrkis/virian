@@ -9,3 +9,4 @@ outs/
 .nfs*
 **/*.pdf
 plots
+.python-version
