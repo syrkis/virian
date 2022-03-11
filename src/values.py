@@ -11,6 +11,16 @@ from factor_analyzer import FactorAnalyzer
 import seaborn as sns
 
 
+# make values
+def make_values(langs):
+    meta_cols = "essround cntry".split()
+    val_cols = "ipcrtiv imprich ipeqopt ipshabt impsafe impdiff ipfrule ipudrst ipmodst ipgdtim impfree iphlppl ipsuces ipstrgv ipadvnt ipbhprp iprspot iplylfr impenv imptrad impfun".split()
+    ess_data = pd.read_csv('../data/ess/data.csv', dtype='object', usecols=meta_cols + val_cols)
+    fa = FactorAnalyzer(n_factors=5, rotation="promax")
+    fa.fit(ess_data[val_cols])
+    return ess_data
+
+
 # values analysis
 def factor_analysis(n_factors):
     meta = "essround cntry".split()
@@ -28,4 +38,4 @@ def factor_analysis(n_factors):
             ess_round = (country.loc[v2][vals]).apply(pd.to_numeric)
             tmp = fa.transform(ess_round)
             print(tmp.mean(axis=0).round(2), tmp.var(axis=0).round(2))
-        break
+        print()
