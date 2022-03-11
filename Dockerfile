@@ -1,14 +1,16 @@
-FROM python:3.7
+FROM python:3.8.5
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
+COPY requirements.txt requirements.txt
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-ADD src src
+RUN mkdir src
 
-COPY main.py .
+COPY src src
 
-CMD python main.py
+COPY main.py main.py
+
+CMD ls
 
