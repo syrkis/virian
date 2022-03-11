@@ -56,8 +56,7 @@ def main():
     if args.train:
         run_training()
     if args.values:
-        load_df()
-        pass
+        factor_analysis(5)
 
 if __name__ == "__main__":
     main()

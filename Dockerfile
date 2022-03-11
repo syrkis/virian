@@ -12,5 +12,5 @@ COPY src src
 
 COPY main.py main.py
 
-CMD ls
+ENTRYPOINT ["python", "main.py"]
 
