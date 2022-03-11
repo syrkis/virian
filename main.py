@@ -23,8 +23,9 @@ def run_articles(langs):
         p.map(get_articles, langs)
 
 def run_months(langs):
+    lang_values = make_values(langs)
     with Pool(4) as p:
-        p.map(make_months, make_values(langs)) # make [(lang, value)]
+        p.map(make_months, lang_values) # make [(lang, value)]
 
 def get_values(langs):
     return make_values(langs)    
@@ -60,7 +61,7 @@ def main():
     if args.train:
         run_training()
     if args.values:
-        factor_analysis(5)
+        pass
 
 if __name__ == "__main__":
     main()

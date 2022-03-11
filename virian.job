@@ -9,6 +9,6 @@
 
 module --ignore-cache load CUDA
 source env/bin/activate
-python main.py --months --langs da,no
+python main.py --months --langs da,no,sv
 # python -c 'import torch; print(torch.cuda.is_available())'
 # docker run --rm --mount type=bind,source=$HOME/virian/data,target=/usr/src/data nlp
