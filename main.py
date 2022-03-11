@@ -23,11 +23,8 @@ def run_articles(langs):
         p.map(get_articles, langs)
 
 def run_months(langs):
-    lang_and_values = make_values(langs) # [(lang, values), (lang, values)]
-    print(lang_and_values)
-    exit()
     with Pool(4) as p:
-        p.map(make_months, langs)
+        p.map(make_months, make_values(langs)) # make [(lang, value)]
 
 def get_values(langs):
     return make_values(langs)    
