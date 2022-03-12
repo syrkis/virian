@@ -36,7 +36,7 @@ def make_month(lang, month_value, month): # TODO: add infered monthly ess factor
             for article in articles:
                 title_hash = sha256((article['article']).encode('utf-8')).hexdigest()
                 dailies_data[day][title_hash] += article['views'] # TODO: use title hash
-    data = {"month": month, "values": month_value.tolist(), "lang": lang, "dailies": {k: None for k in dailies_data.keys()}}
+    data = {"month": month, "values": {"mean": list(month_value[0]), "var": list(month_value[1])}, "lang": lang, "dailies": {k: None for k in dailies_data.keys()}}
     for k1, v1 in dailies_data.items():
         data["dailies"][k1] = {k2: v2 for k2, v2 in v1.items()}
     return data
@@ -44,13 +44,11 @@ def make_month(lang, month_value, month): # TODO: add infered monthly ess factor
 # function that assigns values to a month.....
 def month_value_mapper(values, month):
     out = None
-    print(month) 
     if month < "2015_12" and "7" in values: # if month is from before 2017 and there's ess
         out = values['7']   
     elif month < "2017_06" and "8" in values:
         out = values['8']   
     elif month < "2019_06" and "9" in values:
         out = values['9']
-    print(out)
     return out
     

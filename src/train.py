@@ -6,7 +6,7 @@
 import pickle
 from tqdm import tqdm
 from itertools import islice
-from src.helpers import get_s3
+from src.utils import get_s3
 
 
 # train function

@@ -5,7 +5,7 @@
 # imports
 from torch.utils.data import Dataset, IterableDataset
 from itertools import cycle
-from src.helpers import get_s3
+from src.utils import get_s3
 import pandas as pd
 import os, json, random, torch
 from tqdm import tqdm
@@ -32,7 +32,11 @@ class Dataset(IterableDataset):
         if self.tokenizer: # training model
             for file in files:
                 with open(f"{self.months_dir}/{file}", 'r') as f:
-                    yield self.construct(f.read())
+                    data = json.loads(f.read())
+                    if 'values' in data:
+                        yield self.construct(data)
+                    else:
+                        continue
         else: # training vocab
             for file in tqdm(files):
                 with open(f"{self.articles_dir}/{file}", 'r') as f:
@@ -43,9 +47,9 @@ class Dataset(IterableDataset):
                     except json.decoder.JSONDecodeError:
                         pass
 
-    def construct(self, month):
-        data = json.loads(month)
-        X, W, Y = torch.zeros((31, 1000, self.sample_size)), torch.zeros((31, 1000)), torch.zeros((5,3))
+    def construct(self, data): # some months shouldn't exist bcs ess rounds
+        X, W = torch.zeros((31, 1000, self.sample_size)), torch.zeros((31, 1000))
+        Y = torch.tensor([data['values']['mean'], data['values']['var']])
         with open(f"{self.articles_dir}/{data['lang']}.json", 'r') as f:
             articles = json.load(f)
         for idx, (k1, v1) in enumerate(data['dailies'].items()):
