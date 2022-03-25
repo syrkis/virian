@@ -1,4 +1,4 @@
-# Value Information Reconstructing Intelligent Artificial Network
+# THe Virian Project
 
 *This repository is under active development and things might break*
 

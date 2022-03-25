@@ -4,6 +4,7 @@
 
 # imports
 import os, json
+import torch
 from tqdm import tqdm
 from collections import defaultdict
 from hashlib import sha256
@@ -25,7 +26,8 @@ def make_months(lang_and_values):
 
 
 # create month
-def make_month(lang, month_value, month): # TODO: add infered monthly ess factor dists
+def make_month(lang, month_value, month): # TODO: infer monthly ess factor dists
+    make_month_new(lang, month_value, month)
     dailies_dir = f"../data/dailies/{lang}"
     dailies = [f for f in os.listdir(dailies_dir) if f[:7] == month]
     dailies_data = {daily[:10]: defaultdict(lambda: 0) for daily in dailies}
@@ -35,16 +37,34 @@ def make_month(lang, month_value, month): # TODO: add infered monthly ess factor
             articles = json.loads(f.read())
             for article in articles:
                 title_hash = sha256((article['article']).encode('utf-8')).hexdigest()
-                dailies_data[day][title_hash] += article['views'] # TODO: use title hash
-    data = {"month": month, "values": {"mean": list(month_value[0]), "var": list(month_value[1])}, "lang": lang, "dailies": {k: None for k in dailies_data.keys()}}
+                dailies_data[day][title_hash] += article['views']
+    data = {
+            "month": month,
+            "values": {"mean": list(month_value[0]), "var": list(month_value[1])},
+            "lang": lang, "dailies": {k: None for k in dailies_data.keys()}
+            }
     for k1, v1 in dailies_data.items():
         data["dailies"][k1] = {k2: v2 for k2, v2 in v1.items()}
     return data
 
+
+# constuct compelte month sample
+def make_month_new(lang, values, month):
+    X = torch.zeros((31, 1000))
+    W = torch.zeros((31, 1000))
+    Y = torch.zeros((2, 5))
+    dailies_dir = f"../data/dailies/{lang}"
+    dailies = [f for f in os.listdir(dailies_dir) if f[:7] == month]
+    dailies_data = {daily[:10]: defaultdict(lambda: 0) for daily in dailies} # daily articles W
+    for daily in dailies:
+        with open(f'{dailies_dir}/{daily}', 'r') as f:
+            pass       
+
+
 # function that assigns values to a month.....
 def month_value_mapper(values, month):
     out = None
-    if month < "2015_12" and "7" in values: # if month is from before 2017 and there's ess
+    if month < "2015_12" and "7" in values: # if ess exist and month date given
         out = values['7']   
     elif month < "2017_06" and "8" in values:
         out = values['8']   

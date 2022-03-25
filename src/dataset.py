@@ -29,7 +29,7 @@ class Dataset(IterableDataset):
         return cycle(self.process_data(files))
 
     def process_data(self, files):
-        if self.tokenizer: # training model
+        if self.tokenizer: # training model # MAYBE LOAD PRE BUILD TENSOR DATASET
             for file in files:
                 with open(f"{self.months_dir}/{file}", 'r') as f:
                     data = json.loads(f.read())

@@ -4,7 +4,7 @@
 
 # imports
 from src.dataset import Dataset
-from src.helpers import get_s3
+from src.utils import get_s3
 from collections import Counter
 from itertools import islice
 from tqdm import tqdm
