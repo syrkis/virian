@@ -18,6 +18,7 @@ class Dataset(IterableDataset):
     vocab_size = 2 ** 14
     sample_size = 2 ** 8
     months_dir = "../data/months"
+    dailies_dir = "../data/dailies_new"
     articles_dir = "../data/articles"
     monthly_files = [f for f in os.listdir(months_dir) if f[-5:] == ".json"]
     article_files = [f for f in os.listdir(articles_dir) if f[-5:] == ".json"]
@@ -31,8 +32,11 @@ class Dataset(IterableDataset):
 
     def process_data(self, files):
         if self.tokenizer: # training model # MAYBE LOAD PRE BUILD TENSOR DATASET
+            files = os.listdir(self.dailies_dir) 
             for file in files:
-                yield sample
+                with open(f"{self.dailies_dir}/{file}", 'r') as f:
+                    D = json.load(f)
+                    yield D.keys()
         else: # training vocab
             for file in tqdm(files):
                 with open(f"{self.articles_dir}/{file}", 'r') as f:
