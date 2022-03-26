@@ -11,9 +11,9 @@ from tqdm import tqdm
 # run time function
 def get_dailies(lang):
     dailies_file = f"../data/dailies_new/{lang}.json"
-    with open(dailies_file, 'r') as f:
-        D = json.load(f)
     api = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
+    with open(dailies_file, 'r') as f: # create of !exist
+        D = json.load(f)
     done = [d.replace('_', '/') for d in D.keys()]
     start_date = get_date(done[-1] if done else "2015/07/01")
     end_date = datetime.now() - timedelta(days=3) 
@@ -26,7 +26,7 @@ def get_dailies(lang):
         data = json.loads(res)['items'][0]['articles']
         D[date_str.replace('/', '_')] = data
         date += timedelta(days = 1)
-
+    exit()  
     with open(dailies_file, 'w') as f:
         json.dump(D, f, indent=4)
 

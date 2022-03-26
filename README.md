@@ -1,5 +1,8 @@
 # The Virian Project
 
+## todo
+- [] fix dailies for reproducubility and future wiki data.
+
 *This repository is under active development and things might break*
 
 The code here should map a collection of view weighted articles (X) to a point in human value space (y).
