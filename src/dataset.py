@@ -9,6 +9,7 @@ from src.utils import get_s3
 import pandas as pd
 import os, json, random, torch
 from tqdm import tqdm
+import random
 
 
 # wiki dataset
@@ -31,12 +32,7 @@ class Dataset(IterableDataset):
     def process_data(self, files):
         if self.tokenizer: # training model # MAYBE LOAD PRE BUILD TENSOR DATASET
             for file in files:
-                with open(f"{self.months_dir}/{file}", 'r') as f:
-                    data = json.loads(f.read())
-                    if 'values' in data:
-                        yield self.construct(data)
-                    else:
-                        continue
+                yield sample
         else: # training vocab
             for file in tqdm(files):
                 with open(f"{self.articles_dir}/{file}", 'r') as f:
@@ -62,7 +58,7 @@ class Dataset(IterableDataset):
         return X, W, Y
 
     def __iter__(self):
-        return self.get_stream(self.monthly_files)
+        return self.get_stream(self.article_files)
 
 
 # dev stack
