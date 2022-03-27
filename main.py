@@ -53,7 +53,7 @@ def run_data(langs):
     ds = Dataset(tokenizer)
     i = 0
     for sample in ds:
-        print(sample[0][50].item(), end=' ')
+        print(sample.shape, end=' ')
     
 def run_training():
     tokenizer = Tokenizer(trained=False)

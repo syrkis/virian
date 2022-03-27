@@ -1,4 +1,4 @@
-# values.py
+# ess.py
 #   virian ess analysis
 # by: Noah Syrkis
 

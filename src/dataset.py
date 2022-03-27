@@ -17,7 +17,7 @@ import random
 class Dataset(IterableDataset):
 
     vocab_size = 2 ** 16
-    sample_size = 2 ** 8
+    sample_size = 2 ** 7
     months_dir = "../data/months"
     dailies_dir = "../data/dailies"
     articles_dir = "../data/articles"
@@ -26,8 +26,7 @@ class Dataset(IterableDataset):
         if file[-5:] == '.json':
             with open(f"{articles_dir}/{file}", 'r') as f:
                 articles[file[:2]] = json.load(f)
-    monthly_files = [f for f in os.listdir(months_dir) if f[-5:] == ".json"]
-    article_files = [f for f in os.listdir(articles_dir) if f[-5:] == ".json"]
+    article_files = [f for f in articles_dir if f[-5:] == '.json']
     s3 = get_s3()
 
     def __init__(self, tokenizer=None):
@@ -56,33 +55,19 @@ class Dataset(IterableDataset):
     def construct(self, day, lang): # some months shouldn't exist bcs ess rounds
         date = day['date']
         articles = day['data'] 
-        raw_X = []
-        raw_W = []
-        for article in articles:
+        X = torch.zeros((1000, self.sample_size))
+        W = torch.zeros(1000)
+        Y = torch.zeros((5, 2))
+        for idx, article in enumerate(articles):
             title_hash = sha256((article['article']).encode('utf-8')).hexdigest()
             if title_hash in self.articles[lang]:
                 article_text = self.articles[lang][title_hash]['text']
                 tokens = self.tokenizer.vectorize(article_text)
-                raw_X.append(tokens)
+                X[idx] += tokens
             else:
-                raw_X.append(torch.zeros(self.sample_size))
-            raw_W.append(article['views']) 
-
-        return raw_X
-        """
-        X, W = torch.zeros((31, 1000, self.sample_size)), torch.zeros((31, 1000))
-        Y = torch.tensor([data['values']['mean'], data['values']['var']])
-        with open(f"{self.articles_dir}/{data['lang']}.json", 'r') as f:
-            articles = json.load(f)
-        for idx, (k1, v1) in enumerate(data['dailies'].items()):
-            for jdx, (k2, v2) in enumerate(v1.items()):
-                if k2 in articles:
-                    text = articles[k2]['text']
-                    tokens = self.tokenizer.vectorize(text)
-                    X[idx, jdx, :] = tokens
-                    W[idx, jdx] = v2
-        return X, W, Y
-        """
+                X[idx] += torch.zeros(self.sample_size)
+            W[idx] += article['views']
+        return X
 
     def __iter__(self):
         return self.get_stream(self.article_files)
