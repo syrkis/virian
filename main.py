@@ -15,46 +15,32 @@ import argparse
 
 # get cliargs
 def get_args():
-    parser = argparse.ArgumentParser(description="Virian data scraper scripts")
-    parser.add_argument('--dailies',  action='store_true', help='scrape daily top read')
-    parser.add_argument('--months',  action='store_true', help='make monthly wiki ess data')
-    parser.add_argument('--articles', action='store_true', help="scrape wiki articles")
-    parser.add_argument('--values', action='store_true', help="focus on ess data")
+    parser = argparse.ArgumentParser(description="Virian Script")
+    parser.add_argument('--wiki',  action='store_true', help='create/update wiki data')
+    parser.add_argument('--ess', action='store_true', help="run ess script")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
-    parser.add_argument('--data', action='store_true', help="run through data samples")
-    parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it,et,fr,is", help="what langs to taget")
+    parser.add_argument('--dataset', action='store_true', help="explore dataset")
+    parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it,et,fr,is", help="target langs")
     return parser.parse_args()
 
 
 # runners
-def run_dailies(langs):
+def run_wiki(langs):
     with Pool(2) as p:
         p.map(get_dailies, langs)
-
-def run_articles(langs):
-    """
-    TODO: wont work on frsh run
-    TODO: store article scrape data
-    """
     with Pool(2) as p:
         p.map(get_articles, langs)
 
-def run_months(langs):
-    lang_values = make_values(langs)
-    with Pool(4) as p:
-        p.map(make_months, lang_values) # make [(lang, value)]
+def run_ess():
+    construct_factors()    
 
-def get_values(langs):
-    return make_values(langs)    
-
-def run_data(langs):
+def run_dataset(langs):
     tokenizer = Tokenizer(trained=True)
     ds = Dataset(tokenizer)
-    i = 0
     for sample in ds:
         print(sample.shape, end=' ')
     
-def run_training():
+def run_train():
     tokenizer = Tokenizer(trained=False)
     ds = Dataset(tokenizer)
     model = Model(ds.sample_size)
@@ -66,19 +52,15 @@ def run_training():
 # call stack
 def main():
     args = get_args()
-    langs = args.langs.split(",") # de fi not done
-    if args.dailies:
-        run_dailies(langs)    
-    if args.articles:
-        run_articles(langs)
-    if args.months:
-        run_months(langs)
+    langs = args.langs.split(",")
+    if args.ess:
+        run_ess()    
+    if args.wiki:
+        run_wiki(langs)
     if args.train:
-        run_training()
-    if args.data:
-        run_data(langs)
-    if args.values:
-        pass
+        run_train()
+    if args.dataset:
+        run_dataset(langs)
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,9 @@ from boto3.session import Session
 import os
 import json
 from tqdm import tqdm
+from hashlib import sha256
 
+hypers = {'vocab_size': 2 ** 14, 'sample_size': 2 ** 7}
 
 # connect to digital ocean spaces
 def get_s3():
@@ -20,6 +22,7 @@ def get_s3():
     return client
 
 
+# load ess, wiki text or wiki days
 def load(target):
     path  = f"../data/wiki/{target}" 
     files = [f for f in os.listdir(path) if f[-4:] == 'json']
@@ -32,3 +35,7 @@ def load(target):
                 data = [json.loads(line) for line in f]
     return data
 
+
+# hash title name of wiki text
+def title_hash(title):
+    return sha256((article['article']).encode('utf-8')).hexdigest()

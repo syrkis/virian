@@ -8,15 +8,12 @@ import numpy as np
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 from factor_analyzer import FactorAnalyzer
-import seaborn as sns
 
 
 # make values
-def make_values(langs):
-    D = {lang: {} for lang in langs}
-    lang2country = {lang: lang.upper() for lang in langs}
-    lang2country['da'] = 'DK'; lang2country['sv'] = 'SE'
-    country2lang = {v: k for k, v in lang2country.items()}
+def construct_factors():
+     
+    
     meta_cols = "essround cntry".split()
     val_cols = "ipcrtiv imprich ipeqopt ipshabt impsafe impdiff ipfrule ipudrst ipmodst ipgdtim impfree iphlppl ipsuces ipstrgv ipadvnt ipbhprp iprspot iplylfr impenv imptrad impfun".split()
     ess_data = pd.read_csv('../data/ess/raw.csv', dtype='object', usecols=meta_cols + val_cols)
@@ -33,4 +30,7 @@ def make_values(langs):
                 D[country2lang[k1]][k2] = round_my_sigma
     D = [(k, v) for k, v in D.items()]
     return D
+
+# helpers
+val_cols = "ipcrtiv imprich ipeqopt ipshabt impsafe impdiff ipfrule ipudrst ipmodst ipgdtim impfree iphlppl ipsuces ipstrgv ipadvnt ipbhprp iprspot iplylfr impenv imptrad impfun".split()
 

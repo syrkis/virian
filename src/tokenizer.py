@@ -4,7 +4,6 @@
 
 # imports
 from src.dataset import Dataset
-from src.utils import get_s3
 from collections import Counter
 from itertools import islice
 from tqdm import tqdm
@@ -16,6 +15,7 @@ class Tokenizer(Dataset):
 
     unk = "<UNK>"
     pad = "<PAD>"
+    s3  = utils.get_s3()
 
     def __init__(self, trained=True):
         super().__init__()
@@ -51,14 +51,6 @@ class Tokenizer(Dataset):
         for idx, tok in enumerate(tokens[:min(self.sample_size, len(tokens))]):
             tok = tok if tok in self.word_to_idx else self.unk # insert unks
             vec[idx] = self.word_to_idx[tok]
-        return vec
-
-    def bag_of_words(self, sample): # TODO: ehm, bag of words is probably too stupid
-        tokens = self.tokenize(sample)
-        vec = torch.zeros(self.vocab_size)
-        for tok in tokens:
-            tok = tok if tok in self.word_to_idx else self.unk # insert unks
-            vec[self.word_to_idx[tok]] += 1
         return vec
 
 

@@ -3,52 +3,44 @@
 # by: Noah Syrkis
 
 # imports
-import os
-import json
+from src import utils
 import torch
-from itertools import cycle
-from src.utils import get_s3, load
 from tqdm import tqdm
-from hashlib import sha256
+from itertools import cycle
 
 
 # wiki dataset
 class Dataset(torch.utils.data.IterableDataset):
 
-    vocab_size  = 2 ** 16  # TODO: multilingual vocab
-    sample_size = 2 ** 7   # 128 word wiki summaries
-    s3          = get_s3() # AWS for remote storage
+    vocab_size  = utils.hypers['vocab_size']  # TODO: multilingual vocab
+    sample_size = utils.hypers['sample_size'] # 128 word wiki summaries
 
     def __init__(self, tokenizer=None):
-        self.texts     = load('texts') # wikipedia summaries
-        self.days      = load('days')  # wikipedia dailies
-        self.ess       = load('ess')   # ess factors
+        self.texts     = utils.load('texts') # wiki summaries
+        self.days      = utils.load('days')  # wiki dailies
+        self.ess       = utils.load('ess')   # ess factors
         self.tokenizer = tokenizer
         
     def process_data(self):
         if self.tokenizer:
             for lang, data in self.days.items():
-                yield self.construct(data, lang)
+                for date, text in data.items():
+                    yield self.construct_sample(date, lang, text)
         else:
             for title, text in self.texts.items():
                 yield text
 
-    def construct(self, day, lang): # some months shouldn't exist bcs ess rounds
-        date = day['date']
-        articles = day['data'] 
+    def construct_sample(self, date, lang, text):
         X = torch.zeros((1000, self.sample_size))
         W = torch.zeros(1000)
-        Y = torch.zeros((5, 2))
-        for idx, article in enumerate(articles):
-            title_hash = sha256((article['article']).encode('utf-8')).hexdigest()
-            if title_hash in self.articles[lang]:
-                article_text = self.articles[lang][title_hash]['text']
-                tokens = self.tokenizer.vectorize(article_text)
-                X[idx] += tokens
-            else:
-                X[idx] += torch.zeros(self.sample_size)
-            W[idx] += article['views']
-        return X
+        Y = self.ess[date]
+
+        for idx, text in enumerate(articles):
+            if utils.title_hash(text['title']) in self.articles[lang]:
+                W[idx] += article['views']
+                X[idx] += self.tokenizer.vectorize(text['text'])
+
+        return X, W, Y
 
     def get_stream(self):
         return cycle(self.process_data())
