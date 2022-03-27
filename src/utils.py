@@ -19,3 +19,16 @@ def get_s3():
             aws_secret_access_key=os.getenv("DIGITAL_OCEAN_SPACES_SECRET"))
     return client
 
+
+def load(target):
+    path  = f"../data/wiki/{target}" 
+    files = [f for f in os.listdir(path) if f[-4:] == 'json']
+    data = {}
+    for file in files:
+        with open(f"{path}/{file}", 'r') as f:
+            if target == 'text':
+                data[file[:2]] = json.load(f)
+            if target == 'days':
+                data = [json.loads(line) for line in f]
+    return data
+

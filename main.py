@@ -22,7 +22,6 @@ def get_args():
     parser.add_argument('--values', action='store_true', help="focus on ess data")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
     parser.add_argument('--data', action='store_true', help="run through data samples")
-    parser.add_argument('--big_daily', action='store_true', help="ony daily file per country")
     parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it,et,fr,is", help="what langs to taget")
     return parser.parse_args()
 
@@ -63,10 +62,6 @@ def run_training():
     optimizer = optim.Adam(model.parameters())
     train(ds, model, optimizer, criterion)
 
-def run_big_daily(langs):
-    with Pool(4) as p:
-        p.map(big_daily, langs)
-
 
 # call stack
 def main():
@@ -82,8 +77,6 @@ def main():
         run_training()
     if args.data:
         run_data(langs)
-    if args.big_daily:
-        run_big_daily(langs)
     if args.values:
         pass
 
