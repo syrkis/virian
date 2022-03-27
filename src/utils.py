@@ -10,6 +10,12 @@ from tqdm import tqdm
 from hashlib import sha256
 
 hypers = {'vocab_size': 2 ** 14, 'sample_size': 2 ** 7}
+paths = {
+        'tokenizer': '../data/model/tokenizer.json',
+        'text': '../data/wiki/text',
+        'days': '../data/wiki/days',
+        'ess': '../data/ess/raw.csv' # redownload
+        }
 
 # connect to digital ocean spaces
 def get_s3():
@@ -24,16 +30,25 @@ def get_s3():
 
 # load ess, wiki text or wiki days
 def load(target):
-    path  = f"../data/wiki/{target}" 
-    files = [f for f in os.listdir(path) if f[-4:] == 'json']
+    files = [f for f in os.listdir(paths[target]) if f[-4:] == 'json']
     data = {}
     for file in files:
-        with open(f"{path}/{file}", 'r') as f:
+        with open(f"{paths[target]}/{file}", 'r') as f:
             if target == 'text':
                 data[file[:2]] = json.load(f)
             if target == 'days':
                 data = [json.loads(line) for line in f]
     return data
+
+
+# iterate through raw text (for tokenizer)
+def text_iter():
+    files = [f for f in os.listdir(path) if f[-4:] == 'json']
+    for file in files:
+        with open(f"{paths['text']}/{file}", 'r') as f:
+            data = json.load(f)
+            for sample in data.values():
+                yield sample['text']
 
 
 # hash title name of wiki text
