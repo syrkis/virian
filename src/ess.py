@@ -4,6 +4,7 @@
 
 # imports
 import pandas as pd
+from src.utils import paths
 import numpy as np
 from tqdm import tqdm
 from matplotlib import pyplot as plt
@@ -12,23 +13,24 @@ from factor_analyzer import FactorAnalyzer
 
 # make values
 def construct_factors():
-     
-    
     meta_cols = "essround cntry".split()
-    val_cols = "ipcrtiv imprich ipeqopt ipshabt impsafe impdiff ipfrule ipudrst ipmodst ipgdtim impfree iphlppl ipsuces ipstrgv ipadvnt ipbhprp iprspot iplylfr impenv imptrad impfun".split()
-    ess_data = pd.read_csv('../data/ess/raw.csv', dtype='object', usecols=meta_cols + val_cols)
+    ess_data = pd.read_csv(paths['ess'], dtype='object', usecols=meta_cols + val_cols)
     fa = FactorAnalyzer(n_factors=5, rotation="promax")
     fa.fit(ess_data[val_cols])
     countries = ess_data.groupby('cntry').groups
+    D = {}
+
     for k1, v1 in countries.items():
-        if k1 in country2lang:
-            country = ess_data.loc[v1]
-            rounds = country.groupby("essround").groups
-            for k2, v2 in rounds.items():
-                round_fa = fa.transform(country.loc[v2][val_cols].dropna().astype(int))
-                round_my_sigma = (round_fa.mean(axis=0), round_fa.var(axis=0)) 
-                D[country2lang[k1]][k2] = round_my_sigma
-    D = [(k, v) for k, v in D.items()]
+        D [k1] = {}
+        country = ess_data.loc[v1]
+        rounds = country.groupby("essround").groups
+
+        for k2, v2 in rounds.items():
+            D[k1][k2] = {}
+            round_factors = fa.transform(country.loc[v2][val_cols].dropna().astype(int))
+            D[k1][k2]['var'] = round_factors.var(axis=0)
+            D[k1][k2]['avg'] = round_factors.mean(axis=0)
+
     return D
 
 # helpers

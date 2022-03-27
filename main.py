@@ -33,13 +33,15 @@ def run_wiki(langs):
         p.map(get_articles, langs)
 
 def run_ess():
-    construct_factors()    
+    ess = construct_factors()    
+    print(ess)
 
 def run_dataset():
     tokenizer = Tokenizer.from_file(paths["tokenizer"])
     ds = Dataset(tokenizer)
-    for (X, Y, Z) in ds:
-        print(Y)
+    for sample in ds:
+        print(sample)
+        break
 
 def run_tokenizer():
     tokenizer = train_tokenizer()

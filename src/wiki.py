@@ -1,5 +1,5 @@
 # wiki.py
-#   scarpes wiki project daily top 1000 api
+#   wiki daily top 1000 articles
 # by: Noah Syrkis
 
 # imports

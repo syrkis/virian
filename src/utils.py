@@ -37,7 +37,7 @@ def load(target):
             if target == 'text':
                 data[file[:2]] = json.load(f)
             if target == 'days':
-                data = [json.loads(line) for line in f]
+                data[file[:2]] = [json.loads(line) for line in f]
     return data
 
 
