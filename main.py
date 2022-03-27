@@ -29,11 +29,15 @@ def get_args():
 
 # runners
 def run_dailies(langs):
-    with Pool(4) as p:
+    with Pool(2) as p:
         p.map(get_dailies, langs)
 
 def run_articles(langs):
-    with Pool(4) as p:
+    """
+    TODO: wont work on frsh run
+    TODO: store article scrape data
+    """
+    with Pool(2) as p:
         p.map(get_articles, langs)
 
 def run_months(langs):
@@ -47,11 +51,12 @@ def get_values(langs):
 def run_data(langs):
     tokenizer = Tokenizer(trained=True)
     ds = Dataset(tokenizer)
+    i = 0
     for sample in ds:
-        print(sample)
+        print(sample[0][50].item(), end=' ')
     
 def run_training():
-    tokenizer = Tokenizer(trained=True)
+    tokenizer = Tokenizer(trained=False)
     ds = Dataset(tokenizer)
     model = Model(ds.sample_size)
     criterion = nn.MSELoss()

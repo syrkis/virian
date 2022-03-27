@@ -13,7 +13,7 @@ from tqdm import tqdm
 # wiki article scraper
 def get_articles(lang):
     wikipedia.set_lang(lang)
-    dailies_dir = f"../data/dailies/{lang}"
+    dailies_dir = f"../data/dailies/"
     articles_dir = f"../data/articles"
     with open(f"{articles_dir}/{lang}.json", "r") as f:
         corpus = json.loads(f.read())
@@ -21,9 +21,9 @@ def get_articles(lang):
     with open(f'{articles_dir}/{lang}_failed.txt', 'r') as f:
         failed = f.read().split()
     target_articles = set()
-    for daily in tqdm(dailies):
-        with open(f"{dailies_dir}/{daily}", 'r') as f:
-            for article in json.load(f):
+    with open(f"{dailies_dir}/{lang}.json", 'r') as f:
+        for line in f.readlines():
+            for article in json.loads(line)['data']:
                 title = article['article']
                 article_id = sha256((title).encode('utf-8')).hexdigest()
                 if article_id not in corpus and title not in failed:
