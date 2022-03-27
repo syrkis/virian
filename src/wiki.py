@@ -15,7 +15,7 @@ import wikipedia
 
 # run time function
 def get_dailies(lang):
-    file = f"../data/dailies_big/{lang}.json"
+    file = f"../data/days/{lang}.json"
     api = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     dones = get_dones(file)
     start_date = get_date(dones[-1].replace('_', '/') if dones else "2015/07/01")
@@ -42,8 +42,8 @@ def get_dailies(lang):
 # get articles from dailies
 def get_articles(lang):
     wikipedia.set_lang(lang)
-    dailies_dir = f"../data/dailies/"
-    articles_dir = f"../data/articles"
+    dailies_dir = f"../data/days"
+    articles_dir = f"../data/text"
     with open(f"{articles_dir}/{lang}.json", "r") as f:
         corpus = json.loads(f.read())
     dailies = [file for file in os.listdir(dailies_dir) if file[-5:] == '.json']
