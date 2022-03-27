@@ -18,9 +18,8 @@ class Dataset(IterableDataset):
 
     vocab_size = 2 ** 16
     sample_size = 2 ** 7
-    months_dir = "../data/months"
-    dailies_dir = "../data/days"
-    articles_dir = "../data/texts"
+    dailies_dir = "../data/wiki/days"
+    articles_dir = "../data/wiki/text"
     articles = {}
     for file in os.listdir(articles_dir):
         if file[-5:] == '.json':

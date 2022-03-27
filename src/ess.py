@@ -19,7 +19,7 @@ def make_values(langs):
     country2lang = {v: k for k, v in lang2country.items()}
     meta_cols = "essround cntry".split()
     val_cols = "ipcrtiv imprich ipeqopt ipshabt impsafe impdiff ipfrule ipudrst ipmodst ipgdtim impfree iphlppl ipsuces ipstrgv ipadvnt ipbhprp iprspot iplylfr impenv imptrad impfun".split()
-    ess_data = pd.read_csv('../data/ess/data.csv', dtype='object', usecols=meta_cols + val_cols)
+    ess_data = pd.read_csv('../data/ess/raw.csv', dtype='object', usecols=meta_cols + val_cols)
     fa = FactorAnalyzer(n_factors=5, rotation="promax")
     fa.fit(ess_data[val_cols])
     countries = ess_data.groupby('cntry').groups
