@@ -24,17 +24,16 @@ class Dataset(torch.utils.data.IterableDataset):
         
     def process_data(self):
         if self.tokenizer:
-            for lang, day in self.days.items():
-                for entry in day.values()['data']:
-                    yield self.construct_sample(day['date'], lang, entry['text'])
+            for lang, days in self.days.items():
+                for day in days:
+                    yield self.construct_sample(day['date'], lang, day['data'])
 
-    def construct_sample(self, date, lang, text):
-        return text
+    def construct_sample(self, date, lang, data):
         X = torch.zeros((1000, self.sample_size))
-        W = torch.zeros(1000) + article['views']
+        W = torch.zeros(1000) + torch.tensor([d['views'] for d in data])
         Y = self.ess[date]
-        for idx, text in enumerate(articles):
-            if utils.title_hash(text['title']) in self.articles[lang]:
+        for idx, article in enumerate(data):
+            if utils.title_hash(text['article']) in self.articles[lang]:
                 X[idx] += self.tokenizer.encode(text['text'][:self.sample_size])
         return X, W, Y
 
