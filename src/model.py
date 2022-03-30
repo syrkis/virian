@@ -20,6 +20,8 @@ class Model(nn.Module):
         x = self.dec(x)
         return x
 
+    def predict(self, x):
+        pass
 
 # dev calls
 def main():

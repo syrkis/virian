@@ -1,4 +1,5 @@
 # utils.py
+
 #   virian helper functions
 # by: Noah Syrkis
 
@@ -9,7 +10,7 @@ import json
 from tqdm import tqdm
 from hashlib import sha256
 
-hypers = {'vocab_size': 2 ** 14, 'sample_size': 2 ** 7}
+hypers = {'vocab_size': 2 ** 14, 'sample_size': 2 ** 4}
 paths = {
         'tokenizer': '../data/model/tokenizer.json',
         'text': '../data/wiki/text',
@@ -38,19 +39,25 @@ def load(target):
                 data[file[:2]] = json.load(f)
             if target == 'days':
                 data[file[:2]] = [json.loads(line) for line in f]
+        break
     return data
 
 
 # iterate through raw text (for tokenizer)
 def text_iter():
-    files = [f for f in os.listdir(path) if f[-4:] == 'json']
+    files = [f for f in os.listdir(paths['text']) if f[-4:] == 'json']
     for file in files:
         with open(f"{paths['text']}/{file}", 'r') as f:
             data = json.load(f)
             for sample in data.values():
                 yield sample['text']
-
+        break
 
 # hash title name of wiki text
 def title_hash(title):
-    return sha256((article['article']).encode('utf-8')).hexdigest()
+    return sha256((title).encode('utf-8')).hexdigest()
+
+# tokenze
+def tokenize(batch, tokenizer):
+    encoding = tokenizer(batch, padding="max_length", return_tensors='pt', max_length=hypers['sample_size'])
+    return encoding['input_ids'][0][:hypers['sample_size']]

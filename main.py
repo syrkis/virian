@@ -6,7 +6,6 @@
 from src import *
 import torch.nn as nn
 import torch.optim as optim
-from tokenizers import Tokenizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from multiprocessing import Pool
@@ -20,7 +19,6 @@ def get_args():
     parser.add_argument('--ess', action='store_true', help="run ess script")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
     parser.add_argument('--dataset', action='store_true', help="explore dataset")
-    parser.add_argument('--tokenizer', action='store_true', help="explore tokenizer")
     parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it,et,fr,is", help="langs")
     return parser.parse_args()
 
@@ -37,19 +35,13 @@ def run_ess():
     print(ess)
 
 def run_dataset():
-    tokenizer = Tokenizer.from_file(paths["tokenizer"])
-    ds = Dataset(tokenizer)
+    ds = Dataset()
     for sample in ds:
-        print(sample)
-        break
+        for i in range(sample.shape[0]):
+            pass
 
-def run_tokenizer():
-    tokenizer = train_tokenizer()
-    tokenizer.save(paths["tokenizer"])
-    
 def run_train():
-    tokenizer = Tokenizer(trained=False)
-    ds = Dataset(tokenizer)
+    ds = Dataset()
     model = Model(ds.sample_size)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())

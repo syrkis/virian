@@ -13,7 +13,7 @@ import datetime
 # train function
 def train(ds, model, optimizer, criterion, month_count=742 * 5): # country_month_count * epoch
     with tqdm(islice(ds, month_count), unit="month", total=month_count) as month:
-        for X, W, Y in month:
+        for X in month:
             optimizer.zero_grad()
             pred = model(X)
             loss = criterion(pred, X)

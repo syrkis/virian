@@ -1,5 +1,4 @@
 from src.dataset import Dataset
-from src.tokenizer import train_tokenizer
 from src.model import Model
 from src.train import train
 from src.utils import get_s3, paths
