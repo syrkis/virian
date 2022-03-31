@@ -37,8 +37,7 @@ def run_ess():
 def run_dataset():
     ds = Dataset()
     for sample in ds:
-        for i in range(sample.shape[0]):
-            pass
+        pass
 
 def run_train():
     ds = Dataset()

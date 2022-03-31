@@ -11,8 +11,8 @@ import datetime
 
 
 # train function
-def train(ds, model, optimizer, criterion, month_count=742 * 5): # country_month_count * epoch
-    with tqdm(islice(ds, month_count), unit="month", total=month_count) as month:
+def train(ds, model, optimizer, criterion, month_count=11 * 2500 * 5): # langs * days * epochs
+    with tqdm(islice(ds, month_count), unit="day", total=month_count) as month:
         for X in month:
             optimizer.zero_grad()
             pred = model(X)

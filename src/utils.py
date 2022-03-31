@@ -1,18 +1,19 @@
 # utils.py
-
 #   virian helper functions
 # by: Noah Syrkis
 
 # imports
 from boto3.session import Session
+import torch.nn.functional as F
 import os
 import json
 from tqdm import tqdm
 from hashlib import sha256
+from collections import defaultdict
 
 hypers = {'vocab_size': 2 ** 14, 'sample_size': 2 ** 4}
 paths = {
-        'tokenizer': '../data/model/tokenizer.json',
+        'tokenizer': 'bert-base-multilingual-cased',
         'text': '../data/wiki/text',
         'days': '../data/wiki/days',
         'ess': '../data/ess/raw.csv' # redownload
@@ -36,7 +37,7 @@ def load(target):
     for file in files:
         with open(f"{paths[target]}/{file}", 'r') as f:
             if target == 'text':
-                data[file[:2]] = json.load(f)
+                data[file[:2]] = defaultdict(lambda: {"text":""}, json.load(f))
             if target == 'days':
                 data[file[:2]] = [json.loads(line) for line in f]
         break
@@ -59,5 +60,13 @@ def title_hash(title):
 
 # tokenze
 def tokenize(batch, tokenizer):
-    encoding = tokenizer(batch, padding="max_length", return_tensors='pt', max_length=hypers['sample_size'])
-    return encoding['input_ids'][0][:hypers['sample_size']]
+    X = tokenizer(batch, truncation=True, padding="max_length", return_tensors='pt', max_length=hypers['sample_size'])
+    X = X['input_ids']
+    X = F.pad(X, pad=(0,0,0,1000-X.shape[0]))
+    return X.float()
+
+# extract text from 100 samples
+def make_batch(data):
+    #toks = [self.text[lang][title_hash(a['article'])]['text'] for a in data if title_hash(a['article']]
+    #return toks
+    pass
