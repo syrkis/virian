@@ -16,8 +16,9 @@ def train(loader, model, optimizer, criterion, epochs=5): # langs * days * epoch
         with tqdm(loader) as tepoch:
             for X, W, Y in tepoch:
                 optimizer.zero_grad()
-                pred = model(X)
-                loss = criterion(pred, X)
+                x_pred, y_pred = model(X, W, Y)
+                print(y_pred)
+                loss = criterion(x_pred, X)
                 loss.backward()
                 optimizer.step()
                 tepoch.set_postfix(loss=loss.item())

@@ -16,12 +16,15 @@ class Model(nn.Module):
     def __init__(self):
         super().__init__()
         self.enc = nn.Linear(self.sample_size, 50)
+        self.fc1 = nn.Linear(50, 10)
         self.dec = nn.Linear(50, self.sample_size)
 
-    def forward(self, x):
+    def forward(self, x, w, y):
         x = self.enc(x)
+        y = self.fc1(x).reshape(5, 2)
         x = self.dec(x)
-        return x
+        return x, y
+
 
     def predict(self, x):
         pass
