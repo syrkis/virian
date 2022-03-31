@@ -4,10 +4,10 @@
 
 # imports from src import 
 from src.utils import *
-import numpy as np
 import torch
 import torch.nn.functional as F
 from itertools import cycle
+import random
 
 
 # wiki dataset
@@ -18,10 +18,11 @@ class Dataset(torch.utils.data.Dataset):
     tokenizer   = get_tokenizer()
 
     def __init__(self):
-        self.toks = load('toks')           # wiki summaries
-        self.days = load('days')           # wiki dailies
-        self.keys = list(self.days.keys()) # day keys
-        self.ess  = get_ess()              # ess factors
+        self.toks = load('toks')              # wiki summaries
+        self.days = load('days')              # wiki dailies
+        self.keys = list(self.days.keys())    # day keys
+        self.keys = random.shuffle(self.keys) # day keys
+        self.ess  = get_ess()                 # ess factors
 
     def __len__(self):
         return len(self.days)

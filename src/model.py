@@ -21,7 +21,7 @@ class Model(nn.Module):
 
     def forward(self, x, w, y):
         x = self.enc(x)
-        y = self.fc1(x).reshape(5, 2)
+        y = torch.mean(self.fc1(x), dim = 1).reshape(x.shape[0], 5, 2)
         x = self.dec(x)
         return x, y
 

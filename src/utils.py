@@ -29,8 +29,12 @@ paths = {
         'factors': '../data/ess/factors.json'
         }
 
-langs = "da,de,et,is,fr,it,nl,no,pl,sv"
+langs = "da,de,et,fi,fr,is,it,nl,no,pl,sv"
 lang_to_country = {lang: lang.upper() for lang in langs.split(',')}
+lang_to_country['es'] = 'SP'
+lang_to_country['et'] = 'ES'
+lang_to_country['se'] = 'SV'
+lang_to_country['da'] = 'DK'
 
 
 # month 2 ess
@@ -40,6 +44,9 @@ def month_to_ess(lang, date, ess):
     best_ess_round = (None, 10000)
     rounds = list(ess[lang_to_country[lang]].keys())
     for r, time in rounds_to_date.items():
+        if time == date:
+            best_ess_round = (r, 0)
+            break
         delta = int(str(datetime.strptime(date, f) - datetime.strptime(time, f)).split()[0].replace('-', ''))
         if delta < best_ess_round[1] and r in rounds:
             best_ess_round = (r, delta)
@@ -73,7 +80,6 @@ def load(target):
                 days = [json.loads(line) for line in f]
                 for  day in days:
                     data[f"{file[:2]}-{day['date']}"] = day
-        break
     return data
 
 
@@ -89,3 +95,4 @@ title_hash = lambda title: sha256((title).encode('utf-8')).hexdigest()
 def get_ess():
     with open(paths['factors'], 'r') as f:
         return json.load(f)
+
