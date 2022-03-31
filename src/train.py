@@ -19,7 +19,7 @@ def train(loader, model, optimizer, criterion): # langs * days * epochs
             loss = criterion(pred, X)
             loss.backward()
             optimizer.step()
-            days.set_postfix(loss=loss.item())
+            data.set_postfix(loss=loss.item())
     get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
 
 
