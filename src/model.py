@@ -5,15 +5,18 @@
 # imports
 import torch
 import torch.nn as nn
+from src.utils import hypers
 
 
 # topic model
 class Model(nn.Module):
 
-    def __init__(self, sample_size):
+    sample_size = hypers['sample_size']
+
+    def __init__(self):
         super().__init__()
-        self.enc = nn.Linear(sample_size, 50)
-        self.dec = nn.Linear(50, sample_size)
+        self.enc = nn.Linear(self.sample_size, 50)
+        self.dec = nn.Linear(50, self.sample_size)
 
     def forward(self, x):
         x = self.enc(x)

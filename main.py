@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from multiprocessing import Pool
 import argparse
+import json
 
 
 # get args
@@ -19,11 +20,23 @@ def get_args():
     parser.add_argument('--ess', action='store_true', help="run ess script")
     parser.add_argument('--train', action='store_true', help="scrape wiki articles")
     parser.add_argument('--dataset', action='store_true', help="explore dataset")
+    parser.add_argument('--tokenize', action='store_true', help="make token files")
+    parser.add_argument('--tokenizer', action='store_true', help="train tokenizer")
     parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it,et,fr,is", help="langs")
     return parser.parse_args()
 
 
 # runners
+def run_tokenize():
+    texts = load('text') 
+    tokenizer = get_tokenizer()
+    for lang, articles in texts.items():
+        toks = {}
+        for title, text in tqdm(articles.items()):
+            toks[title] = tokenize(text['text'], tokenizer)[0].tolist()
+        with open(f"{paths['toks']}/{lang}.json", 'w+') as f:
+            json.dump(toks, f)
+
 def run_wiki(langs):
     with Pool(2) as p:
         p.map(get_dailies, langs)
@@ -36,15 +49,16 @@ def run_ess():
 
 def run_dataset():
     ds = Dataset()
-    for sample in ds:
-        pass
+    for X, W in ds:
+        print(X.shape)
 
 def run_train():
     ds = Dataset()
-    model = Model(ds.sample_size)
+    loader = DataLoader(dataset=ds, batch_size=hypers['batch_size'])
+    model = Model()
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
-    train(ds, model, optimizer, criterion)
+    train(loader, model, optimizer, criterion)
 
 
 # call stack
@@ -59,8 +73,8 @@ def main():
         run_train()
     if args.dataset:
         run_dataset()
-    if args.tokenizer:
-        run_tokenizer()
+    if args.tokenize:
+        run_tokenize()
 
 if __name__ == "__main__":
     main()

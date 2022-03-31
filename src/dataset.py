@@ -3,12 +3,10 @@
 # by: Noah Syrkis
 
 # imports from src import 
-from src.utils import hypers, load, title_hash, tokenize, paths
-from transformers import AutoTokenizer
+from src.utils import hypers, load, title_hash, tokenize, get_tokenizer
 from src.ess import construct_factors
 import torch
 import torch.nn.functional as F
-from tqdm import tqdm
 from itertools import cycle
 
 
@@ -17,12 +15,12 @@ class Dataset(torch.utils.data.IterableDataset):
 
     vocab_size  = hypers['vocab_size']  # TODO: multilingual vocab?
     sample_size = hypers['sample_size'] # 128 word wiki summaries
-    tokenizer   = AutoTokenizer.from_pretrained(paths["tokenizer"])
+    tokenizer   = get_tokenizer()
 
     def __init__(self):
-        self.text      = load('text')  # wiki summaries
-        self.days      = load('days')  # wiki dailies
-        # self.ess       = construct_factors() # ess factors
+        self.toks = load('toks')        # wiki summaries
+        self.days = load('days')        # wiki dailies
+        self.ess  = construct_factors() # ess factors
         
     def process_data(self):
         for lang, days in self.days.items():
@@ -31,12 +29,11 @@ class Dataset(torch.utils.data.IterableDataset):
 
     def construct_sample(self, date, lang, data):
         titles = [title_hash(article['article']) for article in data] 
-        texts  = [self.text[lang][title]['text'] for title in titles]
-        X      = tokenize(texts, self.tokenizer)
+        toks   = torch.stack([torch.tensor(self.toks[lang][title]) for title in titles])
+        X      = F.pad(toks, pad=(0,0,0,1000 - len(titles)))
         views  = torch.tensor([article['views'] for article in data])
         W      = F.pad(views, pad=(0,1000-views.shape[0]))
-        # Y = self.ess[date]
-        return X#, W # , Y
+        return X, W # , Y
 
     def get_stream(self):
         return cycle(self.process_data())
