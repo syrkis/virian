@@ -11,16 +11,17 @@ import datetime
 
 
 # train function
-def train(loader, model, optimizer, criterion): # langs * days * epochs
-    with tqdm(loader) as data:
-        for X, W in data:
-            optimizer.zero_grad()
-            pred = model(X)
-            loss = criterion(pred, X)
-            loss.backward()
-            optimizer.step()
-            data.set_postfix(loss=loss.item())
-    get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
+def train(loader, model, optimizer, criterion, epochs=5): # langs * days * epochs
+    for epoch in range(epochs):
+        with tqdm(loader) as tepoch:
+            for X, W, Y in tepoch:
+                optimizer.zero_grad()
+                pred = model(X)
+                loss = criterion(pred, X)
+                loss.backward()
+                optimizer.step()
+                tepoch.set_postfix(loss=loss.item())
+        # get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
 
 
 # call stack

@@ -12,18 +12,41 @@ import json
 from tqdm import tqdm
 from hashlib import sha256
 from collections import defaultdict
+from datetime import datetime, timedelta
 
 hypers = {
         'vocab_size': 2 ** 14,
         'sample_size': 2 ** 4,
-        'batch_size': 2 ** 4}
+        'batch_size': 2 ** 4
+        }
+
 paths = {
         'tokenizer': 'bert-base-multilingual-cased',
         'toks': '../data/wiki/toks',
         'text': '../data/wiki/text',
         'days': '../data/wiki/days',
-        'ess': '../data/ess/raw.csv' # redownload
+        'ess': '../data/ess/raw.csv', # redownload
+        'factors': '../data/ess/factors.json'
         }
+
+langs = "da,de,et,is,fr,it,nl,no,pl,sv"
+lang_to_country = {lang: lang.upper() for lang in langs.split(',')}
+
+
+# month 2 ess
+def month_to_ess(lang, date, ess):
+    f = '%Y/%m/%d'
+    rounds_to_date = {"7": "2014/12/31", "8": "2016/12/31", "9": "2018/12/31"} # round release assummption
+    best_ess_round = (None, 10000)
+    rounds = list(ess[lang_to_country[lang]].keys())
+    for r, time in rounds_to_date.items():
+        delta = int(str(datetime.strptime(date, f) - datetime.strptime(time, f)).split()[0].replace('-', ''))
+        if delta < best_ess_round[1] and r in rounds:
+            best_ess_round = (r, delta)
+    vec = ess[lang_to_country[lang]][best_ess_round[0]]
+    Y = torch.tensor([vec['avg'], vec['var']]).T
+    return Y
+           
 
 # connect to digital ocean spaces
 def get_s3():
@@ -45,7 +68,7 @@ def load(target):
             if target == 'text':
                 data[file[:2]] = defaultdict(lambda: {"text":""}, json.load(f))
             if target == 'toks':
-                data[file[:2]] = defaultdict(lambda: torch.zeros(hypers['sample_size']), json.load(f))
+                data[file[:2]] = defaultdict(lambda: [0 for _ in range(hypers['sample_size'])], json.load(f))
             if target == 'days':
                 days = [json.loads(line) for line in f]
                 for  day in days:
@@ -63,3 +86,6 @@ def tokenize(batch, tokenizer):
 
 get_tokenizer = lambda: AutoTokenizer.from_pretrained(paths["tokenizer"])
 title_hash = lambda title: sha256((title).encode('utf-8')).hexdigest()
+def get_ess():
+    with open(paths['factors'], 'r') as f:
+        return json.load(f)

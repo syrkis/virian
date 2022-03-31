@@ -3,8 +3,8 @@
 # by: Noah Syrkis
 
 # imports from src import 
-from src.utils import hypers, load, title_hash, tokenize, get_tokenizer
-from src.ess import construct_factors
+from src.utils import *
+import numpy as np
 import torch
 import torch.nn.functional as F
 from itertools import cycle
@@ -21,7 +21,7 @@ class Dataset(torch.utils.data.Dataset):
         self.toks = load('toks')           # wiki summaries
         self.days = load('days')           # wiki dailies
         self.keys = list(self.days.keys()) # day keys
-        # self.ess  = construct_factors()    # ess factors
+        self.ess  = get_ess()              # ess factors
 
     def __len__(self):
         return len(self.days)
@@ -31,11 +31,12 @@ class Dataset(torch.utils.data.Dataset):
         
     def construct_sample(self, meta, data):
         titles = [title_hash(article['article']) for article in data['data']] 
-        toks   = torch.stack([torch.tensor(self.toks[meta[:2]][title]) for title in titles])
+        toks   = torch.tensor([self.toks[meta[:2]][title] for title in titles])
         X      = F.pad(toks, pad=(0,0,0,1000 - len(titles)))
         views  = torch.tensor([article['views'] for article in data['data']])
         W      = F.pad(views, pad=(0,1000-views.shape[0]))
-        return X, W # , Y
+        Y      = month_to_ess(meta[:2], meta[3:].replace('_', '/'), self.ess)
+        return X, W, Y
 
 
 # dev stack

@@ -44,14 +44,14 @@ def run_wiki(langs):
         p.map(get_articles, langs)
 
 def run_ess():
-    ess = construct_factors()    
-    print(ess)
+    construct_factors()    
 
 def run_dataset():
     ds = Dataset()
     loader = DataLoader(dataset=ds, batch_size=64)
-    for X in tqdm(loader):
-        pass
+    for X, W, Y in tqdm(loader):
+        print(Y)
+        break
 
 def run_train():
     ds = Dataset()
