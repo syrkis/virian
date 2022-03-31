@@ -51,7 +51,7 @@ def run_dataset():
     ds = Dataset()
     loader = DataLoader(dataset=ds, batch_size=64)
     for X in tqdm(loader):
-        print(X[0][0] + 1, end="")
+        pass
 
 def run_train():
     ds = Dataset()

@@ -11,35 +11,31 @@ from itertools import cycle
 
 
 # wiki dataset
-class Dataset(torch.utils.data.IterableDataset):
+class Dataset(torch.utils.data.Dataset):
 
     vocab_size  = hypers['vocab_size']  # TODO: multilingual vocab?
     sample_size = hypers['sample_size'] # 128 word wiki summaries
     tokenizer   = get_tokenizer()
 
     def __init__(self):
-        self.toks = load('toks')        # wiki summaries
-        self.days = load('days')        # wiki dailies
-        self.ess  = construct_factors() # ess factors
+        self.toks = load('toks')           # wiki summaries
+        self.days = load('days')           # wiki dailies
+        self.keys = list(self.days.keys()) # day keys
+        # self.ess  = construct_factors()    # ess factors
+
+    def __len__(self):
+        return len(self.days)
+
+    def __getitem__(self, idx):
+        return self.construct_sample(self.keys[idx], self.days[self.keys[idx]])
         
-    def process_data(self):
-        for lang, days in self.days.items():
-            for day in days:
-                yield self.construct_sample(day['date'], lang, day['data'])
-
-    def construct_sample(self, date, lang, data):
-        titles = [title_hash(article['article']) for article in data] 
-        toks   = torch.stack([torch.tensor(self.toks[lang][title]) for title in titles])
+    def construct_sample(self, meta, data):
+        titles = [title_hash(article['article']) for article in data['data']] 
+        toks   = torch.stack([torch.tensor(self.toks[meta[:2]][title]) for title in titles])
         X      = F.pad(toks, pad=(0,0,0,1000 - len(titles)))
-        views  = torch.tensor([article['views'] for article in data])
+        views  = torch.tensor([article['views'] for article in data['data']])
         W      = F.pad(views, pad=(0,1000-views.shape[0]))
-        return X #, W # , Y
-
-    def get_stream(self):
-        return cycle(self.process_data())
-
-    def __iter__(self):
-        return self.get_stream()
+        return X, W # , Y
 
 
 # dev stack

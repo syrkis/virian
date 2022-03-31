@@ -47,7 +47,9 @@ def load(target):
             if target == 'toks':
                 data[file[:2]] = defaultdict(lambda: torch.zeros(hypers['sample_size']), json.load(f))
             if target == 'days':
-                data[file[:2]] = [json.loads(line) for line in f]
+                days = [json.loads(line) for line in f]
+                for  day in days:
+                    data[f"{file[:2]}-{day['date']}"] = day
         break
     return data
 
