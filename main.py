@@ -49,8 +49,9 @@ def run_ess():
 
 def run_dataset():
     ds = Dataset()
-    for X, W in ds:
-        print(X.shape)
+    loader = DataLoader(dataset=ds, batch_size=64)
+    for X in tqdm(loader):
+        print(X[0][0] + 1, end="")
 
 def run_train():
     ds = Dataset()

@@ -11,9 +11,9 @@ import datetime
 
 
 # train function
-def train(ds, model, optimizer, criterion, month_count=(11 * 2500 * 5)//hypers['batch_size']): # langs * days * epochs
-    with tqdm(islice(ds, month_count), total=month_count) as days:
-        for X, W in days:
+def train(loader, model, optimizer, criterion, month_count=(11 * 2500 * 5)//hypers['batch_size']): # langs * days * epochs
+    with tqdm(islice(loader, month_count), total=month_count) as days:
+        for X in days:
             optimizer.zero_grad()
             pred = model(X)
             loss = criterion(pred, X)

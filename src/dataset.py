@@ -33,7 +33,7 @@ class Dataset(torch.utils.data.IterableDataset):
         X      = F.pad(toks, pad=(0,0,0,1000 - len(titles)))
         views  = torch.tensor([article['views'] for article in data])
         W      = F.pad(views, pad=(0,1000-views.shape[0]))
-        return X, W # , Y
+        return X #, W # , Y
 
     def get_stream(self):
         return cycle(self.process_data())
