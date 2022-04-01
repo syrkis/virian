@@ -25,7 +25,7 @@ paths = {
         'toks': '../data/wiki/toks',
         'text': '../data/wiki/text',
         'days': '../data/wiki/days',
-        'ess': '../data/ess/raw.csv', # redownload
+        'ess': '../data/ess/ESS1-9e01_1.csv', # redownload
         'factors': '../data/ess/factors.json'
         }
 
@@ -33,9 +33,10 @@ langs = "da,de,et,fi,fr,is,it,nl,no,pl,sv"
 lang_to_country = {lang: lang.upper() for lang in langs.split(',')}
 lang_to_country['es'] = 'SP'
 lang_to_country['et'] = 'ES'
-lang_to_country['se'] = 'SV'
+lang_to_country['sv'] = 'SE'
 lang_to_country['da'] = 'DK'
 
+# get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
 
 # month 2 ess
 def month_to_ess(lang, date, ess):
@@ -44,11 +45,13 @@ def month_to_ess(lang, date, ess):
     best_ess_round = (None, 10000)
     rounds = list(ess[lang_to_country[lang]].keys())
     for r, time in rounds_to_date.items():
+        if r not in rounds:
+            continue
         if time == date:
             best_ess_round = (r, 0)
-            break
+            continue
         delta = int(str(datetime.strptime(date, f) - datetime.strptime(time, f)).split()[0].replace('-', ''))
-        if delta < best_ess_round[1] and r in rounds:
+        if delta < best_ess_round[1]:
             best_ess_round = (r, delta)
     vec = ess[lang_to_country[lang]][best_ess_round[0]]
     Y = torch.tensor([vec['avg'], vec['var']]).T

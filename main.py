@@ -11,6 +11,7 @@ from tqdm import tqdm
 from multiprocessing import Pool
 import argparse
 import json
+from torch.utils.tensorboard import SummaryWriter
 
 
 # get args
@@ -59,7 +60,9 @@ def run_train():
     model = Model()
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
-    train(loader, model, optimizer, criterion)
+    writer = SummaryWriter()
+    model = train(loader, model, optimizer, criterion, writer)
+    writer.flush()
 
 
 # call stack

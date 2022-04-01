@@ -20,11 +20,24 @@ class Model(nn.Module):
         self.dec = nn.Linear(50, self.sample_size)
 
     def forward(self, x, w, y):
-        x = self.enc(x)
-        y = torch.mean(self.fc1(x), dim = 1).reshape(x.shape[0], 5, 2)
-        x = self.dec(x)
+        x = self.encode(x)
+        y = self.infer(x)
+        x = self.decode(x)
         return x, y
 
+    def encode(self, x):
+        x = self.enc(x)
+        return x
+
+    def decode(self, x):
+        x = self.decode(x)
+        return x
+
+    def infer(self, x):
+        y = self.fc1(x) 
+        y = torch.sum(y, dim=1)
+        y = y.reshape(x.shape[0], 5, 2)
+        return y
 
     def predict(self, x):
         pass

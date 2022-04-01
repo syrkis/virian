@@ -12,3 +12,4 @@ plots
 .python-version
 env
 logs/
+runs/

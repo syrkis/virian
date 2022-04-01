@@ -18,11 +18,11 @@ class Dataset(torch.utils.data.Dataset):
     tokenizer   = get_tokenizer()
 
     def __init__(self):
-        self.toks = load('toks')              # wiki summaries
-        self.days = load('days')              # wiki dailies
-        self.keys = list(self.days.keys())    # day keys
-        self.keys = random.shuffle(self.keys) # day keys
-        self.ess  = get_ess()                 # ess factors
+        self.toks = load('toks')           # wiki summaries
+        self.days = load('days')           # wiki dailies
+        self.keys = list(self.days.keys()) # day keys
+        random.shuffle(self.keys)          # day keys
+        self.ess  = get_ess()              # ess factors
 
     def __len__(self):
         return len(self.days)
@@ -35,7 +35,7 @@ class Dataset(torch.utils.data.Dataset):
         toks   = torch.tensor([self.toks[meta[:2]][title] for title in titles])
         X      = F.pad(toks, pad=(0,0,0,1000 - len(titles)))
         views  = torch.tensor([article['views'] for article in data['data']])
-        W      = F.pad(views, pad=(0,1000-views.shape[0]))
+        W      = F.pad(views, pad=(0,1000-views.shape[0])) / torch.sum(views)
         Y      = month_to_ess(meta[:2], meta[3:].replace('_', '/'), self.ess)
         return X, W, Y
 
