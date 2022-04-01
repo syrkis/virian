@@ -34,13 +34,43 @@ There's a weight column. How do I use that? Let's see what countries we have to 
 cat(unique(ess$cntry))
 ``` 
 
-So there's a lot of country codes we know in there. Let's explore Denmark a bit
+So there's a lot of country codes we know in there. Let's make a function that takes in a country and a feature, and plots it through time:
 
 ```{r}
-trust <- c("ppltrst","pplfair","pplhlp", "essround") # trust question columns
-dk <- subset(ess, cntry == 'DK') # load danish samples into variable
-dk.trust <- dk %>% select(all_of(trust)) %>% filter(ppltrst < 11 & pplfair < 11 & pplhlp < 11)
+get.country <- function(country.code) {
+  country <- subset(ess, cntry == country.code) 
+  return(country)
+}
 
-ggplot(dk.trust, aes(x = ppltrst, color=essround)) +
-  geom_histogram()
+get.feature <- function(country, feature.name) {
+  feature <- country %>%
+    select(essround, !!rlang::sym(feature.name)) %>%
+    filter(!!rlang::sym(feature.name) <= 10)
+  return(feature)
+}
+
+plot.feature <- function(feature) {
+  ggplot(feature, aes(x = ppltrst, fill=as.factor(essround))) +
+           geom_histogram(position='dodge', stat = "count")
+}
+
+country <- get.country('FR')
+feature <- get.feature(country, "ppltrst")
+plot.feature(feat)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
