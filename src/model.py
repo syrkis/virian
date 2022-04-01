@@ -21,7 +21,7 @@ class Model(nn.Module):
 
     def forward(self, x, w, y):
         x = self.encode(x)
-        y = self.infer(x)
+        y = self.infer(x, w)
         x = self.decode(x)
         return x, y
 
@@ -30,17 +30,20 @@ class Model(nn.Module):
         return x
 
     def decode(self, x):
-        x = self.decode(x)
+        x = self.dec(x)
         return x
 
-    def infer(self, x):
+    def infer(self, x, w):
         y = self.fc1(x) 
+        y = w[:,:,None] * y
         y = torch.sum(y, dim=1)
         y = y.reshape(x.shape[0], 5, 2)
         return y
 
     def predict(self, x):
+                   
         pass
+    
 
 # dev calls
 def main():

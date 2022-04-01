@@ -1,0 +1,29 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Inferring Cultural States from Population Reading Activity
+In order to infer cultural states from population reading activity,
+we need to $a)$ understand a bit about cultural states, and $b)$ understand a bit about reading activity. That is what this notebook is about—conducting exploratory data analysis on the European Social Survey data and the Wikipedia data.
+
+## European Social Survey (ESS)
+
+The ESS refers to a biannual (every second year) survey conducted in various European countries,
+focusing on cultural values and attitudes, and how these connect to media, politics and more.
+I'm intending to use the ESS data to evaluate (and improve) the predictions I am making about
+culture from the Wiki data. I'd have loved is the ESS data was annual, but unfortunately it is
+not. There are only three ESS rounds for which I have Wiki data. I'm considering constructing
+intermediate rounds by averaging out the value between rounds 7 and 8, and round 8 and 9, but
+I digress. Let's load in the data (we got rounds 7, 8, 9 and a bunch of non country specific
+questions):
+
+```{r}
+ess.path <- "../data/ess/ESS1-9e01_1.csv"
+ess <- read.csv2(ess.path, sep = ',')
+```
+
+And now lets play around with it a little:
+```{r}
+names(ess)
+```
