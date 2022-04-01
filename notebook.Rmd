@@ -38,12 +38,9 @@ So there's a lot of country codes we know in there. Let's explore Denmark a bit
 
 ```{r}
 trust <- c("ppltrst","pplfair","pplhlp", "essround") # trust question columns
-dk <- subset(ess, cntry == 'FR') # load danish samples into variable
-dk.trust <- dk %>%
-  select(all_of(trust)) %>%
-  filter(ppltrst < 11 & pplfair < 11 & pplhlp < 11) %>%
-  group_by(essround)
+dk <- subset(ess, cntry == 'DK') # load danish samples into variable
+dk.trust <- dk %>% select(all_of(trust)) %>% filter(ppltrst < 11 & pplfair < 11 & pplhlp < 11)
 
-ggplot(dk.trust, aes(x=ppltrst, color=essround)) +
-    geom_histogram()
+ggplot(dk.trust, aes(x = ppltrst, color=essround)) +
+  geom_histogram()
 ```
