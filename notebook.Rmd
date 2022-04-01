@@ -3,6 +3,10 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+```{r}
+library(tidyverse)
+```
+
 # Inferring Cultural States from Population Reading Activity
 In order to infer cultural states from population reading activity,
 we need to $a)$ understand a bit about cultural states, and $b)$ understand a bit about reading activity. That is what this notebook is about—conducting exploratory data analysis on the European Social Survey data and the Wikipedia data.
@@ -20,10 +24,26 @@ questions):
 
 ```{r}
 ess.path <- "../data/ess/ESS1-9e01_1.csv"
-ess <- read.csv2(ess.path, sep = ',')
+ess <- read.csv(ess.path)
 ```
 
-And now lets play around with it a little:
+We got `r length(names(ess))` different columns. That's a bit overwhelming. Which of these are useful?
+How do they evolve through time? How are the distributions within the different countries?
+There's a weight column. How do I use that? Let's see what countries we have to deal with:
 ```{r}
-names(ess)
+cat(unique(ess$cntry))
+``` 
+
+So there's a lot of country codes we know in there. Let's explore Denmark a bit
+
+```{r}
+trust <- c("ppltrst","pplfair","pplhlp", "essround") # trust question columns
+dk <- subset(ess, cntry == 'FR') # load danish samples into variable
+dk.trust <- dk %>%
+  select(all_of(trust)) %>%
+  filter(ppltrst < 11 & pplfair < 11 & pplhlp < 11) %>%
+  group_by(essround)
+
+ggplot(dk.trust, aes(x=ppltrst, color=essround)) +
+    geom_histogram()
 ```
