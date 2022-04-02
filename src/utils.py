@@ -4,7 +4,7 @@
 
 # imports
 from boto3.session import Session
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForMaskedLM
 import torch
 import torch.nn.functional as F
 import os
@@ -14,9 +14,12 @@ from hashlib import sha256
 from collections import defaultdict
 from datetime import datetime, timedelta
 
+get_embeddings = lambda: AutoModelForMaskedLM.from_pretrained("bert-base-multilingual-cased").bert.embeddings.word_embeddings
+
 hypers = {
         'vocab_size': 2 ** 14,
         'sample_size': 2 ** 4,
+        'embedding_dim': 768,
         'batch_size': 2 ** 4
         }
 
@@ -83,6 +86,7 @@ def load(target):
                 days = [json.loads(line) for line in f]
                 for  day in days:
                     data[f"{file[:2]}-{day['date']}"] = day
+        break
     return data
 
 
@@ -90,7 +94,7 @@ def load(target):
 def tokenize(batch, tokenizer):
     X = tokenizer(batch, truncation=True, padding="max_length", return_tensors='pt', max_length=hypers['sample_size'])
     X = X['input_ids']
-    return X.float()
+    return X
 
 
 get_tokenizer = lambda: AutoTokenizer.from_pretrained(paths["tokenizer"])

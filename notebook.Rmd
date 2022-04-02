@@ -38,11 +38,13 @@ cat(unique(ess$cntry))
 So there's a lot of country codes we know in there. Let's make a function that takes in a country and a feature, and plots it through time:
 
 ```{r}
+# get all rows related to specific country
 get.country <- function(country.code) {
   country.df <- subset(ess, cntry == country.code) 
   return(country.df)
 }
 
+# get all columns related to specific question
 get.feature <- function(country.df, feature.name) {
   country.feature.df <- country.df %>%
     select(essround, feature.name)
@@ -50,24 +52,28 @@ get.feature <- function(country.df, feature.name) {
   return(country.feature.df)
 }
 
+# remove weired values
 do.filter <- function(country.feature.df) {
   country.feature.filter.df <- subset(country.feature.df, country.feature.df[,2] <= 10)
   return(country.feature.filter.df)
 }
 
+# plot a histogram
 plot.feature <- function(country.code, feature.name) {
   country <- get.country(country.code)
   country.feature <- get.feature(country, feature.name)  
   country.feature.filter <- do.filter(country.feature)
-  ggplot(country.feature.filter, aes(x = !!rlang::sym(feature.name), fill=as.factor(essround))) +
-           geom_histogram(position='dodge', stat = "count")
+  return(ggplot(country.feature.filter, aes(x = !!rlang::sym(feature.name), fill=as.factor(essround))) + geom_histogram(position='dodge', binwidth = .5) + ggtitle(country.code))
 }
 ```
 
 So we now have a way to get a country, and a feature, and plot a histogram for the different rounds. Next, let's look at a bunch of stuff:
 
 ```{r}
-plot.feature('DK', 'ppltrst')
+countries <- c('DE', 'DK', 'FI', 'NO', 'FR', 'IT', 'NL', 'SE', 'IS', 'DE', 'PL', 'ES')
+for (country in countries) {
+  plot(plot.feature(country, 'happy'))
+}
 ```
 
 

@@ -12,12 +12,13 @@ from src.utils import hypers
 class Model(nn.Module):
 
     sample_size = hypers['sample_size']
+    embedding_dim = hypers['embedding_dim']
 
     def __init__(self):
         super().__init__()
-        self.enc = nn.Linear(self.sample_size, 50)
+        self.enc = nn.Linear(self.embedding_dim, 50)
         self.fc1 = nn.Linear(50, 10)
-        self.dec = nn.Linear(50, self.sample_size)
+        self.dec = nn.Linear(50, self.embedding_dim)
 
     def forward(self, x, w, y):
         x = self.encode(x)
@@ -35,6 +36,8 @@ class Model(nn.Module):
 
     def infer(self, x, w):
         y = self.fc1(x) 
+        print(y.shape)
+        exit()
         y = w[:,:,None] * y
         y = torch.sum(y, dim=1)
         y = y.reshape(x.shape[0], 5, 2)
