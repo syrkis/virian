@@ -25,6 +25,7 @@ questions):
 ```{r}
 ess.path <- "../data/ess/ESS1-9e01_1.csv"
 ess <- read.csv(ess.path)
+ess$essround <- as.factor(ess$essround)
 ```
 
 We got `r length(names(ess))` different columns. That's a bit overwhelming. Which of these are useful?
@@ -38,28 +39,36 @@ So there's a lot of country codes we know in there. Let's make a function that t
 
 ```{r}
 get.country <- function(country.code) {
-  country <- subset(ess, cntry == country.code) 
-  return(country)
+  country.df <- subset(ess, cntry == country.code) 
+  return(country.df)
 }
 
-get.feature <- function(country, feature.name) {
-  feature <- country %>%
-    select(essround, !!rlang::sym(feature.name)) %>%
-    filter(!!rlang::sym(feature.name) <= 10)
-  return(feature)
+get.feature <- function(country.df, feature.name) {
+  country.feature.df <- country.df %>%
+    select(essround, feature.name)
+  country.feature.df[,2] <- as.numeric(country.feature.df[,2])
+  return(country.feature.df)
 }
 
-plot.feature <- function(feature) {
-  ggplot(feature, aes(x = ppltrst, fill=as.factor(essround))) +
+do.filter <- function(country.feature.df) {
+  country.feature.filter.df <- subset(country.feature.df, country.feature.df[,2] <= 10)
+  return(country.feature.filter.df)
+}
+
+plot.feature <- function(country.code, feature.name) {
+  country <- get.country(country.code)
+  country.feature <- get.feature(country, feature.name)  
+  country.feature.filter <- do.filter(country.feature)
+  ggplot(country.feature.filter, aes(x = !!rlang::sym(feature.name), fill=as.factor(essround))) +
            geom_histogram(position='dodge', stat = "count")
 }
-
-country <- get.country('FR')
-feature <- get.feature(country, "ppltrst")
-plot.feature(feat)
 ```
 
+So we now have a way to get a country, and a feature, and plot a histogram for the different rounds. Next, let's look at a bunch of stuff:
 
+```{r}
+plot.feature('DK', 'ppltrst')
+```
 
 
 
