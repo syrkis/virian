@@ -7,3 +7,42 @@
 
 The code here should map a collection of view weighted articles (X) to a point in human value space (y).
 These articles (and their associated view counts) could come from Wikipedia or news organisations.
+
+
+## Countries
+
+| Country        | Code | Wiki | Train | Test | ESS7 | ESS8 | ESS9 |
+|----------------|------|------|-------|------|------|------|------|
+| Austria        | DE   | DE   |       |      | x    | x    | x    |
+| Belgium        | DE   | DE   |       |      | x    | x    | x    |
+| Bulgaria       | DE   | DE   |       |      |      |      | x    |
+| Croatia        | DE   | DE   |       |      |      |      | x    |
+| Cyprus         | DE   | DE   |       |      |      |      | x    |
+| Czechia        | DE   | DE   |       |      | x    | x    | x    |
+| Denmark        | DE   | DE   |       |      | x    |      | x    |
+| Estonia        | DE   | DE   |       |      | x    | x    | x    |
+| Finland        | DE   | DE   |       |      | x    | x    | x    |
+| France         | DE   | DE   |       |      | x    | x    | x    |
+| Germany        | DE   | DE   |       |      | x    | x    | x    |
+| Greece         | DE   | DE   |       |      |      |      |      |
+| Hungary        | DE   | DE   |       |      | x    | x    | x    |
+| Iceland        | DE   | DE   |       |      |      | x    | x    |
+| Ireland        | DE   | DE   |       |      | x    | x    | x    |
+| Israel         | DE   | DE   |       |      | x    | x    |      |
+| Italy          | DE   | DE   |       |      |      | x    | x    |
+| Latvia         | DE   | DE   |       |      |      |      | x    |
+| Lithuania      | DE   | DE   |       |      | x    | x    | x    |
+| Luxembourg     | DE   | DE   |       |      |      | x    |      |
+| Netherlands    | DE   | DE   |       |      | x    | x    | x    |
+| Norway         | DE   | DE   |       |      | x    | x    | x    |
+| Poland         | DE   | DE   |       |      | x    | x    | x    |
+| Portugal       | DE   | DE   |       |      | x    | x    | x    |
+| Russia         | DE   | DE   |       |      |      | x    |      |
+| Slovakia       | DE   | DE   |       |      |      |      | x    |
+| Slovenia       | DE   | DE   |       |      | x    | x    | x    |
+| Spain          | DE   | DE   |       |      | x    | x    | x    |
+| Sweden         | DE   | DE   |       |      | x    | x    | x    |
+| Switzerland    | DE   | DE   |       |      | x    | x    | x    |
+| Turkey         | DE   | DE   |       |      |      |      |      |
+| Ukraine        | DE   | DE   |       |      |      |      |      |
+| United Kingdom | DE   | DE   |       |      | x    | x    | x    |

@@ -43,6 +43,7 @@ lang_to_country['da'] = 'DK'
 
 # month 2 ess
 def month_to_ess(lang, date, ess):
+    date = date.replace('_', '/')
     f = '%Y/%m/%d'
     rounds_to_date = {"7": "2014/12/31", "8": "2016/12/31", "9": "2018/12/31"} # round release assummption
     best_ess_round = (None, 10000)
