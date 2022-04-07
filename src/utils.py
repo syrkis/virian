@@ -14,7 +14,8 @@ from hashlib import sha256
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-get_embeddings = lambda: AutoModelForMaskedLM.from_pretrained("bert-base-multilingual-cased").bert.embeddings.word_embeddings
+def get_embeddings():
+    return AutoModelForMaskedLM.from_pretrained("bert-base-multilingual-cased").bert.embeddings.word_embeddings
 
 hypers = {
         'vocab_size': 2 ** 14,
@@ -98,9 +99,18 @@ def tokenize(batch, tokenizer):
     return X
 
 
-get_tokenizer = lambda: AutoTokenizer.from_pretrained(paths["tokenizer"])
+def get_tokenizer():
+    return AutoTokenizer.from_pretrained(paths["tokenizer"])
+
 title_hash = lambda title: sha256((title).encode('utf-8')).hexdigest()
+
 def get_ess():
     with open(paths['factors'], 'r') as f:
         return json.load(f)
 
+
+def parse_readme_langs():
+    with open('README.md', 'r') as f:
+        table = f.read().split("## Countries")[1].strip()
+    langs = [line.split('|')[3].strip() for line in table.split('\n')[2:]]
+    return " ".join(langs).lower().split()

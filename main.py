@@ -17,13 +17,13 @@ from torch.utils.tensorboard import SummaryWriter
 # get args
 def get_args():
     parser = argparse.ArgumentParser(description="Virian Script")
-    parser.add_argument('--wiki',  action='store_true', help='create/update wiki data')
-    parser.add_argument('--ess', action='store_true', help="run ess script")
-    parser.add_argument('--train', action='store_true', help="scrape wiki articles")
+    parser.add_argument('--wiki',  action='store_true', help='sustain wiki')
+    parser.add_argument('--ess', action='store_true', help="sustain ess")
+    parser.add_argument('--train', action='store_true', help="train model")
     parser.add_argument('--dataset', action='store_true', help="explore dataset")
-    parser.add_argument('--tokenize', action='store_true', help="make token files")
-    parser.add_argument('--tokenizer', action='store_true', help="train tokenizer")
-    parser.add_argument('--langs', default="de,fi,da,no,sv,nl,pl,it,et,fr,is", help="langs")
+    parser.add_argument('--tokenize', action='store_true', help="token files")
+    parser.add_argument('--readme', action="store_true", help="readme")
+    parser.add_argument('--langs', help="target specific languages (wiki)")
     return parser.parse_args()
 
 
@@ -68,7 +68,7 @@ def run_train():
 # call stack
 def main():
     args = get_args()
-    langs = args.langs.split(",")
+    langs = parse_readme_langs()
     if args.ess:
         run_ess()    
     if args.wiki:

@@ -14,9 +14,9 @@ class Dataset(torch.utils.data.Dataset):
 
     vocab_size  = hypers['vocab_size']  # TODO: multilingual vocab?
     sample_size = hypers['sample_size'] # 128 word wiki summaries
-    embedder    = get_embeddings()
 
     def __init__(self, langs):
+        self.embed = get_embeddings()       # get embedding function
         self.langs = langs                  # for training or test?
         self.ess   = get_ess()              # ess factors
         self.toks  = load('toks')           # wiki summaries
