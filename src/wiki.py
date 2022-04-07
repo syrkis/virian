@@ -16,7 +16,7 @@ import wikipedia
 
 # run time function
 def get_dailies(lang):
-    file = f"../data/wiki/days/{lang}.json"
+    file = f"{paths['text']}/{lang}.json"
     api = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     dones = get_dones(file)
     start_date = get_date(dones[-1].replace('_', '/') if dones else "2015/07/01")

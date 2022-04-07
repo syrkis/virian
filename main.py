@@ -13,6 +13,8 @@ import argparse
 import json
 from torch.utils.tensorboard import SummaryWriter
 import os
+from transformers import logging
+logging.set_verbosity_error()
 
 
 # get args
@@ -38,10 +40,7 @@ def setup():
             file = f"{path}/{lang}.json"
             if not os.path.exists(file):
                 fp = open(file, 'x'); fp.close()
-        fail_file = f"{paths['text']}/{lang}_failed.txt"
         text_file = f"{paths['text']}/{lang}.json"
-        if not os.path.exists(fail_file):
-            f = open(fail_file, 'x'); f.close()
         if not os.path.exists(text_file):
             with open(text_file, 'w') as f:
                 json.dump({"__failed__": []}, f)
@@ -58,43 +57,36 @@ def run_tokenize():
             json.dump(toks, f)
 
 def run_wiki(langs):
-    with Pool(len(langs)) as p:
+    with Pool(8) as p:
         p.map(get_dailies, langs)
-    with Pool(len(langs)) as p:
+    with Pool(8) as p:
         p.map(get_articles, langs)
 
 def run_ess():
     construct_factors()    
 
-def run_dataset():
-    ds = Dataset()
-    loader = DataLoader(dataset=ds, batch_size=64)
-    for X, W, Y in tqdm(loader):
-        print(Y)
-        break
-
-def run_train():
-    ds = Dataset()
-    loader = DataLoader(dataset=ds, batch_size=hypers['batch_size'])
-    model = Model()
+def run_train(langs):
+    model     = Model()
+    ds        = Dataset(langs[0])
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
-    writer = SummaryWriter()
-    model = train(loader, model, optimizer, criterion, writer)
+    writer    = SummaryWriter()
+    model     = train(ds, model, optimizer, criterion, writer)
     writer.flush()
 
 
 # call stack
 def main():
-    setup()
+    # setup()
     args = get_args()
-    langs = parse_readme_langs()
     if args.ess:
         run_ess()    
     if args.wiki:
-        run_wiki(langs)
+        train_langs, test_langs = get_langs()
+        run_wiki(train_langs + test_langs)
     if args.train:
-        run_train()
+        train_langs, test_langs = get_langs()
+        run_train((train_langs, test_langs))
     if args.dataset:
         run_dataset()
     if args.tokenize:

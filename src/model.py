@@ -22,9 +22,9 @@ class Model(nn.Module):
         self.dec = nn.Linear(50, self.embedding_dim)
 
     def forward(self, x, w, y):
-        x = F.relu(self.encode(x))
+        x = self.encode(x)
         y = self.infer(x, w)
-        x = F.softmax(self.decode(x))
+        x = self.decode(x)
         return x, y
 
     def encode(self, x):
@@ -37,14 +37,11 @@ class Model(nn.Module):
 
     def infer(self, x, w):
         y = self.fc1(x) 
-        y = w[:,:,None] * y
-        y = torch.sum(y, dim=1)
-        y = y.reshape(x.shape[0], 5, 2)
+        # y = w[:,:,None] * y
+        # y = torch.sum(y, dim=1)
+        # y = y.reshape(x.shape[0], 5, 2)
         return y
 
-    def predict(self, x):
-        pass
-    
 
 # dev calls
 def main():

@@ -26,11 +26,11 @@ hypers = {
 
 paths = {
         'tokenizer': 'bert-base-multilingual-cased',
-        'toks': '../data/wiki/toks',
+        'toks': '../data2/wiki/toks',
         'text': '../data/wiki/text',
-        'days': '../data/wiki/days',
+        'days': '../data2/wiki/days',
         'ess': '../data/ess/ESS1-9e01_1.csv', # redownload
-        'factors': '../data/ess/factors.json',
+        'factors': '../data2/ess/factors.json',
         "all_dirs": ['../data', '../data/models', '../data/ess', '../data/wiki', '../data/wiki/days', '../data/wiki/toks', '../data/wiki/text']
         }
 
@@ -76,20 +76,22 @@ def get_s3():
 
 
 # load ess, wiki text or wiki days
-def load(target):
+def load(target, langs):
     files = [f for f in os.listdir(paths[target]) if f[-4:] == 'json']
     data = {}
-    for file in files:
-        with open(f"{paths[target]}/{file}", 'r') as f:
-            if target == 'text':
-                data[file[:2]] = defaultdict(lambda: {"text":""}, json.load(f))
-            if target == 'toks':
-                data[file[:2]] = defaultdict(lambda: [0 for _ in range(hypers['sample_size'])], json.load(f))
-            if target == 'days':
-                days = [json.loads(line) for line in f]
-                for  day in days:
-                    data[f"{file[:2]}-{day['date']}"] = day
-        break
+    for idx, file in enumerate(files):
+        if file[:2] in langs: # train or test split
+            with open(f"{paths[target]}/{file}", 'r') as f:
+                if target == 'text':
+                    data[file[:2]] = defaultdict(lambda: {"text":""}, json.load(f))
+                if target == 'toks':
+                    data[file[:2]] = defaultdict(lambda: [0 for _ in range(hypers['sample_size'])], json.load(f))
+                if target == 'days':
+                    days = [json.loads(line) for line in f]
+                    for  day in days:
+                        data[f"{file[:2]}-{day['date']}"] = day
+        if idx >= 2:
+            break
     return data
 
 
@@ -110,8 +112,11 @@ def get_ess():
         return json.load(f)
 
 
-def parse_readme_langs():
+def get_langs():
     with open('README.md', 'r') as f:
-        table = f.read().split("## Countries")[1].strip()
-    langs = [line.split('|')[3].strip() for line in table.split('\n')[2:]]
-    return " ".join(langs).lower().split()
+        table = f.read().split("## Countries")[1].strip().lower()
+    data        = [line.strip().split('|')[1:-1] for line in table.split('\n')[2:]]
+    data        = [[entry.strip() for entry in line] for line in data]
+    train_langs = [line[2] for line in data if "".join(line[-3:]) == "xxx"]
+    test_langs  = [line[2] for line in data if line[2] not in train_langs]
+    return train_langs, test_langs
