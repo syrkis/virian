@@ -12,6 +12,7 @@ from multiprocessing import Pool
 import argparse
 import json
 from torch.utils.tensorboard import SummaryWriter
+import os
 
 
 # get args
@@ -28,6 +29,24 @@ def get_args():
 
 
 # runners
+def setup():
+    for path in paths['all_dirs']:
+        if not os.path.exists(path):
+            os.makedirs(path)
+    for lang in parse_readme_langs():
+        for path in paths['all_dirs'][4:-1]:
+            file = f"{path}/{lang}.json"
+            if not os.path.exists(file):
+                fp = open(file, 'x'); fp.close()
+        fail_file = f"{paths['text']}/{lang}_failed.txt"
+        text_file = f"{paths['text']}/{lang}.json"
+        if not os.path.exists(fail_file):
+            f = open(fail_file, 'x'); f.close()
+        if not os.path.exists(text_file):
+            with open(text_file, 'w') as f:
+                json.dump({"__failed__": []}, f)
+    
+
 def run_tokenize():
     texts = load('text') 
     tokenizer = get_tokenizer()
@@ -39,9 +58,9 @@ def run_tokenize():
             json.dump(toks, f)
 
 def run_wiki(langs):
-    with Pool(2) as p:
+    with Pool(len(langs)) as p:
         p.map(get_dailies, langs)
-    with Pool(2) as p:
+    with Pool(len(langs)) as p:
         p.map(get_articles, langs)
 
 def run_ess():
@@ -67,6 +86,7 @@ def run_train():
 
 # call stack
 def main():
+    setup()
     args = get_args()
     langs = parse_readme_langs()
     if args.ess:

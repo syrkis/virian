@@ -30,7 +30,8 @@ paths = {
         'text': '../data/wiki/text',
         'days': '../data/wiki/days',
         'ess': '../data/ess/ESS1-9e01_1.csv', # redownload
-        'factors': '../data/ess/factors.json'
+        'factors': '../data/ess/factors.json',
+        "all_dirs": ['../data', '../data/models', '../data/ess', '../data/wiki', '../data/wiki/days', '../data/wiki/toks', '../data/wiki/text']
         }
 
 langs = "da,de,et,fi,fr,is,it,nl,no,pl,sv"

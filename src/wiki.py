@@ -9,6 +9,7 @@ import json
 import requests
 import time
 from tqdm import tqdm
+from src.utils import paths, title_hash
 from hashlib import sha256
 import wikipedia
 
@@ -34,7 +35,7 @@ def get_dailies(lang):
             del sample['rank']
         D = {'date': get_str(date).replace('/', '_'), 'data': data}
         with open(file, 'a+') as f:
-            json.dump(D, f)
+            json.dump(D, f, ensure_ascii=False)
             f.write('\n')
         date += timedelta(days = 1)
 
@@ -42,46 +43,29 @@ def get_dailies(lang):
 # get articles from dailies
 def get_articles(lang):
     wikipedia.set_lang(lang)
-    dailies_dir = f"../data/wiki/days"
-    articles_dir = f"../data/wiki/text"
-    with open(f"{articles_dir}/{lang}.json", "r") as f:
-        corpus = json.loads(f.read())
-    dailies = [file for file in os.listdir(dailies_dir) if file[-5:] == '.json']
-    with open(f'{articles_dir}/{lang}_failed.txt', 'r') as f:
-        failed = f.read().split()
+    with open(f"{paths['text']}/{lang}.json", "r") as f:
+        texts = json.load(f) # object to be filled out with text
     target_articles = set()
-    with open(f"{dailies_dir}/{lang}.json", 'r') as f:
+    with open(f"{paths['days']}/{lang}.json", 'r') as f:
         for line in f.readlines():
             for article in json.loads(line)['data']:
                 title = article['article']
-                article_id = sha256((title).encode('utf-8')).hexdigest()
-                if article_id not in corpus and title not in failed:
+                article_id = title_hash(title)
+                if article_id not in texts and title not in texts["__failed__"]:
                     target_articles.add(article['article'])
     for idx, title in enumerate(tqdm(list(target_articles))):
         if idx % 100 == 0:
-            with open(f"{articles_dir}/{lang}.json", "w") as f:
-                json.dump(corpus, f)
+            with open(f"{paths['text']}/{lang}.json", "w") as f:
+                json.dump(texts, f, ensure_ascii=False)
         try:
             text = wikipedia.page(title).summary
             article_id = sha256((title).encode('utf-8')).hexdigest()
-            corpus[article_id] = {"title": title, "text": text}
-        except wikipedia.exceptions.PageError:
-            open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
+            texts[article_id] = {"title": title, "text": text}
+        except (wikipedia.exceptions.PageError, KeyError, wikipedia.exceptions.DisambiguationError, json.decoder.JSONDecodeError, wikipedia.exceptions.WikipediaException):
+            texts["__failed__"].append(title)
             pass
-        except KeyError:
-            open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
-            pass
-        except wikipedia.exceptions.DisambiguationError:
-            open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
-            pass
-        except json.decoder.JSONDecodeError:
-            open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
-            pass
-        except wikipedia.exceptions.WikipediaException:
-            open(f"{articles_dir}/{lang}_failed.txt", 'a').write(f"{title}\n")
-            pass
-    with open(f"{articles_dir}/{lang}.json", "w") as f:
-        json.dump(corpus, f)
+    with open(f"{paths['text']}/{lang}.json", "w") as f:
+        json.dump(texts, f, ensure_ascii=False)
 
 
 # helpers
