@@ -11,38 +11,32 @@ These articles (and their associated view counts) could come from Wikipedia or n
 
 ## Countries
 
-| Country            | Code | Wiki | Train | Test | ESS7 | ESS8 | ESS9 |
-|--------------------|------|------|-------|------|------|------|------|
-| Austria            | DE   | DE   |       |      | x    | x    | x    |
-| Belgium            | DE   | DE   |       |      | x    | x    | x    |
-| Bulgaria           | DE   | DE   | x     |      |      |      | x    |
-| Croatia            | DE   | DE   | x     |      |      |      | x    |
-| Cyprus             | DE   | DE   | x     |      |      |      | x    |
-| Czechia            | DE   | DE   |       |      | x    | x    | x    |
-| Denmark            | DE   | DE   | x     |      |      | x    |
-| Estonia            | DE   | DE   |       |      | x    | x    | x    |
-| Finland            | DE   | DE   |       | x    | x    | x    | x    |
-| France             | DE   | DE   |       | x    | x    | x    | x    |
-| Germany            | DE   | DE   |       | x    | x    | x    | x    |
-| ~~Greece~~         | DE   | DE   |       |      |      |      |      |
-| Hungary            | DE   | DE   |       | x    | x    | x    | x    |
-| Iceland            | DE   | DE   | x     |      |      | x    | x    |
-| Ireland            | DE   | DE   |       |      | x    | x    | x    |
-| Israel             | DE   | DE   | x     |      | x    | x    |      |
-| Italy              | DE   | DE   | x     |      |      | x    | x    |
-| Latvia             | DE   | DE   | x     |      |      |      | x    |
-| Lithuania          | DE   | DE   |       |      | x    | x    | x    |
-| Luxembourg         | DE   | DE   | x     |      |      | x    |      |
-| Netherlands        | DE   | DE   |       |      | x    | x    | x    |
-| Norway             | DE   | DE   |       |      | x    | x    | x    |
-| Poland             | DE   | DE   |       |      | x    | x    | x    |
-| Portugal           | DE   | DE   |       |      | x    | x    | x    |
-| Russia             | DE   | DE   | x     |      |      | x    |      |
-| Slovakia           | DE   | DE   | x     |      |      |      | x    |
-| Slovenia           | DE   | DE   |       |      | x    | x    | x    |
-| Spain              | DE   | DE   |       |      | x    | x    | x    |
-| Sweden             | DE   | DE   |       |      | x    | x    | x    |
-| Switzerland        | DE   | DE   |       |      | x    | x    | x    |
-| ~~Turkey~~         | DE   | DE   |       |      |      |      |      |
-| ~~Ukraine~~        | DE   | DE   |       |      |      |      |      |
-| ~~United Kingdom~~ | DE   | DE   |       |      | x    | x    | x    |
+| Country     | Code | Wiki | Train | Test | ESS7 | ESS8 | ESS9 |
+|-------------|------|------|-------|------|------|------|------|
+| Belgium     | BE   |      |       |      | x    | x    | x    |
+| Bulgaria    | BG   |      | x     |      |      |      | x    |
+| Croatia     |      |      | x     |      |      |      | x    |
+| Cyprus      | CY   |      | x     |      |      |      | x    |
+| Czechia     | CZ   |      |       |      | x    | x    | x    |
+| Denmark     | DK   | DA   | x     |      |      | x    |      | 
+| Estonia     |      |      |       |      | x    | x    | x    |
+| Finland     | FI   | FI   |       | x    | x    | x    | x    |
+| France      | FR   | FR   |       | x    | x    | x    | x    |
+| Germany     | DE   | DE   |       | x    | x    | x    | x    |
+| Hungary     |      |      |       | x    | x    | x    | x    |
+| Iceland     |      |      | x     |      |      | x    | x    |
+| Israel      |      |      | x     |      | x    | x    |      |
+| Italy       | IT   | IT   | x     |      |      | x    | x    |
+| Latvia      |      |      | x     |      |      |      | x    |
+| Lithuania   |      |      |       |      | x    | x    | x    |
+| Luxembourg  |      |      | x     |      |      | x    |      |
+| Netherlands | NL   | NL   |       |      | x    | x    | x    |
+| Norway      | NO   | NO   |       |      | x    | x    | x    |
+| Poland      | PL   | PL   |       |      | x    | x    | x    |
+| Portugal    | PT   | PT   |       |      | x    | x    | x    |
+| Russia      | RU   | RU   | x     |      |      | x    |      |
+| Slovakia    |      |      | x     |      |      |      | x    |
+| Slovenia    |      |      |       |      | x    | x    | x    |
+| Spain       |      | ES   |       |      | x    | x    | x    |
+| Sweden      |      | SV   |       |      | x    | x    | x    |
+| Switzerland |      |      |       |      | x    | x    | x    |
