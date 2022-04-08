@@ -26,11 +26,11 @@ hypers = {
 
 paths = {
         'tokenizer': 'bert-base-multilingual-cased',
-        'toks': '../data2/wiki/toks',
+        'toks': '../data/wiki/toks',
         'text': '../data/wiki/text',
-        'days': '../data2/wiki/days',
+        'days': '../data/wiki/days',
         'ess': '../data/ess/ESS1-9e01_1.csv', # redownload
-        'factors': '../data2/ess/factors.json',
+        'factors': '../data/ess/factors.json',
         "all_dirs": ['../data', '../data/models', '../data/ess', '../data/wiki', '../data/wiki/days', '../data/wiki/toks', '../data/wiki/text']
         }
 

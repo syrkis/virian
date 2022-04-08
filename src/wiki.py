@@ -16,7 +16,7 @@ import wikipedia
 
 # run time function
 def get_dailies(lang):
-    file = f"{paths['text']}/{lang}.json"
+    file = f"{paths['days']}/{lang}.json"
     api = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     dones = get_dones(file)
     start_date = get_date(dones[-1].replace('_', '/') if dones else "2015/07/01")
@@ -61,8 +61,9 @@ def get_articles(lang):
             text = wikipedia.page(title).summary
             article_id = sha256((title).encode('utf-8')).hexdigest()
             texts[article_id] = {"title": title, "text": text}
-        except (wikipedia.exceptions.PageError, KeyError, wikipedia.exceptions.DisambiguationError, json.decoder.JSONDecodeError, wikipedia.exceptions.WikipediaException):
+        except (wikipedia.exceptions.PageError, KeyError, wikipedia.exceptions.DisambiguationError, json.decoder.JSONDecodeError, wikipedia.exceptions.WikipediaException) as e:
             texts["__failed__"].append(title)
+            print(e)
             pass
     with open(f"{paths['text']}/{lang}.json", "w") as f:
         json.dump(texts, f, ensure_ascii=False)

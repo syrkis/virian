@@ -36,15 +36,15 @@ def setup():
         if not os.path.exists(path):
             os.makedirs(path)
     for lang in parse_readme_langs():
-        for path in paths['all_dirs'][4:-1]:
+        for idx, path in [hypers['days'], hypers['text']]:
             file = f"{path}/{lang}.json"
             if not os.path.exists(file):
-                fp = open(file, 'x'); fp.close()
-        text_file = f"{paths['text']}/{lang}.json"
-        if not os.path.exists(text_file):
-            with open(text_file, 'w') as f:
-                json.dump({"__failed__": []}, f)
-    
+                if idx == 0:
+                    fp = open(file, 'x'); fp.close()
+                else:
+                    with open(file, 'w') as f:
+                        json.dump({"__failed__": []}, f) # sould have been set
+
 
 def run_tokenize():
     texts = load('text') 
@@ -53,7 +53,7 @@ def run_tokenize():
         toks = {}
         for title, text in tqdm(articles.items()):
             toks[title] = tokenize(text['text'], tokenizer)[0].tolist()
-        with open(f"{paths['toks']}/{lang}.json", 'w+') as f:
+        with open(f"{paths['toks']}/{lang}.json", 'w') as f:
             json.dump(toks, f)
 
 def run_wiki(langs):
