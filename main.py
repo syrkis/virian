@@ -57,9 +57,9 @@ def run_tokenize():
             json.dump(toks, f)
 
 def run_wiki(langs):
-    with Pool(8) as p:
+    with Pool(len(langs)) as p:
         p.map(get_dailies, langs)
-    with Pool(8) as p:
+    with Pool(len(langs)) as p:
         p.map(get_articles, langs)
 
 def run_ess():
