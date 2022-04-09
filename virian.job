@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu               # Schedule a GPU
 #SBATCH --mem=16000              # how much memo you need homie?
 
-module --ignore-cache load CUDA
+module --ignore-cache load CUDA/10.2.89-GCC-8.3.0
 source env/bin/activate
 python main.py --train
 # python -c 'import torch; print(torch.cuda.is_available())'
