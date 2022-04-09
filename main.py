@@ -43,16 +43,17 @@ def setup():
                     fp = open(file, 'x'); fp.close()
                 else:
                     with open(file, 'w') as f:
-                        json.dump({"__failed__": []}, f) # sould have been set
+                        json.dump({"__failed__": []}, f) # sould have been set and in own level
 
 
-def run_tokenize():
-    texts = load('text') 
+def run_tokenize(langs):
+    texts = load('text', langs) 
     tokenizer = get_tokenizer()
     for lang, articles in texts.items():
         toks = {}
         for title, text in tqdm(articles.items()):
-            toks[title] = tokenize(text['text'], tokenizer)[0].tolist()
+            if 'text' in text:
+                toks[title] = tokenize(text['text'], tokenizer)[0].tolist()
         with open(f"{paths['toks']}/{lang}.json", 'w') as f:
             json.dump(toks, f)
 
@@ -90,7 +91,8 @@ def main():
     if args.dataset:
         run_dataset()
     if args.tokenize:
-        run_tokenize()
+        train_langs, test_langs = get_langs()
+        run_tokenize(train_langs + test_langs)
 
 if __name__ == "__main__":
     main()

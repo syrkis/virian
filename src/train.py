@@ -17,7 +17,7 @@ def train(ds, model, optimizer, criterion, writer, n_epochs=10):
     for fold, lang in enumerate(ds.langs):
         train_loader, val_loader = k_fold(ds, lang)
         with tqdm(train_loader) as fold:
-            for epoch in n_epochs:
+            for epoch in range(n_epochs):
                 for X, W, Y in fold:
                     optimizer.zero_grad()
                     x_pred, y_pred = model(X, W, Y)
@@ -29,17 +29,17 @@ def train(ds, model, optimizer, criterion, writer, n_epochs=10):
                     loss.backward()
                     optimizer.step()
                     fold.set_postfix(loss=loss.item())
-                with torch.no_grad():
-                    validate(val_loader, model, criterion, writer, epoch)
+                validate(val_loader, model, criterion, writer, epoch)
     return model
 
 
 # compuate epoch validation score
 def validate(loader, model, criterion, writer, epoch):
-    for X, W, Y in loader:
-        x_pred, y_pred = model(X, W, Y)
-        loss_x = criterion(x_pred, X)
-        writer.add_scalar("Wiki Val Loss", loss_x, epoch) 
+    with torch.no_grad():
+        for X, W, Y in loader:
+            x_pred, y_pred = model(X, W, Y)
+            loss_x = criterion(x_pred, X)
+            writer.add_scalar("Wiki Val Loss", loss_x, epoch) 
 
 
 # make k fold loaders

@@ -19,7 +19,7 @@ def get_embeddings():
 
 hypers = {
         'vocab_size': 2 ** 14,
-        'sample_size': 2 ** 4,
+        'sample_size': 2 ** 7,
         'embedding_dim': 768,
         'batch_size': 2 ** 4
         }
@@ -34,13 +34,6 @@ paths = {
         "all_dirs": ['../data', '../data/models', '../data/ess', '../data/wiki', '../data/wiki/days', '../data/wiki/toks', '../data/wiki/text']
         }
 
-langs = "da,de,et,fi,fr,is,it,nl,no,pl,sv"
-lang_to_country = {lang: lang.upper() for lang in langs.split(',')}
-lang_to_country['es'] = 'SP'
-lang_to_country['et'] = 'ES'
-lang_to_country['sv'] = 'SE'
-lang_to_country['da'] = 'DK'
-
 # get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
 
 # month 2 ess
@@ -49,7 +42,7 @@ def month_to_ess(lang, date, ess):
     f = '%Y/%m/%d'
     rounds_to_date = {"7": "2014/12/31", "8": "2016/12/31", "9": "2018/12/31"} # round release assummption
     best_ess_round = (None, 10000)
-    rounds = list(ess[lang_to_country[lang]].keys())
+    rounds = list(ess[lang2cntry[lang]].keys())
     for r, time in rounds_to_date.items():
         if r not in rounds:
             continue
@@ -59,7 +52,7 @@ def month_to_ess(lang, date, ess):
         delta = int(str(datetime.strptime(date, f) - datetime.strptime(time, f)).split()[0].replace('-', ''))
         if delta < best_ess_round[1]:
             best_ess_round = (r, delta)
-    vec = ess[lang_to_country[lang]][best_ess_round[0]]
+    vec = ess[lang2cntry[lang]][best_ess_round[0]]
     Y = torch.tensor([vec['avg'], vec['var']]).T
     return Y
            
@@ -90,8 +83,6 @@ def load(target, langs):
                     days = [json.loads(line) for line in f]
                     for  day in days:
                         data[f"{file[:2]}-{day['date']}"] = day
-        if idx >= 2:
-            break
     return data
 
 
@@ -120,3 +111,15 @@ def get_langs():
     train_langs = [line[2] for line in data if "".join(line[-3:]) == "xxx"]
     test_langs  = [line[2] for line in data if line[2] not in train_langs]
     return train_langs, test_langs
+
+def get_lang2cntry():
+    with open('README.md', 'r') as f:
+        table = f.read().split("## Countries")[1].strip().lower()
+    out = table.split('\n')[2:]
+    out = [[e.strip() for e in line.split('|')[2:4]] for line in out]
+    D = {}
+    for country, lang in out:
+        D[lang] = country.upper()
+    return D
+
+lang2cntry = get_lang2cntry()
