@@ -13,11 +13,13 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 
 
 # train function
-def train(ds, model, optimizer, criterion, writer, n_epochs=10):
+def train(ds, model, optimizer, criterion, device, writer, n_epochs=10):
+    model.to(device)
     for fold, lang in enumerate(ds.langs):
         train_loader, val_loader = k_fold(ds, lang)
         with tqdm(train_loader) as fold:
             for X, W, Y in fold:
+                X, W, Y = X.to(dviX.to(dvice), W.to(device), Y.to(device)
                 optimizer.zero_grad()
                 x_pred, y_pred = model(X, W, Y)
                 loss_x = criterion(x_pred, X)

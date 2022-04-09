@@ -68,11 +68,12 @@ def run_ess():
 
 def run_train(langs):
     model     = Model()
+    device    = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     ds        = Dataset(langs[0])
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
     writer    = SummaryWriter()
-    model     = train(ds, model, optimizer, criterion, writer)
+    model     = train(ds, model, optimizer, criterion, device, writer)
     writer.flush()
 
 
