@@ -1,11 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=virian       # Job name
-#SBATCH --output=logs/%j-%x.out # Name of output file (%j expands to jobId)
-#SBATCH --cpus-per-task=1       # Schedule one core
-#SBATCH --time=01:00:00         # Run time (hh:mm:ss)
-#SBATCH --partition=brown       # Run on either the Red or Brown queue
-#SBATCH --mem=16000             # how much memo you need homie?
+#SBATCH --job-name=virian        # Job name
+#SBATCH --output=logs/%j-%x.out  # Name of output file (%j expands to jobId)
+#SBATCH --cpus-per-task=1        # Schedule one core
+#SBATCH --time=01:00:00          # Run time (hh:mm:ss)
+#SBATCH --partition=brown        # Run on either the Red or Brown queue
+#SBATCH --gres=gpu               # Schedule a GPU
+#SBATCH --mem=16000              # how much memo you need homie?
 
 module --ignore-cache load CUDA
 source env/bin/activate
