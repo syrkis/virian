@@ -83,8 +83,6 @@ def load(target, langs):
                     days = [json.loads(line) for line in f]
                     for  day in days:
                         data[f"{file[:2]}-{day['date']}"] = day
-            if idx > 4:
-                break
     return data
 
 

@@ -6,7 +6,7 @@
 #SBATCH --time=01:00:00          # Run time (hh:mm:ss)
 #SBATCH --partition=brown        # Run on either the Red or Brown queue
 #SBATCH --gres=gpu               # Schedule a GPU
-#SBATCH --mem-per-cpu=32768      # <value bigger than you've requested before>
+#SBATCH --mem-per-cpu=16000      # <value bigger than you've requested before>
 
 
 module --ignore-cache load CUDA/10.2.89-GCC-8.3.0
