@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=virian            # Job name
-#SBATCH --output=runs/logs/%j-%x.out # Name of output file
+#SBATCH --output=jobs/logs/%j-%x.out # Name of output file
 #SBATCH --cpus-per-task=1            # Schedule one core
 #SBATCH --time=01:00:00              # Run time (hh:mm:ss)
 #SBATCH --partition=brown            # Run on either the Red or Brown queue
