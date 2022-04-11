@@ -23,9 +23,9 @@ class Model(nn.Module):
 
     def forward(self, x, w, y):
         x = self.encode(x)
-        y = self.infer(x, w)
+        # y = self.infer(x, w)
         x = self.decode(x)
-        return x, y
+        return x # , y
 
     def encode(self, x):
         x = self.enc(x)
