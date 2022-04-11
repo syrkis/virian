@@ -19,9 +19,9 @@ def get_embeddings():
 
 hypers = {
         'vocab_size': 2 ** 14,
-        'sample_size': 2 ** 5,
+        'sample_size': 2 ** 4,
         'embedding_dim': 768,
-        'batch_size': 2 ** 2
+        'batch_size': 2 ** 5
         }
 
 paths = {
