@@ -10,6 +10,7 @@ from src.utils import get_s3, hypers
 import datetime
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
+import time
 
 
 # train function
@@ -19,9 +20,11 @@ def train(ds, model, optimizer, criterion, device, writer, n_epochs=10):
         train_loader, val_loader = k_fold(ds, lang)
         with tqdm(train_loader) as fold:
             for X, W, Y in fold:
+                tic = time.time()
                 X, W, Y = X.to(device), W.to(device), Y.to(device)
                 optimizer.zero_grad()
-                x_pred, y_pred = model(X, W, Y)
+                # x_pred, y_pred = model(X, W, Y)
+                x_pred = model(X, W, Y)
                 loss_x = criterion(x_pred, X)
                 # loss_y = criterion(y_pred, Y)
                 writer.add_scalar("Wiki Train Loss", loss_x)
@@ -30,6 +33,8 @@ def train(ds, model, optimizer, criterion, device, writer, n_epochs=10):
                 loss.backward()
                 optimizer.step()
                 fold.set_postfix(loss=loss.item())
+                toc = time.time()
+                print(toc - tic)
         validate(val_loader, model, criterion, writer)
     return model
 
