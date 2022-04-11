@@ -21,7 +21,7 @@ hypers = {
         'vocab_size': 2 ** 14,
         'sample_size': 2 ** 4,
         'embedding_dim': 768,
-        'batch_size': 2 ** 5
+        'batch_size': 2 ** 3
         }
 
 paths = {

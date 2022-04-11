@@ -20,7 +20,6 @@ def train(ds, model, optimizer, criterion, device, writer, n_epochs=10):
         train_loader, val_loader = k_fold(ds, lang)
         with tqdm(train_loader) as fold:
             for X, W, Y in fold:
-                tic = time.time()
                 X, W, Y = X.to(device), W.to(device), Y.to(device)
                 optimizer.zero_grad()
                 # x_pred, y_pred = model(X, W, Y)
@@ -33,8 +32,6 @@ def train(ds, model, optimizer, criterion, device, writer, n_epochs=10):
                 loss.backward()
                 optimizer.step()
                 fold.set_postfix(loss=loss.item())
-                toc = time.time()
-                print(toc - tic)
         validate(val_loader, model, criterion, writer)
     return model
 
