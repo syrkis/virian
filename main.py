@@ -51,7 +51,7 @@ def run_wiki(langs):
 
 def run_ess():
     ess = ESS()
-    out = ess._date_to_round('SE', '2020_10_30')
+    out = ess.get_target('SE', '2020_10_30')
     print(out)
 
 def run_train(langs, local):

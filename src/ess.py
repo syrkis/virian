@@ -28,19 +28,27 @@ class ESS:
 
     def get_target(self, country, date, factor=True):
         ess_round = self._date_to_round(country, date)
-        avg = self.fact_avg.loc[country, date]
-        var = self.fact_var.loc[country, date]
+        avg = self.fact_avg.loc[country, ess_round]
+        var = self.fact_var.loc[country, ess_round]
         return avg, var
 
     def _date_to_round(self, country, date):
-        return self.rounds[country]
+        date = datetime.strptime(date, "%Y_%m_%d")
+        country_rounds = list(self.rounds[country])
+        pos = np.argmin([abs(_round[0]-date) for _round in country_rounds])
+        return country_rounds[pos][1]
         
     def _make_rounds(self):
+        round_dates   = [(7, "2014"), (8, "2016"), (9, "2018")]
+        round_to_date = {k: (self._to_date(f'{v}_12_31'), k) for k, v in round_dates}
         keys = self.raw.groupby(['cntry', 'essround']).groups.keys()
-        rounds = {k: set() for k, _ in keys}
-        for k, v in keys:
-            rounds[k].add(v)
+        rounds = {k: [] for k, _ in keys}
+        for k, v in keys: # country, round
+            rounds[k].append(round_to_date[v])
         return rounds
+
+    def _to_date(self, string):
+        return datetime.strptime(string, "%Y_%m_%d") 
 
     def _make_summary(self):
         groups = self.raw.groupby(['cntry', 'essround'])
