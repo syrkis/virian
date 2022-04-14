@@ -76,7 +76,8 @@ for (country in countries) {
 }
 ```
 
-
+### Distributuion of factors
+On question: what's the distribution of the dofferent factors? Is it gausian? If it is, great! Than I can have my metric be how many standard devation I'm on average away from the true thing. Lets load in this shit
 
 
 

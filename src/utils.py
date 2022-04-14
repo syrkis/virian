@@ -14,12 +14,29 @@ from hashlib import sha256
 from collections import defaultdict
 from datetime import datetime, timedelta
 
+
+
+# runners
+def setup():
+    for path in paths['all_dirs']:
+        if not os.path.exists(path):
+            os.makedirs(path)
+    for lang in parse_readme_langs():
+        for idx, path in [hypers['days'], hypers['text']]:
+            file = f"{path}/{lang}.json"
+            if not os.path.exists(file):
+                if idx == 0:
+                    fp = open(file, 'x'); fp.close()
+                else:
+                    with open(file, 'w') as f:
+                        json.dump({"__failed__": []}, f) # sould have been set and in own level
+
 def get_embeddings():
     return AutoModelForMaskedLM.from_pretrained("bert-base-multilingual-cased").bert.embeddings.word_embeddings
 
 hypers = {
         'vocab_size': 2 ** 14,
-        'sample_size': 2 ** 4,
+        'sample_size': 2 ** 5,
         'embedding_dim': 768,
         'batch_size': 2 ** 3
         }
@@ -69,7 +86,7 @@ def get_s3():
 
 
 # load ess, wiki text or wiki days
-def load(target, langs):
+def load(target, langs, local):
     files = [f for f in os.listdir(paths[target]) if f[-4:] == 'json']
     data = {}
     for idx, file in enumerate(files):
@@ -83,6 +100,8 @@ def load(target, langs):
                     days = [json.loads(line) for line in f]
                     for  day in days:
                         data[f"{file[:2]}-{day['date']}"] = day
+        if local and idx >= 2:
+            break
     return data
 
 
@@ -111,6 +130,7 @@ def get_langs():
     train_langs = [line[2] for line in data if "".join(line[-3:]) == "xxx"]
     test_langs  = [line[2] for line in data if line[2] not in train_langs]
     return train_langs, test_langs
+
 
 def get_lang2cntry():
     with open('README.md', 'r') as f:

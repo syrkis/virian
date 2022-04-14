@@ -27,24 +27,9 @@ def get_args():
     parser.add_argument('--dataset', action='store_true', help="explore dataset")
     parser.add_argument('--tokenize', action='store_true', help="token files")
     parser.add_argument('--readme', action="store_true", help="readme")
+    parser.add_argument('--local', action="store_true", help="local run?")
     parser.add_argument('--langs', help="target specific languages (wiki)")
     return parser.parse_args()
-
-
-# runners
-def setup():
-    for path in paths['all_dirs']:
-        if not os.path.exists(path):
-            os.makedirs(path)
-    for lang in parse_readme_langs():
-        for idx, path in [hypers['days'], hypers['text']]:
-            file = f"{path}/{lang}.json"
-            if not os.path.exists(file):
-                if idx == 0:
-                    fp = open(file, 'x'); fp.close()
-                else:
-                    with open(file, 'w') as f:
-                        json.dump({"__failed__": []}, f) # sould have been set and in own level
 
 
 def run_tokenize(langs):
@@ -65,12 +50,14 @@ def run_wiki(langs):
         p.map(get_articles, langs)
 
 def run_ess():
-    construct_factors()    
+    ess = ESS()
+    out = ess._date_to_round('SE', '2020_10_30')
+    print(out)
 
-def run_train(langs):
+def run_train(langs, local):
     model     = Model()
     device    = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    ds        = Dataset(langs[0])
+    ds        = Dataset(langs[0], local)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
     writer    = SummaryWriter()
@@ -89,7 +76,7 @@ def main():
         run_wiki(train_langs + test_langs)
     if args.train:
         train_langs, test_langs = get_langs()
-        run_train((train_langs, test_langs))
+        run_train((train_langs, test_langs), args.local)
     if args.dataset:
         run_dataset()
     if args.tokenize:

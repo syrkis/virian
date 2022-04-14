@@ -4,6 +4,7 @@
 
 # imports
 from src.utils import *
+from src.ess import ESS
 import torch
 import torch.nn.functional as F
 import random
@@ -15,11 +16,11 @@ class Dataset(torch.utils.data.Dataset):
     vocab_size  = hypers['vocab_size']  # TODO: multilingual vocab?
     sample_size = hypers['sample_size'] # 128 word wiki summaries
 
-    def __init__(self, langs):
+    def __init__(self, langs, local):
         self.embed = get_embeddings()                # get embedding function
-        self.ess   = get_ess()                       # ess factors
-        self.toks  = load('toks', langs)             # wiki summaries
-        self.days  = load('days', langs)             # wiki dailies
+        self.ess   = ESS()                           # ess factors
+        self.toks  = load('toks', langs, local)      # wiki summaries
+        self.days  = load('days', langs, local)      # wiki dailies
         self.keys  = list(self.days.keys())          # day keys
         self.langs = set([k[:2] for k in self.keys]) # for training or test?
         random.shuffle(self.keys)                    # day keys

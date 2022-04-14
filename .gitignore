@@ -13,3 +13,4 @@ plots
 env
 logs/
 runs/
+**/.R*
