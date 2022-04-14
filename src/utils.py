@@ -118,7 +118,7 @@ def get_lang2cntry():
     out = [[e.strip() for e in line.split('|')[2:4]] for line in out]
     D = {}
     for country, lang in out:
-        D[lang] = country.upper()
+        D[lang] = country
     return D
 
-lang2cntry = get_lang2cntry()
+# lang_to_cntry = get_lang2cntry()

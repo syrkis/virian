@@ -23,9 +23,9 @@ class Model(nn.Module):
 
     def forward(self, x, w, y):
         x = self.encode(x)
-        # y = self.infer(x, w)
+        y = self.infer(x, w)
         x = self.decode(x)
-        return x # , y
+        return x, y
 
     def encode(self, x):
         x = self.enc(x)
@@ -37,9 +37,10 @@ class Model(nn.Module):
 
     def infer(self, x, w):
         y = self.fc1(x) 
-        # y = w[:,:,None] * y
-        # y = torch.sum(y, dim=1)
-        # y = y.reshape(x.shape[0], 5, 2)
+        y = y * w[:,:,None,None]
+        y = torch.sum(y, dim=1) # collapse 100 summaries
+        y = torch.sum(y, dim=1) # collapse 16 words
+        y = y.reshape((8, 2, 5))
         return y
 
 

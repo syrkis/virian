@@ -11,29 +11,49 @@ import datetime
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 import time
+import mlflow
 
 
 # train function
-def train(ds, model, optimizer, criterion, device, writer, n_epochs=10):
+def train(ds, model, optimizer, criterion, device, writer, idx=0):
     model.to(device)
     for fold, lang in enumerate(ds.langs):
         train_loader, val_loader = k_fold(ds, lang)
         with tqdm(train_loader) as fold:
             for X, W, Y in fold:
+                
+                # tensors to GPU
                 X, W, Y = X.to(device), W.to(device), Y.to(device)
+
+                # clean tensor gradients
                 optimizer.zero_grad()
-                # x_pred, y_pred = model(X, W, Y)
-                x_pred = model(X, W, Y)
-                loss_x = criterion(x_pred, X)
-                # loss_y = criterion(y_pred, Y)
-                writer.add_scalar("Wiki Train Loss", loss_x)
-                # writer.add_scalar("ESS Loss", loss_y, epoch)
-                loss = loss_x # + loss_y
+
+                # make predictions
+                x_pred, y_pred = model(X, W, Y)
+
+                # calcualte loss
+                x_loss, y_loss = criterion(x_pred, X), criterion(y_pred, Y)
+
+                # report loss
+                loss = loss_function(criterion, writer, fold, x_loss, y_loss, idx:= idx + 1) 
+
+                # backpropagate errors
                 loss.backward()
+
+                # update model parameters
                 optimizer.step()
-                fold.set_postfix(loss=loss.item())
+
         validate(val_loader, model, criterion, writer)
     return model
+
+
+# compute and report loss
+def loss_function(criterion, writer, fold, x_loss, y_loss, idx):
+    writer.add_scalar("Wiki Train Loss", x_loss, idx)
+    writer.add_scalar("ESS Train Loss", y_loss, idx)
+    loss = x_loss + y_loss
+    fold.set_postfix(loss=loss.item())
+    return loss
 
 
 # compuate epoch validation score

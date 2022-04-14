@@ -28,11 +28,12 @@ class ESS:
         self.fact_avg, self.fact_var = self._make_factors()
         self.rounds                  = self._make_rounds()
 
-    def get_target(self, country, date, factor=True):
+    def get_target(self, lang, date, factor=True):
+        country   = lang_to_country[lang]
         ess_round = self._date_to_round(country, date)
         avg       = self.fact_avg.loc[country, ess_round]
         var       = self.fact_var.loc[country, ess_round]
-        Y         = torch.from_numpy(np.array((avg.to_numpy(), var.to_numpy())))
+        Y         = torch.from_numpy(np.array((avg.to_numpy(), var.to_numpy()))).float()
         return Y
 
     def _date_to_round(self, country, date):
@@ -76,6 +77,7 @@ val_cols = "ipcrtiv imprich ipeqopt ipshabt impsafe impdiff ipfrule ipudrst ipmo
 
 meta = """essround,cntry""".split(',') # add pspwght
 data = """health,hlthhmp,rlgblg,rlgdnm,rlgblge,rlgdnme,rlgdgr,rlgatnd,pray,happy,sclmeet,inprdsc,sclact,crmvct,aesfdrk,ipcrtiv,imprich,ipeqopt,ipshabt,impsafe,impdiff,ipfrule,ipudrst,ipmodst,ipgdtim,impfree,iphlppl,ipsuces,ipstrgv,ipadvnt,ipbhprp,iprspot,iplylfr,impenv,imptrad,impfun""".split(',')
+lang_to_country = {'bg': 'bg', 'hr': 'hr', 'cs': 'cz', 'da': 'dk', 'et': 'ee', 'fi': 'fi', 'fr': 'fr', 'de': 'de', 'hu': 'hu', 'is': 'is', 'he': 'il', 'it': 'it', 'lv': 'lv', 'lt': 'lt', 'nl': 'nl', 'no': 'no', 'pl': 'pl', 'pt': 'pt', 'ru': 'ru', 'sk': 'sk', 'si': 'si', 'es': 'es', 'sv': 'se'}
 
 def main():
     ess = ESS()
