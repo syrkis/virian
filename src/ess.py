@@ -6,12 +6,12 @@
 from src.utils import paths
 from datetime import datetime, timedelta
 
+import torch
 import pandas as pd
 import numpy as np
 
 from matplotlib import pyplot as plt
 from factor_analyzer import FactorAnalyzer as FA
-
 
 
 # make values
@@ -21,16 +21,18 @@ class ESS:
     facts = 'a b c d e'.split()
 
     def __init__(self):
-        self.raw = pd.read_csv(paths['ess'], usecols=meta+data).replace(self.nans, np.NaN)
+        self.raw                     = pd.read_csv(paths['ess'], usecols=meta+data).replace(self.nans, np.NaN)
+        self.raw['cntry']            = self.raw['cntry'].str.lower()
         self.raw_avg, self.raw_var   = self._make_summary()
         self.fact_avg, self.fact_var = self._make_factors()
-        self.rounds = self._make_rounds()
+        self.rounds                  = self._make_rounds()
 
     def get_target(self, country, date, factor=True):
         ess_round = self._date_to_round(country, date)
         avg = self.fact_avg.loc[country, ess_round]
         var = self.fact_var.loc[country, ess_round]
-        return avg, var
+        Y = torch.from_numpy(np.array((avg.to_numpy(), var.to_numpy())))
+        return Y
 
     def _date_to_round(self, country, date):
         date = datetime.strptime(date, "%Y_%m_%d")
@@ -56,19 +58,14 @@ class ESS:
         return raw_avg, raw_var
 
     def _make_factors(self):
-
         avg_fa = FA(n_factors=5, rotation="promax")
         var_fa = FA(n_factors=5, rotation="promax")
-
         avg_fa.fit(self.raw_avg)
         var_fa.fit(self.raw_var)
-
         fact_avg = pd.DataFrame(avg_fa.transform(self.raw_avg),
                 columns=self.facts, index=self.raw_avg.index)
-
         fact_var = pd.DataFrame(var_fa.transform(self.raw_var),
                 columns=self.facts, index=self.raw_var.index)
-
         return fact_avg, fact_var
 
 

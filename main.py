@@ -78,7 +78,10 @@ def main():
         train_langs, test_langs = get_langs()
         run_train((train_langs, test_langs), args.local)
     if args.dataset:
-        run_dataset()
+        train_langs, _ = get_langs()
+        ds = Dataset(train_langs, args.local)
+        for X, W, Y in ds:
+            print(Y)
     if args.tokenize:
         train_langs, test_langs = get_langs()
         run_tokenize(train_langs + test_langs)

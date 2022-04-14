@@ -16,7 +16,7 @@ class Dataset(torch.utils.data.Dataset):
     vocab_size  = hypers['vocab_size']  # TODO: multilingual vocab?
     sample_size = hypers['sample_size'] # 128 word wiki summaries
 
-    def __init__(self, langs, local):
+    def __init__(self, langs, local=False):
         self.embed = get_embeddings()                # get embedding function
         self.ess   = ESS()                           # ess factors
         self.toks  = load('toks', langs, local)      # wiki summaries
@@ -37,7 +37,7 @@ class Dataset(torch.utils.data.Dataset):
         X = self.embed(F.pad(X, pad=(0,0,0,1000 - len(A))).int())
         W = torch.tensor([a['views'] for a in data['data']])
         W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.sum(W)
-        Y = month_to_ess(meta[:2], meta[3:], self.ess)
+        Y = self.ess.get_target(meta[:2], meta[3:])
         return X, W, Y
 
     def k_fold(self, lang):
