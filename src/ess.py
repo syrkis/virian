@@ -33,7 +33,7 @@ class ESS:
         return avg, var
 
     def _date_to_round(self, country, date):
-        return None
+        return self.rounds[country]
         
     def _make_rounds(self):
         keys = self.raw.groupby(['cntry', 'essround']).groups.keys()
