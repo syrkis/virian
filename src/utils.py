@@ -36,7 +36,7 @@ def get_embeddings():
 
 hypers = {
         'vocab_size': 2 ** 14,
-        'sample_size': 2 ** 5,
+        'sample_size': 2 ** 4,
         'embedding_dim': 768,
         'batch_size': 2 ** 3
         }
@@ -53,27 +53,6 @@ paths = {
 
 # get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
 
-# month 2 ess
-def month_to_ess(lang, date, ess):
-    date = date.replace('_', '/')
-    f = '%Y/%m/%d'
-    rounds_to_date = {"7": "2014/12/31", "8": "2016/12/31", "9": "2018/12/31"} # round release assummption
-    best_ess_round = (None, 10000)
-    rounds = list(ess[lang2cntry[lang]].keys())
-    for r, time in rounds_to_date.items():
-        if r not in rounds:
-            continue
-        if time == date:
-            best_ess_round = (r, 0)
-            continue
-        delta = int(str(datetime.strptime(date, f) - datetime.strptime(time, f)).split()[0].replace('-', ''))
-        if delta < best_ess_round[1]:
-            best_ess_round = (r, delta)
-    vec = ess[lang2cntry[lang]][best_ess_round[0]]
-    Y = torch.tensor([vec['avg'], vec['var']]).T
-    return Y
-           
-
 # connect to digital ocean spaces
 def get_s3():
     session = Session()
@@ -86,7 +65,7 @@ def get_s3():
 
 
 # load ess, wiki text or wiki days
-def load(target, langs, local):
+def load(target, langs, local=False):
     files = [f for f in os.listdir(paths[target]) if f[-4:] == 'json']
     data = {}
     for idx, file in enumerate(files):

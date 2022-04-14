@@ -21,7 +21,8 @@ class ESS:
     facts = 'a b c d e'.split()
 
     def __init__(self):
-        self.raw                     = pd.read_csv(paths['ess'], usecols=meta+data).replace(self.nans, np.NaN)
+        self.raw                     = pd.read_csv(paths['ess'], usecols=meta+data)
+        self.raw                     = self.raw.replace(self.nans, np.NaN) # 99 etc. to NaN
         self.raw['cntry']            = self.raw['cntry'].str.lower()
         self.raw_avg, self.raw_var   = self._make_summary()
         self.fact_avg, self.fact_var = self._make_factors()
@@ -29,22 +30,22 @@ class ESS:
 
     def get_target(self, country, date, factor=True):
         ess_round = self._date_to_round(country, date)
-        avg = self.fact_avg.loc[country, ess_round]
-        var = self.fact_var.loc[country, ess_round]
-        Y = torch.from_numpy(np.array((avg.to_numpy(), var.to_numpy())))
+        avg       = self.fact_avg.loc[country, ess_round]
+        var       = self.fact_var.loc[country, ess_round]
+        Y         = torch.from_numpy(np.array((avg.to_numpy(), var.to_numpy())))
         return Y
 
     def _date_to_round(self, country, date):
-        date = datetime.strptime(date, "%Y_%m_%d")
-        country_rounds = list(self.rounds[country])
-        pos = np.argmin([abs(_round[0]-date) for _round in country_rounds])
-        return country_rounds[pos][1]
+        date   = datetime.strptime(date, "%Y_%m_%d")
+        rounds = self.rounds[country]
+        pos    = np.argmin([abs(r[0] - date) for r in rounds])
+        return rounds[pos][1]
         
     def _make_rounds(self):
         round_dates   = [(7, "2014"), (8, "2016"), (9, "2018")]
         round_to_date = {k: (self._to_date(f'{v}_12_31'), k) for k, v in round_dates}
-        keys = self.raw.groupby(['cntry', 'essround']).groups.keys()
-        rounds = {k: [] for k, _ in keys}
+        keys          = self.raw.groupby(['cntry', 'essround']).groups.keys()
+        rounds        = {k: [] for k, _ in keys}
         for k, v in keys: # country, round
             rounds[k].append(round_to_date[v])
         return rounds
@@ -53,7 +54,7 @@ class ESS:
         return datetime.strptime(string, "%Y_%m_%d") 
 
     def _make_summary(self):
-        groups = self.raw.groupby(['cntry', 'essround'])
+        groups           = self.raw.groupby(['cntry', 'essround'])
         raw_avg, raw_var = groups.mean(), groups.var()
         return raw_avg, raw_var
 
