@@ -42,7 +42,7 @@ def train(ds, model, optimizer, criterion, device, writer, idx=0):
                     optimizer.step()
 
                     # run inference on 8 val batches
-                    val_loss = validate(val_iter, model, criterion)
+                    val_loss = validate(val_iter, model, criterion, device)
 
                     # write loss to tqdm
                     log_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx:=idx+1)
