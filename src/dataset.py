@@ -35,11 +35,13 @@ class Dataset(torch.utils.data.Dataset):
         date = self.keys[idx][3:]
         return self.construct(lang, date, self.days[self.keys[idx]])
         
-    def construct(self, lang, date, data):
-        A = [title_hash(a['article']) for a in data['data']] 
+    def construct(self, lang, date, days_articles):
+        A = [title_hash(a['article']) for a in days_articles] 
+        print(A)
+        exit()
         X = torch.tensor([self.toks[lang][t] for t in A])
         X = self.embed(F.pad(X, value=-1, pad=(0,0,0,1000 - len(A))).int())
-        W = torch.tensor([a['views'] for a in data['data']])
+        W = torch.tensor([a['views'] for a in days_articles])
         W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.sum(W)
         Y = self.ess.get_target(lang, date)
         return X, W, Y
@@ -56,13 +58,16 @@ class Dataset(torch.utils.data.Dataset):
         return embed
         
     def _load_days_and_toks(self):
-        days = {lang: self._load_days(lang) for lang in self.langs}
+        days = self._load_days(self.langs)
         toks = {lang: self._load_toks(lang) for lang in self.langs}
         return  days, toks
 
-    def _load_days(self, lang):
-        with open(f"{paths['wiki']}/days_{lang}.json", 'r') as f:
-            return {json.loads(line)['date']: json.loads(line)['date'] for line in f}
+    def _load_days(self, langs, days={}):
+        for lang in langs:
+            with open(f"{paths['wiki']}/days_{lang}.json", 'r') as f:
+                for day in f:
+                    days[f"{lang}_{json.loads(day)['date']}"] = json.loads(day)['data']
+        return days
 
     def _load_toks(self, lang):
         with open(f"{paths['wiki']}/toks_{lang}.json", 'r') as f:
