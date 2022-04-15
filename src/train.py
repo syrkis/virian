@@ -61,6 +61,7 @@ def log_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx):
 def validate(val_iter, model, criterion):
     with torch.no_grad():
         X, W, Y        = next(val_iter)
+        X, W, Y        = X.to(device), W.to(device), Y.to(device)
         x_pred, y_pred = model(X, W, Y)
         x_loss, y_loss = criterion(x_pred, X), criterion(y_pred, Y)
         return x_loss, y_loss
