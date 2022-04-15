@@ -22,9 +22,9 @@ class Dataset(torch.utils.data.Dataset):
     def __init__(self, langs):
         self.langs           = langs
         self.ess             = ESS() 
-        self.days, self.toks = load('toks', langs, local)
+        self.days, self.toks = self._load_days_and_toks()
+        self.embed           = self._load_embed()
         self.keys            = list(self.days.keys())
-        self.embed           = self._get_embed()
         random.shuffle(self.keys)
 
     def __len__(self):
@@ -49,23 +49,23 @@ class Dataset(torch.utils.data.Dataset):
         train_idx = [idx for idx in range(len(self.keys)) if idx not in val_idx]
         return train_idx, val_idx
 
-    def _load_embedself):
+    def _load_embed(self):
         embed = BPEmb(lang="multi", vs=10 ** 6, dim=300, add_pad_emb=True).vectors
-        embed = nn.Embedding.from_pretrained(torch.tensor(self.embed))
-        embed = self.embed.requires_grad_(requires_grad=False)
+        embed = nn.Embedding.from_pretrained(torch.tensor(embed))
+        embed = embed.requires_grad_(requires_grad=False)
         return embed
         
-    def _load_days_and_toks(self, langs):
-        days = {lang: self._load_days(lang) for lang in langs}
-        days = {lang: self._load_toks(lang) for lang in langs}
+    def _load_days_and_toks(self):
+        days = {lang: self._load_days(lang) for lang in self.langs}
+        toks = {lang: self._load_toks(lang) for lang in self.langs}
         return  days, toks
 
     def _load_days(self, lang):
-        with open(f"paths['wiki']}/days_{lang}", 'r') as f:
-            return defaultdict(lambda: {"text":""}, json.load(f))
+        with open(f"{paths['wiki']}/days_{lang}.json", 'r') as f:
+            return {json.loads(line)['date']: json.loads(line)['date'] for line in f}
 
     def _load_toks(self, lang):
-        with open(f"paths['wiki']}/toks_{lang}", 'r') as f:
+        with open(f"{paths['wiki']}/toks_{lang}.json", 'r') as f:
             return defaultdict(lambda: [0 for _ in range(hypers['sample_size'])], json.load(f))
 
 

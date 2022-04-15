@@ -78,7 +78,9 @@ def main():
         run_train((train_langs, test_langs), args.local)
     if args.dataset:
         train_langs, _ = get_langs()
-        ds = Dataset(train_langs, args.local)
+        if args.local:
+            ds = Dataset(train_langs[:4])
+        exit()
         for X, W, Y in ds:
             print(X, W, Y)
             exit()

@@ -39,6 +39,7 @@ def get_langs():
 
 # lang_to_cntry = get_lang2cntry()
 paths = {
+        'wiki': '../data/wiki',
         'tokenizer': 'bert-base-multilingual-cased',
         'toks': '../data/wiki/toks',
         'text': '../data/wiki/text',
