@@ -38,8 +38,8 @@ def run_tokenize(langs):
         toks = {}
         for title, text in tqdm(articles.items()):
             if 'text' in text:
-                toks[title] = tokenizer.encode_ids(text['text'])
-        with open(f"{paths['toks']}/{lang}.json", 'w') as f:
+                toks[title] = tokenizer.encode(text['text'])
+        with open(f"{paths['wiki']}/toks_{lang}.json", 'w') as f:
             json.dump(toks, f)
 
 def run_wiki(langs):
@@ -81,7 +81,7 @@ def main():
         if args.local:
             ds = Dataset(train_langs[:1])
         for X, W, Y in ds:
-            print(X, W, Y)
+            print(X)
     if args.tokenize:
         train_langs, test_langs = get_langs()
         run_tokenize(train_langs + test_langs)
