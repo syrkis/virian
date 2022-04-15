@@ -58,7 +58,7 @@ def log_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx):
 
 
 # compuate epoch validation score
-def validate(val_iter, model, criterion):
+def validate(val_iter, model, criterion, device):
     with torch.no_grad():
         X, W, Y        = next(val_iter)
         X, W, Y        = X.to(device), W.to(device), Y.to(device)
