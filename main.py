@@ -14,8 +14,7 @@ import argparse
 import json
 from torch.utils.tensorboard import SummaryWriter
 import os
-from transformers import logging
-logging.set_verbosity_error()
+from bpemb import BPEmb
 
 
 # get args
@@ -33,13 +32,13 @@ def get_args():
 
 
 def run_tokenize(langs):
+    tokenizer = BPEmb(lang="multi", vs=10 ** 6, dim=300)
     texts = load('text', langs) 
-    tokenizer = get_tokenizer()
     for lang, articles in texts.items():
         toks = {}
         for title, text in tqdm(articles.items()):
             if 'text' in text:
-                toks[title] = tokenize(text['text'], tokenizer)[0].tolist()
+                toks[title] = tokenizer.encode_ids(text['text'])
         with open(f"{paths['toks']}/{lang}.json", 'w') as f:
             json.dump(toks, f)
 
@@ -82,6 +81,7 @@ def main():
         ds = Dataset(train_langs, args.local)
         for X, W, Y in ds:
             print(X, W, Y)
+            exit()
     if args.tokenize:
         train_langs, test_langs = get_langs()
         run_tokenize(train_langs + test_langs)

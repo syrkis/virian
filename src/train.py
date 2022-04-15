@@ -4,14 +4,16 @@
 # imports
 import pickle
 from tqdm import tqdm, trange
-from itertools import islice, cycle
-from src.utils import get_s3, hypers
-import datetime
+from itertools import cycle
+from src.utils import hypers
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
-import time
+from memory_profiler import profile
+
+
 
 # train function
+@profile
 def train(ds, model, optimizer, criterion, device, writer, idx=0):
     model.to(device)
     with trange(1, len(ds.langs), desc="all folds") as folds:
@@ -27,7 +29,7 @@ def train(ds, model, optimizer, criterion, device, writer, idx=0):
                     optimizer.zero_grad()
 
                     # make predictions
-                    x_pred, y_pred = model(X, W, Y)
+                    x_pred, y_pred = model(X, W)
 
                     # calcualte loss
                     x_loss, y_loss = criterion(x_pred, X), criterion(y_pred, Y)
@@ -62,7 +64,7 @@ def validate(val_iter, model, criterion, device):
     with torch.no_grad():
         X, W, Y        = next(val_iter)
         X, W, Y        = X.to(device), W.to(device), Y.to(device)
-        x_pred, y_pred = model(X, W, Y)
+        x_pred, y_pred = model(X, W)
         x_loss, y_loss = criterion(x_pred, X), criterion(y_pred, Y)
         return x_loss, y_loss
 
