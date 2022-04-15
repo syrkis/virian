@@ -14,3 +14,5 @@ env
 logs/
 runs/
 **/.R*
+mlruns/
+wandb/
