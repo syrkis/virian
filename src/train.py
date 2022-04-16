@@ -14,7 +14,7 @@ from memory_profiler import profile
 # train function
 @profile
 def train(ds, model, optimizer, criterion, device, writer, idx=0):
-    model.to(device)
+    # model.to(device)
     with trange(1, len(ds.langs), desc="all folds") as folds:
         for fold, lang in zip(folds, ds.langs):
             train_loader, val_iter = k_fold(ds, lang)
@@ -22,7 +22,7 @@ def train(ds, model, optimizer, criterion, device, writer, idx=0):
                 for X, W, Y in fold:
                     
                     # tensors to GPU
-                    X, W, Y = X.to(device), W.to(device), Y.to(device)
+                    # X, W, Y = X.to(device), W.to(device), Y.to(device)
               
                     # clean tensor gradients
                     optimizer.zero_grad()
@@ -63,7 +63,7 @@ def report_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx):
 def validate(val_iter, model, criterion, device):
     with torch.no_grad():
         X, W, Y        = next(val_iter)
-        X, W, Y        = X.to(device), W.to(device), Y.to(device)
+        # X, W, Y        = X.to(device), W.to(device), Y.to(device)
         x_pred, y_pred = model(X, W)
         x_loss, y_loss = criterion(x_pred, X), criterion(y_pred, Y)
         return x_loss, y_loss
