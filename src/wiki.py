@@ -23,7 +23,7 @@ class Wiki:
     def __init__(self, langs):
         self.langs      = langs
         self.start_date = "2015_07_01"
-        self.end_date   = "2016_01_01"
+        self.end_date   = "2020_01_01"
 
     def get_dailies(self):
         with Pool(len(self.langs)) as p:

@@ -46,14 +46,14 @@ def train(ds, model, optimizer, criterion, device, writer, idx=0):
                     val_loss = validate(val_iter, model, criterion, device)
 
                     # write loss to tqdm
-                    log_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx:=idx+1)
+                    report_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx:=idx+1)
 
     # get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
     return model
 
 
 # compute and report loss
-def log_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx):
+def report_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx):
     writer.add_scalars(f"Wiki Loss", {"training": x_loss, "validation": val_loss[0]}, idx)
     writer.add_scalars(f"ESS Loss", {"training": y_loss, "validation": val_loss[1]}, idx)
     fold.set_postfix(loss=loss.item())

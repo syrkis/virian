@@ -14,6 +14,10 @@ parameters      = { 'vocab_size': 10 ** 6, 'sample_size': 2 ** 4, 'embedding_dim
 lang_splits     = { 'train': ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','si','es','sv'], 'test': ['bg','hr','da','is','he','it','lv','ru','sk'] }
 lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi','fr':'fr','de':'de','hu':'hu','is':'is','he':'il','it':'it',
                     'lv':'lv','lt':'lt','nl':'nl','no':'no','pl':'pl','pt':'pt','ru':'ru','sk':'sk','si':'si','es':'es','sv':'se' }
+ess_cols        = { 'meta' : ['essround','cntry'], 'questions': ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge", "rlgdnme", "rlgdgr", "rlgatnd",
+                    "pray", "happy", "sclmeet", "inprdsc", "sclact", "crmvct", "aesfdrk", "ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe",
+                    "impdiff", "ipfrule", "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt", "ipbhprp",
+                    "iprspot", "iplylfr", "impenv", "imptrad", "impfun"] }
 
 # get args
 def get_args():

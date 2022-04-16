@@ -72,7 +72,7 @@ class ESS:
         return fact_avg, fact_var
 
 
-meta = """essround,cntry""".split(',') # add pspwght
+meta = """essround,cntry""".split(',') # add pspwght weight!!!
 data = """health,hlthhmp,rlgblg,rlgdnm,rlgblge,rlgdnme,rlgdgr,rlgatnd,pray,happy,sclmeet,inprdsc,sclact,crmvct,aesfdrk,ipcrtiv,imprich,ipeqopt,ipshabt,impsafe,impdiff,ipfrule,ipudrst,ipmodst,ipgdtim,impfree,iphlppl,ipsuces,ipstrgv,ipadvnt,ipbhprp,iprspot,iplylfr,impenv,imptrad,impfun""".split(',')
 
 
