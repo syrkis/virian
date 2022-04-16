@@ -16,9 +16,10 @@ from tqdm import tqdm
 class Wiki:
 
     date_format = variables['date_format']
+    data_dir    = variables['data_dir']
     wiki_api    = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     headers     = {"User-Agent": "nobr@itu.dk"}
-    tokenizer   = BPEmb(lang="multi", vs=10 ** 6, dim=300)
+    # tokenizer   = BPEmb(lang="multi", vs=10 ** 6, dim=300)
     
     def __init__(self, langs):
         self.langs      = langs
@@ -26,32 +27,34 @@ class Wiki:
         self.end_date   = "2020_01_01"
 
     def get_dailies(self):
-        with Pool(len(self.langs)) as p:
-            p.map(self._get_dailies_lang, self.langs)
+        for lang in self.langs:
+            self._get_dailies_lang(lang)
 
-    def get_texts(self): # TODO: switch to parquet
+    def get_texts(self):
         with Pool(len(self.langs)) as p:
             p.map(self._get_texts_lang, self.langs)
 
-    def texts_to_toks(self): # TODO: switch to parquet
+    def texts_to_toks(self):
         for lang in tqdm(self.langs):
             self._texts_to_toks_lang(lang)
 
-    def _get_texts_lang(self, lang): # TODO: support cont.
+    def _get_texts_lang(self, lang, fails = 0): # TODO: support cont.
         D = {"texts" : {}, "fails" : set()}
         wikipedia.set_lang(lang)
         titles = self._get_titles(lang)
-        for title in tqdm(list(titles)): # add fail found to tqdm
-            if title not in D['fails']:
-                try:
-                    D['texts'][title] = self.tokenizer.encode(wikipedia.page(title).summary)
-                except (wikipedia.exceptions.PageError, KeyError,
-                        wikipedia.exceptions.DisambiguationError,
-                        wikipedia.exceptions.WikipediaException,
-                        json.decoder.JSONDecodeError) as e:
-                    D['fails'].add(title)
-                    continue
-        with open(f"{variables['wiki']}/text_{lang}.json", 'r') as f:
+        with tqdm(titles) as title_iter:
+            for title in title_iter: # add fail found to tqdm
+                if title not in D['fails']:
+                    try:
+                        D['texts'][title] = self.tokenizer.encode(wikipedia.page(title).summary)
+                    except (wikipedia.exceptions.PageError, KeyError,
+                            wikipedia.exceptions.DisambiguationError,
+                            wikipedia.exceptions.WikipediaException,
+                            json.decoder.JSONDecodeError) as e:
+                        D['fails'].add(title)
+                        title_iter.postfix(fail_ratio=len(D['fails']) / len(D['texts']))
+                        continue
+        with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
             json.dump(D, f, ensure_ascii=False)
 
     def _get_dailies_lang(self, lang): # TODO: support cont.
@@ -61,24 +64,24 @@ class Wiki:
             url  = self._get_url(date, lang)
             res  = requests.get(url, headers=self.headers)
             day  = json.loads(res.text)['items'][0]['articles']
-            D[self._to_str(date)] = day
-            with open(f"{variables['wiki']}/days_{lang}.json", 'w') as f:
-                f.write(json.dumps(D, ensure_ascii=False) + "\n")
+            D[self._to_str(date)] = [{k: v for k, v in entry.items() if k != 'rank'} for entry in day]
+        with open(f"{self.data_dir}/wiki/days_{lang}.json", 'w') as f:
+            f.write(json.dumps(D, ensure_ascii=False) + "\n")
 
     def _texts_to_toks_lang(self, lang): # one of migration func
         D = {"texts" : {}, "fails" : set()}
         hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
-        with open(f"{variables['wiki']}/text_{lang}.json", 'r') as f:
+        with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
             texts = json.load(f)
         for _hash in tqdm(hashes):
             if _hash in texts:
                 D[texts[_hash]['title']] = self.tokenizer.encode_ids(texts[_hash]['text'])
         D['fails'] = texts['__failed__']
-        with open(f"{variables['wiki']}/toks_{lang}.json", 'w') as f:
+        with open(f"{self.data_dir}/wiki/toks_{lang}.json", 'w') as f:
             json.dump(D, f)
 
     def _get_titles(self, lang):
-        with open(f'{variables["wiki"]}/days_{lang}.json', 'r') as f:
+        with open(f'{self.data_dir}/wiki/days_{lang}.json', 'r') as f:
             return set([text['article'] for day in f for text in json.loads(day)['data']]) # old schem
 
     def _titles_to_hash(self, titles):

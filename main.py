@@ -3,19 +3,13 @@
 # by: Noah Syrkis
 
 # imports
-from src import (lang_splits, get_args, train, Dataset, Model)
+from src import Dataset, Model, Wiki, lang_splits, get_args, train
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-
-
-def run_ess():
-    ess = ESS()
-    out = ess.get_target('SE', '2020_10_30')
-    print(out)
 
 
 def run_train(train_langs, test_langs):
@@ -32,18 +26,22 @@ def run_train(train_langs, test_langs):
 # call stack
 def main():
     args = get_args()
+
     if args.ess:
-        run_ess()    
+        ess = ESS()
+
     if args.wiki:
         train_langs, test_langs = lang_splits.values()
         all_langs = train_langs + test_langs
-        wiki = Wiki(all_langs)
-        wiki.texts_to_toks()
+        # wiki = Wiki(all_langs)
+        # wiki.get_dailies() # don't run
+
     if args.train:
         train_langs, test_langs = lang_splits.values()
         if args.local:
             run_train(train_langs[:2], test_langs)
         run_train(train_langs, test_langs)
+
     if args.dataset:
         train_langs, _ = lang_splits.values()
         if args.local:

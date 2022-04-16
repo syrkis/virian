@@ -73,8 +73,8 @@ class Dataset(torch.utils.data.Dataset):
         days = {}
         for lang in langs:
             with open(f"{self.data_dir}/wiki/days_{lang}.json", 'r') as f:
-                for day in f:
-                    days[f"{lang}_{json.loads(day)['date']}"] = json.loads(day)['data']
+                for date, days_text in json.load(f).items():
+                    days[f"{lang}_{date}"] = days_text
         return days
 
     def _extend(self, sample):
