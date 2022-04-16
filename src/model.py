@@ -18,10 +18,9 @@ class Model(nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.emb = nn.Embedding(self.vocab_size, self.embedding_dim)
         self.enc = nn.Linear(self.embedding_dim, 50)
         self.fc1 = nn.Linear(50, 10)
-        self.dec = nn.Linear(50, 10)
+        self.dec = nn.Linear(50, self.embedding_dim)
 
     def forward(self, x, w):
         x = self.encode(x)
@@ -30,13 +29,10 @@ class Model(nn.Module):
         return x, y
 
     def encode(self, x):
-        x = self.emb(x)
         x = self.enc(x)
         return x
 
     def decode(self, x):
-        print(x.shape)
-        exit()
         x = self.dec(x)
         return x
 

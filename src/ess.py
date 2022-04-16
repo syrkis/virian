@@ -3,6 +3,7 @@
 # by: Noah Syrkis
 
 # imports
+from src.utils import variables, lang_to_country
 from datetime import datetime, timedelta
 
 import torch
@@ -16,11 +17,12 @@ from factor_analyzer import FactorAnalyzer as FA
 # make values
 class ESS:
 
-    nans  = [66,77,88,99]
-    facts = 'a b c d e'.split()
+    nans     = [66,77,88,99]
+    facts    = 'a b c d e'.split()
+    ess_file = f"{variables['data_dir']}/ess/ESS1-9e01_1.csv"
 
     def __init__(self):
-        self.raw                     = pd.read_csv(paths['ess'], usecols=meta+data)
+        self.raw                     = pd.read_csv(self.ess_file, usecols=meta+data)
         self.raw                     = self.raw.replace(self.nans, np.NaN) # 99 etc. to NaN
         self.raw['cntry']            = self.raw['cntry'].str.lower()
         self.raw_avg, self.raw_var   = self._make_summary()
@@ -46,7 +48,7 @@ class ESS:
         round_to_date = {k: (self._to_date(f'{v}_12_31'), k) for k, v in round_dates}
         keys          = self.raw.groupby(['cntry', 'essround']).groups.keys()
         rounds        = {k: [] for k, _ in keys}
-        for k, v in keys: # country, round
+        for k, v in keys: # (country, round)
             rounds[k].append(round_to_date[v])
         return rounds
 
@@ -75,10 +77,7 @@ data = """health,hlthhmp,rlgblg,rlgdnm,rlgblge,rlgdnme,rlgdgr,rlgatnd,pray,happy
 
 
 def main():
-    ess = ESS()
-    out = ess._date_to_round('SE', '2020_10_30')
-    print(out)
-
+    pass
 
 if __name__ == "__main__":
     main()

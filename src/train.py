@@ -48,6 +48,7 @@ def train(ds, model, optimizer, criterion, device, writer, idx=0):
                     # write loss to tqdm
                     log_loss(loss, x_loss, y_loss, val_loss, writer, fold, idx:=idx+1)
 
+    # get_s3().put_object(Bucket="models", Body=pickle.dumps(model.state_dict()), Key="model.pth.pkl")
     return model
 
 
