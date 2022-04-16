@@ -8,28 +8,19 @@ import torch
 import os
 import json
 from tqdm import tqdm
-from hashlib import sha256
 from collections import defaultdict
 from datetime import datetime, timedelta
 
 
 hypers = {
-        'vocab_size': 119547, # from bert tokenizer
+        'vocab_size': 10 ** 6,
         'sample_size': 2 ** 4,
         'embedding_dim': 10,
         'batch_size': 2 ** 3
         }
 
 date_format = "%Y_%m_%d"
-wiki_api = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
 
-
-
-
-
-
-
-title_hash = lambda title: sha256((title).encode('utf-8')).hexdigest()
 
 def get_langs():
     with open('README.md', 'r') as f:
@@ -40,7 +31,6 @@ def get_langs():
     test_langs  = [line[2] for line in data if line[2] not in train_langs]
     return train_langs, test_langs
 
-# lang_to_cntry = get_lang2cntry()
 paths = {
         'wiki': '../data/wiki',
         'tokenizer': 'bert-base-multilingual-cased',
@@ -55,7 +45,6 @@ paths = {
             '../data/wiki/text'
             ]
         }
-
 
 # runners
 def setup():

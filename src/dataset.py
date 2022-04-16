@@ -35,10 +35,10 @@ class Dataset(torch.utils.data.Dataset):
         date = self.keys[idx][3:]
         return self.construct(lang, date, self.days[self.keys[idx]])
         
-    def construct(self, lang, date, days_articles):
-        A = [title_hash(article['article']) for article in days_articles] 
-        X = [self.toks[lang][article][:self.sample_size] for article in A]
-        X = tensor([self._extend(article) for article in X])
+    def construct(self, lang, date, days_text):
+        X = [text['article'] for text in days_text] 
+        X = [self.toks[lang][title][:self.sample_size] for title in X]
+        X = tensor(self._extend([self._extend(article) for article in X]))
         X = F.pad(X, value=0, pad=(0,0,0,1000 - len(A)))
         X = self.emb(X)
         W = tensor([article['views'] for article in days_articles])
@@ -52,7 +52,7 @@ class Dataset(torch.utils.data.Dataset):
         return train_idx, val_idx
 
     def _load_emb(self):
-        emb = BPEmb(lang="multi", vs=10 ** 6, dim=300)
+        emb = BPEmb(lang="multi", vs=10 ** 6, dim=300, add_pad_emb=True)
         emb = nn.Embedding.from_pretrained(tensor(emb.vectors)) # no padding
         return emb
         
@@ -70,11 +70,15 @@ class Dataset(torch.utils.data.Dataset):
 
     def _load_toks(self, lang):
         with open(f"{paths['wiki']}/toks_{lang}.json", 'r') as f:
-            return defaultdict(lambda: [0 for _ in range(hypers['sample_size'])], json.load(f))
+            return defaultdict(lambda: ['<pad>' for _ in range(hypers['sample_size'])], json.load(f))
 
     def _extend(self, sample):
-        return sample + [0 for _ in range(self.sample_size - len(sample))]
-
+        if is type(sample[0]) == list:
+            for i in range(1000 - len(sample)):
+                sample.append(["<pad>" for _ in range(hypers["sample_size"])])
+        else:
+            sample += [0 for _ in range(self.sample_size - len(sample))]
+        return sample
 
 
 # dev stack

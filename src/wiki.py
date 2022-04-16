@@ -3,23 +3,20 @@
 # by: Noah Syrkis
 
 # imports
+from src.utils import paths, date_format, title_hash
 from datetime import datetime, timedelta
-from multiprocessing import Pool
-import os
-import json
-import requests as req
-import time
-from tqdm import tqdm
-from src.utils import paths, date_format, wiki_api, title_hash
-import wikipedia
 from bpemb import BPEmb
+from multiprocessing import Pool
+from hashlib import sha256
+import os, json, requests, wikipedia
+from tqdm import tqdm
 
 
 # wikipedia class (tokenizes and scarpes, etc.)
 class Wiki:
 
     date_format = date_format
-    wiki_api    = wiki_api
+    wiki_api    = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     headers     = {"User-Agent": "nobr@itu.dk"}
     tokenizer   = BPEmb(lang="multi", vs=10 ** 6, dim=300)
     
@@ -32,11 +29,11 @@ class Wiki:
         with Pool(len(self.langs)) as p:
             p.map(self._get_dailies_lang, self.langs)
 
-    def get_texts(self):
+    def get_texts(self): # TODO: switch to parquet
         with Pool(len(self.langs)) as p:
             p.map(self._get_texts_lang, self.langs)
 
-    def texts_to_toks(self):
+    def texts_to_toks(self): # TODO: switch to parquet
         for lang in tqdm(self.langs):
             self._texts_to_toks_lang(lang)
 
@@ -60,14 +57,14 @@ class Wiki:
         for i in tqdm(range(self._str_to_delta(self.start_date, self.end_date))):
             date = self._add_days(self._to_date(self.start_date), i)
             url  = self._get_url(date, lang)
-            res  = req.get(url, headers=self.headers)
+            res  = requests.get(url, headers=self.headers)
             day  = json.loads(res.text)['items'][0]['articles']
             D[self._to_str(date)] = day
             with open(f"{paths['wiki']}/days_{lang}.json", 'w') as f:
                 f.write(json.dumps(D, ensure_ascii=False) + "\n")
 
     def _texts_to_toks_lang(self, lang, D = {"texts" : {}, "fails" : set()}): # one of migration func
-        hashes = [title_hash(title) for title in self._get_titles(lang)]
+        hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
         with open(f"{paths['wiki']}/text_{lang}.json", 'r') as f:
             texts = json.load(f)
         for _hash in tqdm(hashes):
@@ -99,6 +96,8 @@ class Wiki:
     def _get_url(self, date, lang):
         return f'{self.wiki_api}/{lang}.wikipedia.org/all-access/{self._to_str(date, "/")}'
         
+    def _get_title_hash(self, title):
+        return sha256((title).encode('utf-8')).hexdigest()
 
 # dev calls
 def main():
