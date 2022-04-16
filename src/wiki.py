@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import paths, date_format, title_hash
+from src.utils import paths, date_format
 from datetime import datetime, timedelta
 from bpemb import BPEmb
 from multiprocessing import Pool
@@ -37,7 +37,8 @@ class Wiki:
         for lang in tqdm(self.langs):
             self._texts_to_toks_lang(lang)
 
-    def _get_texts_lang(self, lang, D = {"texts" : {}, "fails" : set()}): # TODO: support cont.
+    def _get_texts_lang(self, lang): # TODO: support cont.
+        D = {"texts" : {}, "fails" : set()}
         wikipedia.set_lang(lang)
         titles = self._get_titles(lang)
         for title in tqdm(list(titles)): # add fail found to tqdm
@@ -53,7 +54,8 @@ class Wiki:
         with open(f"{paths['wiki']}/text_{lang}.json", 'r') as f:
             json.dump(D, f, ensure_ascii=False)
 
-    def _get_dailies_lang(self, lang, D = {}): # TODO: support cont.
+    def _get_dailies_lang(self, lang): # TODO: support cont.
+        D = {}
         for i in tqdm(range(self._str_to_delta(self.start_date, self.end_date))):
             date = self._add_days(self._to_date(self.start_date), i)
             url  = self._get_url(date, lang)
@@ -63,13 +65,14 @@ class Wiki:
             with open(f"{paths['wiki']}/days_{lang}.json", 'w') as f:
                 f.write(json.dumps(D, ensure_ascii=False) + "\n")
 
-    def _texts_to_toks_lang(self, lang, D = {"texts" : {}, "fails" : set()}): # one of migration func
+    def _texts_to_toks_lang(self, lang): # one of migration func
+        D = {"texts" : {}, "fails" : set()}
         hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
         with open(f"{paths['wiki']}/text_{lang}.json", 'r') as f:
             texts = json.load(f)
         for _hash in tqdm(hashes):
             if _hash in texts:
-                D[texts[_hash]['title']] = self.tokenizer.encode(texts[_hash]['text'])
+                D[texts[_hash]['title']] = self.tokenizer.encode_ids(texts[_hash]['text'])
         D['fails'] = texts['__failed__']
         with open(f"{paths['wiki']}/toks_{lang}.json", 'w') as f:
             json.dump(D, f)
@@ -98,6 +101,7 @@ class Wiki:
         
     def _get_title_hash(self, title):
         return sha256((title).encode('utf-8')).hexdigest()
+
 
 # dev calls
 def main():

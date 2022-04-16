@@ -11,7 +11,6 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 from memory_profiler import profile
 
 
-
 # train function
 @profile
 def train(ds, model, optimizer, criterion, device, writer, idx=0):
@@ -43,7 +42,7 @@ def train(ds, model, optimizer, criterion, device, writer, idx=0):
                     # update model parameters
                     optimizer.step()
 
-                    # run inference on 8 val batches
+                    # run validation
                     val_loss = validate(val_iter, model, criterion, device)
 
                     # write loss to tqdm

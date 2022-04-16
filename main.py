@@ -65,8 +65,10 @@ def main():
         train_langs, _ = get_langs()
         if args.local:
             ds = Dataset(train_langs[:1])
-        for X, W, Y in ds:
-            print(X)
+        ds = Dataset(train_langs)
+        shapes = []
+        for X, W, Y in tqdm(ds):
+            shapes.append(X.shape)
     if args.tokenize:
         train_langs, test_langs = get_langs()
         run_tokenize(train_langs + test_langs)

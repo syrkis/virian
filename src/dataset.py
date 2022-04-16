@@ -18,6 +18,7 @@ class Dataset(torch.utils.data.Dataset):
 
     vocab_size  = hypers['vocab_size']  # TODO: multilingual vocab?
     sample_size = hypers['sample_size'] # 128 word wiki summaries
+    pad         = 10 ** 6
 
     def __init__(self, langs):
         self.emb             = self._load_emb()
@@ -36,12 +37,12 @@ class Dataset(torch.utils.data.Dataset):
         return self.construct(lang, date, self.days[self.keys[idx]])
         
     def construct(self, lang, date, days_text):
-        X = [text['article'] for text in days_text] 
-        X = [self.toks[lang][title][:self.sample_size] for title in X]
-        X = tensor(self._extend([self._extend(article) for article in X]))
-        X = F.pad(X, value=0, pad=(0,0,0,1000 - len(A)))
+        T = [text['article'] for text in days_text] 
+        X = [self.toks[lang][title][:self.sample_size] for title in T]
+        X = tensor([self._extend(article) for article in X])
+        X = F.pad(X, value=self.pad, pad=(0,0,0,1000 - len(T)))
         X = self.emb(X)
-        W = tensor([article['views'] for article in days_articles])
+        W = tensor([text['views'] for text in days_text])
         W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.sum(W)
         Y = self.ess.get_target(lang, date)
         return X, W, Y
@@ -52,8 +53,8 @@ class Dataset(torch.utils.data.Dataset):
         return train_idx, val_idx
 
     def _load_emb(self):
-        emb = BPEmb(lang="multi", vs=10 ** 6, dim=300, add_pad_emb=True)
-        emb = nn.Embedding.from_pretrained(tensor(emb.vectors)) # no padding
+        emb = BPEmb(lang="multi", vs=self.pad, dim=300, add_pad_emb=True)
+        emb = nn.Embedding.from_pretrained(tensor(emb.vectors), padding_idx=self.pad) # no padding
         return emb
         
     def _load_days_and_toks(self):
@@ -70,15 +71,10 @@ class Dataset(torch.utils.data.Dataset):
 
     def _load_toks(self, lang):
         with open(f"{paths['wiki']}/toks_{lang}.json", 'r') as f:
-            return defaultdict(lambda: ['<pad>' for _ in range(hypers['sample_size'])], json.load(f))
+            return defaultdict(lambda: [self.pad for _ in range(hypers['sample_size'])], json.load(f))
 
     def _extend(self, sample):
-        if is type(sample[0]) == list:
-            for i in range(1000 - len(sample)):
-                sample.append(["<pad>" for _ in range(hypers["sample_size"])])
-        else:
-            sample += [0 for _ in range(self.sample_size - len(sample))]
-        return sample
+        return sample + [self.pad for _ in range(self.sample_size - len(sample))]
 
 
 # dev stack
