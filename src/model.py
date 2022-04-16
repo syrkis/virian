@@ -6,15 +6,15 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.utils import hypers
+from src.utils import parameters
 
 
 # topic model
 class Model(nn.Module):
 
-    sample_size   = hypers['sample_size']
-    embedding_dim = hypers['embedding_dim']
-    vocab_size    = hypers['vocab_size']
+    sample_size   = parameters['sample_size']
+    embedding_dim = parameters['embedding_dim']
+    vocab_size    = parameters['vocab_size']
 
     def __init__(self):
         super().__init__()

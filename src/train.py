@@ -2,10 +2,10 @@
 # by: Noah Syrkis
 
 # imports
+from src.utils import parameters
 import pickle
 from tqdm import tqdm, trange
 from itertools import cycle
-from src.utils import hypers
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from memory_profiler import profile
@@ -73,8 +73,8 @@ def k_fold(ds, lang):
     train_idx, val_idx = ds.k_fold(lang)
     train_sampler      = SubsetRandomSampler(train_idx)
     val_sampler        = SubsetRandomSampler(val_idx)
-    train_loader       = DataLoader(dataset=ds, batch_size=hypers['batch_size'], sampler=train_sampler)
-    val_loader         = DataLoader(dataset=ds, batch_size=hypers['batch_size'], sampler=val_sampler)
+    train_loader       = DataLoader(dataset=ds, batch_size=parameters['batch_size'], sampler=train_sampler)
+    val_loader         = DataLoader(dataset=ds, batch_size=parameters['batch_size'], sampler=val_sampler)
     return train_loader, cycle(val_loader)
 
 

@@ -9,12 +9,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from multiprocessing import Pool
 import argparse
-import json
 from torch.utils.tensorboard import SummaryWriter
-import os
-from bpemb import BPEmb
 
 
 # get args
@@ -49,7 +45,6 @@ def run_train(langs, local):
 
 # call stack
 def main():
-    # setup()
     args = get_args()
     if args.ess:
         run_ess()    
@@ -64,7 +59,7 @@ def main():
     if args.dataset:
         train_langs, _ = get_langs()
         if args.local:
-            ds = Dataset(train_langs[:1])
+            ds = Dataset(train_langs[:3])
         ds = Dataset(train_langs)
         shapes = []
         for X, W, Y in tqdm(ds):

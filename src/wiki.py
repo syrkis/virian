@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import paths, date_format
+from src.utils import variables
 from datetime import datetime, timedelta
 from bpemb import BPEmb
 from multiprocessing import Pool
@@ -15,7 +15,7 @@ from tqdm import tqdm
 # wikipedia class (tokenizes and scarpes, etc.)
 class Wiki:
 
-    date_format = date_format
+    date_format = variables['date_format']
     wiki_api    = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     headers     = {"User-Agent": "nobr@itu.dk"}
     tokenizer   = BPEmb(lang="multi", vs=10 ** 6, dim=300)
@@ -51,7 +51,7 @@ class Wiki:
                         json.decoder.JSONDecodeError) as e:
                     D['fails'].add(title)
                     continue
-        with open(f"{paths['wiki']}/text_{lang}.json", 'r') as f:
+        with open(f"{variables['wiki']}/text_{lang}.json", 'r') as f:
             json.dump(D, f, ensure_ascii=False)
 
     def _get_dailies_lang(self, lang): # TODO: support cont.
@@ -62,23 +62,23 @@ class Wiki:
             res  = requests.get(url, headers=self.headers)
             day  = json.loads(res.text)['items'][0]['articles']
             D[self._to_str(date)] = day
-            with open(f"{paths['wiki']}/days_{lang}.json", 'w') as f:
+            with open(f"{variables['wiki']}/days_{lang}.json", 'w') as f:
                 f.write(json.dumps(D, ensure_ascii=False) + "\n")
 
     def _texts_to_toks_lang(self, lang): # one of migration func
         D = {"texts" : {}, "fails" : set()}
         hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
-        with open(f"{paths['wiki']}/text_{lang}.json", 'r') as f:
+        with open(f"{variables['wiki']}/text_{lang}.json", 'r') as f:
             texts = json.load(f)
         for _hash in tqdm(hashes):
             if _hash in texts:
                 D[texts[_hash]['title']] = self.tokenizer.encode_ids(texts[_hash]['text'])
         D['fails'] = texts['__failed__']
-        with open(f"{paths['wiki']}/toks_{lang}.json", 'w') as f:
+        with open(f"{variables['wiki']}/toks_{lang}.json", 'w') as f:
             json.dump(D, f)
 
     def _get_titles(self, lang):
-        with open(f'{paths["wiki"]}/days_{lang}.json', 'r') as f:
+        with open(f'{variables["wiki"]}/days_{lang}.json', 'r') as f:
             return set([text['article'] for day in f for text in json.loads(day)['data']]) # old schem
 
     def _titles_to_hash(self, titles):

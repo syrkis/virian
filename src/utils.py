@@ -4,62 +4,14 @@
 
 # imports
 from boto3.session import Session
-import torch
-import os
-import json
-from tqdm import tqdm
-from collections import defaultdict
-from datetime import datetime, timedelta
 
 
-hypers = {
-        'vocab_size': 10 ** 6,
-        'sample_size': 2 ** 4,
-        'embedding_dim': 10,
-        'batch_size': 2 ** 3
-        }
-
-date_format = "%Y_%m_%d"
-
-
-def get_langs():
-    with open('README.md', 'r') as f:
-        table = f.read().split("## Countries")[1].strip().lower()
-    data        = [line.strip().split('|')[1:-1] for line in table.split('\n')[2:]]
-    data        = [[entry.strip() for entry in line] for line in data]
-    train_langs = [line[2] for line in data if "".join(line[-3:]) == "xxx"]
-    test_langs  = [line[2] for line in data if line[2] not in train_langs]
-    return train_langs, test_langs
-
-paths = {
-        'wiki': '../data/wiki',
-        'tokenizer': 'bert-base-multilingual-cased',
-        'toks': '../data/wiki/toks',
-        'text': '../data/wiki/text',
-        'days': '../data/wiki/days',
-        'ess': '../data/ess/ESS1-9e01_1.csv', # redownload
-        'factors': '../data/ess/factors.json',
-        "all_dirs": [
-            '../data', '../data/models', '../data/ess',
-            '../data/wiki', '../data/wiki/days', '../data/wiki/toks',
-            '../data/wiki/text'
-            ]
-        }
-
-# runners
-def setup():
-    for path in paths['all_dirs']:
-        if not os.path.exists(path):
-            os.makedirs(path)
-    for lang in parse_readme_langs():
-        for idx, path in [hypers['days'], hypers['text']]:
-            file = f"{path}/{lang}.json"
-            if not os.path.exists(file):
-                if idx == 0:
-                    fp = open(file, 'x'); fp.close()
-                else:
-                    with open(file, 'w') as f:
-                        json.dump({"__failed__": []}, f) # sould have been set and in own level
+# global variables
+variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_path': '../data', 'data_dirs': ['wiki', 'ess'] }
+parameters      = { 'vocab_size': 10 ** 6, 'sample_size': 2 ** 4, 'embedding_dim': 300, 'batch_size': 2 ** 3 }
+lang_splits     = { 'train':['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','si','es','sv'],'test':['bg','hr','da','is','he','it','lv','ru','sk'] } 
+lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi','fr':'fr','de':'de','hu':'hu','is':'is','he':'il','it':'it',
+                    'lv':'lv','lt':'lt','nl':'nl','no':'no','pl':'pl','pt':'pt','ru':'ru','sk':'sk','si':'si','es':'es','sv':'se' }
 
 # connect to digital ocean spaces
 def get_s3():

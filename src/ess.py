@@ -3,7 +3,6 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import paths
 from datetime import datetime, timedelta
 
 import torch
@@ -73,7 +72,7 @@ class ESS:
 
 meta = """essround,cntry""".split(',') # add pspwght
 data = """health,hlthhmp,rlgblg,rlgdnm,rlgblge,rlgdnme,rlgdgr,rlgatnd,pray,happy,sclmeet,inprdsc,sclact,crmvct,aesfdrk,ipcrtiv,imprich,ipeqopt,ipshabt,impsafe,impdiff,ipfrule,ipudrst,ipmodst,ipgdtim,impfree,iphlppl,ipsuces,ipstrgv,ipadvnt,ipbhprp,iprspot,iplylfr,impenv,imptrad,impfun""".split(',')
-lang_to_country = {'bg': 'bg', 'hr': 'hr', 'cs': 'cz', 'da': 'dk', 'et': 'ee', 'fi': 'fi', 'fr': 'fr', 'de': 'de', 'hu': 'hu', 'is': 'is', 'he': 'il', 'it': 'it', 'lv': 'lv', 'lt': 'lt', 'nl': 'nl', 'no': 'no', 'pl': 'pl', 'pt': 'pt', 'ru': 'ru', 'sk': 'sk', 'si': 'si', 'es': 'es', 'sv': 'se'}
+
 
 def main():
     ess = ESS()

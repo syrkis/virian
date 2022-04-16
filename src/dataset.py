@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import *
+from src.utils import variables, parameters
 from src.ess import ESS
 import torch
 from torch import nn, tensor
@@ -16,9 +16,9 @@ from collections import defaultdict
 # virian dataset
 class Dataset(torch.utils.data.Dataset):
 
-    vocab_size  = hypers['vocab_size']  # TODO: multilingual vocab?
-    sample_size = hypers['sample_size'] # 128 word wiki summaries
-    pad         = 10 ** 6
+    vocab_size  = parameters['vocab_size']  # TODO: multilingual vocab?
+    sample_size = parameters['sample_size'] # 128 word wiki summaries
+    pad         = variables['pad']
 
     def __init__(self, langs):
         self.emb             = self._load_emb()
