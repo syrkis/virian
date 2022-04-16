@@ -31,23 +31,6 @@ def get_args():
     return parser.parse_args()
 
 
-def run_tokenize(langs):
-    tokenizer = BPEmb(lang="multi", vs=10 ** 6, dim=300)
-    texts = load('text', langs) 
-    for lang, articles in texts.items():
-        toks = {}
-        for title, text in tqdm(articles.items()):
-            if 'text' in text:
-                toks[title] = tokenizer.encode(text['text'])
-        with open(f"{paths['wiki']}/toks_{lang}.json", 'w') as f:
-            json.dump(toks, f)
-
-def run_wiki(langs):
-    with Pool(len(langs)) as p:
-        p.map(get_dailies, langs)
-    with Pool(len(langs)) as p:
-        p.map(get_articles, langs)
-
 def run_ess():
     ess = ESS()
     out = ess.get_target('SE', '2020_10_30')
@@ -72,7 +55,9 @@ def main():
         run_ess()    
     if args.wiki:
         train_langs, test_langs = get_langs()
-        run_wiki(train_langs + test_langs)
+        all_langs = train_langs + test_langs
+        wiki = Wiki(all_langs)
+        wiki.texts_to_toks()
     if args.train:
         train_langs, test_langs = get_langs()
         run_train((train_langs, test_langs), args.local)

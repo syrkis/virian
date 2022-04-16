@@ -4,84 +4,101 @@
 
 # imports
 from datetime import datetime, timedelta
+from multiprocessing import Pool
 import os
 import json
-import requests
+import requests as req
 import time
 from tqdm import tqdm
-from src.utils import paths, title_hash
-from hashlib import sha256
+from src.utils import paths, date_format, wiki_api, title_hash
 import wikipedia
+from bpemb import BPEmb
 
 
-# run time function
-def get_dailies(lang):
-    file = f"{paths['days']}/{lang}.json"
-    api = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
-    dones = get_dones(file)
-    start_date = get_date(dones[-1].replace('_', '/') if dones else "2015/07/01")
-    end_date = datetime.now() - timedelta(days=3) 
-    date = start_date
-    for _ in tqdm(range((end_date - start_date).days)):
-        if get_str(date).replace('/', '_') in dones:
-            date += timedelta(days = 1)
-            continue
-        date_str = get_str(date)
-        headers = {"User-Agent": "nobr@itu.dk"}
-        url = get_url(api, date_str, lang)
-        res = requests.get(url, headers=headers).text
-        data = json.loads(res)['items'][0]['articles']
-        for sample in data:
-            del sample['rank']
-        D = {'date': get_str(date).replace('/', '_'), 'data': data}
-        with open(file, 'a+') as f:
+# wikipedia class (tokenizes and scarpes, etc.)
+class Wiki:
+
+    date_format = date_format
+    wiki_api    = wiki_api
+    headers     = {"User-Agent": "nobr@itu.dk"}
+    tokenizer   = BPEmb(lang="multi", vs=10 ** 6, dim=300)
+    
+    def __init__(self, langs):
+        self.langs      = langs
+        self.start_date = "2015_07_01"
+        self.end_date   = "2016_01_01"
+
+    def get_dailies(self):
+        with Pool(len(self.langs)) as p:
+            p.map(self._get_dailies_lang, self.langs)
+
+    def get_texts(self):
+        with Pool(len(self.langs)) as p:
+            p.map(self._get_texts_lang, self.langs)
+
+    def texts_to_toks(self):
+        for lang in tqdm(self.langs):
+            self._texts_to_toks_lang(lang)
+
+    def _get_texts_lang(self, lang, D = {"texts" : {}, "fails" : set()}): # TODO: support cont.
+        wikipedia.set_lang(lang)
+        titles = self._get_titles(lang)
+        for title in tqdm(list(titles)): # add fail found to tqdm
+            if title not in D['fails']:
+                try:
+                    D['texts'][title] = self.tokenizer.encode(wikipedia.page(title).summary)
+                except (wikipedia.exceptions.PageError, KeyError,
+                        wikipedia.exceptions.DisambiguationError,
+                        wikipedia.exceptions.WikipediaException,
+                        json.decoder.JSONDecodeError) as e:
+                    D['fails'].add(title)
+                    continue
+        with open(f"{paths['wiki']}/text_{lang}.json", 'r') as f:
             json.dump(D, f, ensure_ascii=False)
-            f.write('\n')
-        date += timedelta(days = 1)
 
+    def _get_dailies_lang(self, lang, D = {}): # TODO: support cont.
+        for i in tqdm(range(self._str_to_delta(self.start_date, self.end_date))):
+            date = self._add_days(self._to_date(self.start_date), i)
+            url  = self._get_url(date, lang)
+            res  = req.get(url, headers=self.headers)
+            day  = json.loads(res.text)['items'][0]['articles']
+            D[self._to_str(date)] = day
+            with open(f"{paths['wiki']}/days_{lang}.json", 'w') as f:
+                f.write(json.dumps(D, ensure_ascii=False) + "\n")
 
-# get articles from dailies
-def get_articles(lang):
-    wikipedia.set_lang(lang)
-    with open(f"{paths['text']}/{lang}.json", "r") as f:
-        texts = json.load(f) # object to be filled out with text
-    target_articles = set()
-    with open(f"{paths['days']}/{lang}.json", 'r') as f:
-        for line in f.readlines():
-            for article in json.loads(line)['data']:
-                title = article['article']
-                article_id = title_hash(title)
-                if article_id not in texts and title not in texts["__failed__"]:
-                    target_articles.add(article['article'])
-    for idx, title in enumerate(tqdm(list(target_articles))):
-        if idx % 100 == 0:
-            with open(f"{paths['text']}/{lang}.json", "w") as f:
-                json.dump(texts, f, ensure_ascii=False)
-        try:
-            text = wikipedia.page(title).summary
-            article_id = sha256((title).encode('utf-8')).hexdigest()
-            texts[article_id] = {"title": title, "text": text}
-        except (wikipedia.exceptions.PageError, KeyError, wikipedia.exceptions.DisambiguationError, json.decoder.JSONDecodeError, wikipedia.exceptions.WikipediaException) as e:
-            texts["__failed__"].append(title)
-            print(e)
-            pass
-    with open(f"{paths['text']}/{lang}.json", "w") as f:
-        json.dump(texts, f, ensure_ascii=False)
+    def _texts_to_toks_lang(self, lang, D = {"texts" : {}, "fails" : set()}): # one of migration func
+        hashes = [title_hash(title) for title in self._get_titles(lang)]
+        with open(f"{paths['wiki']}/text_{lang}.json", 'r') as f:
+            texts = json.load(f)
+        for _hash in tqdm(hashes):
+            if _hash in texts:
+                D[texts[_hash]['title']] = self.tokenizer.encode(texts[_hash]['text'])
+        D['fails'] = texts['__failed__']
+        with open(f"{paths['wiki']}/toks_{lang}.json", 'w') as f:
+            json.dump(D, f)
 
+    def _get_titles(self, lang):
+        with open(f'{paths["wiki"]}/days_{lang}.json', 'r') as f:
+            return set([text['article'] for day in f for text in json.loads(day)['data']]) # old schem
 
-# helpers
-get_url = lambda api, date, lang: f'{api}/{lang}.wikipedia.org/all-access/{date}'
-get_date = lambda s: datetime.strptime(s, "%Y/%m/%d")
-get_str = lambda d: str(d).split()[0].replace('-', '/')
+    def _titles_to_hash(self, titles):
+        return {titles: titles_hash(title) for title in list(titles)}
 
-def  get_dones(file):
-    exist = os.path.exists(file)
-    if exist:
-        with open(file, 'r') as f:
-            dones = [json.loads(sample)['date'] for sample in f.readlines()]
-        return sorted(dones)
-    return None
+    def _str_to_delta(self, start, end):
+        return (self._to_date(end) - self._to_date(start)).days
 
+    def _to_date(self, string):
+        return datetime.strptime(string, self.date_format)
+
+    def _add_days(self, date, days):
+        return date + timedelta(days = days)
+
+    def _to_str(self, date, sep='_'):
+        return str(date).split()[0].replace('-', '/')
+
+    def _get_url(self, date, lang):
+        return f'{self.wiki_api}/{lang}.wikipedia.org/all-access/{self._to_str(date, "/")}'
+        
 
 # dev calls
 def main():

@@ -20,6 +20,9 @@ hypers = {
         'batch_size': 2 ** 3
         }
 
+date_format = "%Y_%m_%d"
+wiki_api = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
+
 
 
 
