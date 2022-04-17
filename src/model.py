@@ -6,21 +6,17 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.utils import parameters
 
 
 # topic model
 class Model(nn.Module):
 
-    sample_size   = parameters['sample_size']
-    embedding_dim = parameters['embedding_dim']
-    vocab_size    = parameters['vocab_size']
-
-    def __init__(self):
+    def __init__(self, params):
         super(Model, self).__init__()
-        self.enc = nn.Linear(self.embedding_dim, 50)
-        self.fc1 = nn.Linear(50, 10)
-        self.dec = nn.Linear(50, self.embedding_dim)
+        self.params = params
+        self.enc    = nn.Linear(self.params["Embedding Dim"], 50)
+        self.fc1    = nn.Linear(50, 10)
+        self.dec    = nn.Linear(50, self.params["Embedding Dim"])
 
     def forward(self, x, w):
         x = self.encode(x)
@@ -41,7 +37,7 @@ class Model(nn.Module):
         y = y * w[:,:,None,None]
         y = torch.sum(y, dim=1) # collapse 1000 summaries
         y = torch.sum(y, dim=1) # collapse 16 words
-        y = y.reshape((8, 2, 5))
+        y = y.reshape((self.params["Batch Size"], 2, 5))
         return y
 
 

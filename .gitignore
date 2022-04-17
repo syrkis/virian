@@ -16,3 +16,4 @@ runs/
 **/.R*
 mlruns/
 wandb/
+.env

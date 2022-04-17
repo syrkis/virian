@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import variables, parameters
+from src.utils import variables
 from src.ess import ESS
 
 import torch
@@ -19,19 +19,17 @@ import json
 # virian dataset
 class Dataset(torch.utils.data.Dataset):
 
-    vocab_size    = parameters['vocab_size']
-    embedding_dim = parameters['embedding_dim']
-    sample_size   = parameters['sample_size']
     data_dir      = variables['data_dir']
     pad           = variables['pad']
 
-    def __init__(self, langs):
-        self.emb   = self._load_emb()
-        self.langs = langs
-        self.ess   = ESS() 
-        self.days  = self._load_days(self.langs)
-        self.toks  = self._load_toks(self.langs)
-        self.keys  = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
+    def __init__(self, langs, params):
+        self.params = params
+        self.emb    = self._load_emb()
+        self.langs  = langs
+        self.ess    = ESS() 
+        self.days   = self._load_days(self.langs)
+        self.toks   = self._load_toks(self.langs)
+        self.keys   = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
         random.shuffle(self.keys)
 
     def __len__(self):
@@ -56,13 +54,13 @@ class Dataset(torch.utils.data.Dataset):
 
     def _titles_to_tensor(self, lang, days_text):
         X = [text['article'] for text in days_text] 
-        X = [self.toks[lang][title][:self.sample_size] for title in X]
+        X = [self.toks[lang][title][:self.params["Sample Size"]] for title in X]
         X = tensor([self._extend(article) for article in X])
         X = self.emb(F.pad(X, value=self.pad, pad=(0,0,0,1000 - X.shape[0]))).detach()
         return X
 
     def _load_emb(self):
-        emb = BPEmb(lang="multi", vs=self.vocab_size, dim=self.embedding_dim, add_pad_emb=True)
+        emb = BPEmb(lang="multi", vs=self.params['Vocab Size'], dim=self.params['Embedding Dim'], add_pad_emb=True)
         emb = nn.Embedding.from_pretrained(tensor(emb.vectors), padding_idx=self.pad)
         return emb
         
@@ -70,7 +68,7 @@ class Dataset(torch.utils.data.Dataset):
         toks = {}
         for lang in langs:
             with open(f"{self.data_dir}/wiki/toks_{lang}.json", 'r') as f:
-                toks[lang] = defaultdict(lambda: [self.pad for _ in range(self.sample_size)], json.load(f))
+                toks[lang] = defaultdict(lambda: [self.pad for _ in range(self.params["Sample Size"])], json.load(f))
         return toks
 
     def _load_days(self, langs):
@@ -82,7 +80,7 @@ class Dataset(torch.utils.data.Dataset):
         return days
 
     def _extend(self, sample):
-        return sample + [self.pad for _ in range(self.sample_size - len(sample))]
+        return sample + [self.pad for _ in range(self.params["Sample Size"] - len(sample))]
 
 
 # dev stack

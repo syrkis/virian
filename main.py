@@ -3,30 +3,27 @@
 # by: Noah Syrkis
 
 # imports
-from src import Dataset, Model, Wiki, lang_splits, get_args, train
+from src import Dataset, Model, Wiki, lang_splits, get_args, get_params, train
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from torch.utils.tensorboard import SummaryWriter
 
 
-def run_train(train_langs, test_langs):
-    model     = Model()
+def run_train(params, train_langs, test_langs):
     device    = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    ds        = Dataset(train_langs)
+    model     = Model(params); model.to(device) # get model and give to device
+    ds        = Dataset(train_langs, params)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters())
-    writer    = SummaryWriter()
-    model     = train(ds, model, optimizer, criterion, device, writer)
-    writer.flush()
+    model     = train(ds, model, optimizer, criterion, device, params)
 
 
 # call stack
 def main():
     args = get_args()
-
+    params = get_params(args)
     if args.ess:
         ess = ESS()
 
@@ -39,9 +36,9 @@ def main():
     if args.train:
         train_langs, test_langs = lang_splits.values()
         if args.local:
-            run_train(train_langs[:2], test_langs)
+            run_train(params, train_langs[:2], test_langs)
         else:
-            run_train(train_langs, test_langs)
+            run_train(params, train_langs, test_langs)
 
     if args.dataset:
         train_langs, _ = lang_splits.values()
