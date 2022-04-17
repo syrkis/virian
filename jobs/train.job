@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=4               # Schedule one core
 #SBATCH --time=01:00:00                 # Run time (hh:mm:ss)
 #SBATCH --partition=red                 # Run on either the Red or Brown queue
-#SBATCH --gres=gpu                      # Schedule a GPU
-#SBATCH --mem-per-cpu=64000             # memory per cpu
+#SBATCH --gres=gpu:v100:1               # Schedule a GPU
+#SBATCH --mem=32000                     # memory per cpu
 
 
 module --ignore-cache load CUDA/10.2.89-GCC-8.3.0
