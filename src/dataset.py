@@ -48,14 +48,18 @@ class Dataset(torch.utils.data.Dataset):
         return train_idx, val_idx
 
     def _construct(self, lang, date, days_text):
+        X = self._titles_to_tensor(lang, days_text)
+        W = tensor([text['views'] for text in days_text])
+        W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.max(W)
+        Y = self.ess.get_target(lang, date)
+        return X, W, Y
+
+    def _titles_to_tensor(self, lang, days_text):
         X = [text['article'] for text in days_text] 
         X = [self.toks[lang][title][:self.sample_size] for title in X]
         X = tensor([self._extend(article) for article in X])
-        X = self.emb(F.pad(X, value=self.pad, pad=(0,0,0,1000 - X.shape[0]))) # final X
-        W = tensor([text['views'] for text in days_text])
-        W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.max(W)                  # final W
-        Y = self.ess.get_target(lang, date)                                   # final Y
-        return X, W, Y
+        X = self.emb(F.pad(X, value=self.pad, pad=(0,0,0,1000 - X.shape[0]))).detach()
+        return X
 
     def _load_emb(self):
         emb = BPEmb(lang="multi", vs=self.vocab_size, dim=self.embedding_dim, add_pad_emb=True)

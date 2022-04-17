@@ -39,16 +39,16 @@ def main():
     if args.train:
         train_langs, test_langs = lang_splits.values()
         if args.local:
-            run_train(train_langs[:2], test_langs)
+            run_train(train_langs[:1], test_langs)
         run_train(train_langs, test_langs)
 
     if args.dataset:
         train_langs, _ = lang_splits.values()
-        if args.local:
-            ds = Dataset(train_langs[:2])
+        ds = Dataset(train_langs[:2]) if args.local else Dataset(train_langs)
+        loader = DataLoader(dataset=ds, batch_size=32)
         shapes = []
-        for X, W, Y in tqdm(ds):
-            shapes.append(X.shape)
+        for X, W, Y in tqdm(loader): # not filling storage. but slower then without loader??
+            shapes.append([X.shape, W.shape, Y.shape])
 
 if __name__ == "__main__":
     main()
