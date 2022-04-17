@@ -39,8 +39,9 @@ def main():
     if args.train:
         train_langs, test_langs = lang_splits.values()
         if args.local:
-            run_train(train_langs[:1], test_langs)
-        run_train(train_langs, test_langs)
+            run_train(train_langs[:2], test_langs)
+        else:
+            run_train(train_langs, test_langs)
 
     if args.dataset:
         train_langs, _ = lang_splits.values()

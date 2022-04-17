@@ -17,7 +17,7 @@ class Model(nn.Module):
     vocab_size    = parameters['vocab_size']
 
     def __init__(self):
-        super().__init__()
+        super(Model, self).__init__()
         self.enc = nn.Linear(self.embedding_dim, 50)
         self.fc1 = nn.Linear(50, 10)
         self.dec = nn.Linear(50, self.embedding_dim)
