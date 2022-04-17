@@ -32,8 +32,8 @@ def train(ds, model, optimizer, criterion, device, writer):
                     model.eval()
                     X_val, W_val, Y_val = next(valid_iter)
                     X_val, W_val, Y_val = X_val.to(device), W_val.to(device), Y_val.to(device)
-                    x_val_pred, y_val_pred = model(X, W)
-                    x_val_loss, y_val_loss = criterion(x_val_pred, X), criterion(y_val_pred, Y)
+                    x_val_pred, y_val_pred = model(X_val, W_val)
+                    x_val_loss, y_val_loss = criterion(x_val_pred, X_val), criterion(y_val_pred, Y_val)
     
                     # report
                     writer.add_scalars(f"Wiki Loss", {"train": x_loss.item(), "valid": x_val_loss.item()}, step)
