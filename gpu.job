@@ -1,21 +1,18 @@
 #!/bin/bash
 
-#SBATCH --job-name=virian               # Job name
-#SBATCH --output=jobs/logs/train-%j.out # Name of output file
-#SBATCH --cpus-per-task=4               # Schedule one core
-#SBATCH --time=01:00:00                 # Run time (hh:mm:ss)
-#SBATCH --partition=red                 # Run on either the Red or Brown queue
-#SBATCH --gres=gpu:v100:1               # Schedule a GPU
-#SBATCH --mem=32000                     # memory per cpu
+#SBATCH --job-name=virian        # Job name
+#SBATCH --output=logs/hpc/%j.out # Name of output file
+#SBATCH --cpus-per-task=4        # Schedule one core
+#SBATCH --time=06:00:00          # Run time (hh:mm:ss)
+#SBATCH --partition=red          # Run on either the Red or Brown queue
+#SBATCH --gres=gpu:v100:1        # Schedule a GPU
+#SBATCH --mem=32000              # memory per cpu
 
 
 module --ignore-cache load CUDA/10.2.89-GCC-8.3.0
 module --ignore-cache load SQLite/3.29.0-GCCcore-8.3.0
 module --ignore-cache load Python/3.7.4-GCCcore-8.3.0
 
-module list
-
 source env/bin/activate
-pip install -r requirements.txt
 
 python main.py --train

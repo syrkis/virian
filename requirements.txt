@@ -31,4 +31,4 @@ torch==1.11.0
 tqdm==4.64.0
 typing_extensions==4.2.0
 urllib3==1.26.9
-wikipedia @ git+git://github.com/goldsmith/Wikipedia.git@1554943e8ab463cef5e93081def48fafbdef324e
+wikipedia @ git+https://github.com/goldsmith/Wikipedia.git@1554943e8ab463cef5e93081def48fafbdef324e
