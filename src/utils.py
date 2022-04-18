@@ -6,7 +6,6 @@
 from boto3.session import Session
 import argparse
 import os
-import mlflow
 
 
 # global variables

@@ -10,7 +10,6 @@ import torch
 import pandas as pd
 import numpy as np
 
-from matplotlib import pyplot as plt
 from factor_analyzer import FactorAnalyzer as FA
 
 
