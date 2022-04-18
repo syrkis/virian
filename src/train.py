@@ -37,7 +37,8 @@ def train(ds, model, optimizer, criterion, device, params):
 
             # report
             tracker.save(step, {'wiki mse': wiki_loss.item() / params["Batch Size"],
-                                'ess mse': ess_loss.item() / params["Batch Size"]})
+                'ess train mse': y_loss.item() / params["Batch Size"],
+                'ess valid mse': ess_loss.item() / params["Batch Size"]})
 
     return model
 
