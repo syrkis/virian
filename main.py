@@ -15,7 +15,7 @@ from labml import experiment
 def main():
 
     args     = get_args()
-    exp_name = 'test' if args.local else 'bsc'
+    exp_name = 'local' if args.local else 'bsc'
     params   = get_params(args)
 
     if args.train:

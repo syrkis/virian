@@ -20,13 +20,16 @@ def train(ds, model, optimizer, criterion, device, params):
             optimizer.zero_grad()
 
             x_pred, y_pred = model(X, W) # predict on train data
-            x_loss, y_loss = criterion(x_pred, X), criterion(y_pred, Y)
+            x_loss         = criterion(x_pred, X)
+            y_loss         =  criterion(y_pred, Y)
 
             X_val, W_val, Y_val    = next(valid_iter) # val data
             x_pred_val, y_pred_val = model(X_val, W_val) 
-            x_loss_val, y_loss_val = criterion(x_pred_val, X_val), criterion(y_pred_val, Y_val)
+            x_loss_val             = criterion(x_pred_val, X_val)
+            y_loss_val             = criterion(y_pred_val, Y_val)
 
-            tracker.save(step, {'wiki mse': x_loss.item() / params["Batch Size"],
+            tracker.save(step, {
+                'wiki mse': x_loss.item() / params["Batch Size"],
                 'ess train mse': y_loss.item() / params["Batch Size"],
                 'ess valid mse': y_loss_val.item() / params["Batch Size"]})
 
