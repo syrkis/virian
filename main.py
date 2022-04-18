@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
 from labml import experiment
 
 def run_train(params, train_langs, test_langs):
-    with experiment.record(name='sample', exp_conf=params):
+    with experiment.record(name='bsc', exp_conf=params):
         device    = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model     = Model(params); model.to(device) # get model and give to device
         ds        = Dataset(train_langs, params)
