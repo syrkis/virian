@@ -3,21 +3,24 @@
 # by: Noah Syrkis
 
 # imports
-from src import Dataset, Model, Wiki, lang_splits, get_args, get_params, train
+from src import (Dataset, Model, Wiki, lang_splits,
+                 get_args, get_params, train)
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
+from labml import experiment
 
 def run_train(params, train_langs, test_langs):
-    device    = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model     = Model(params); model.to(device) # get model and give to device
-    ds        = Dataset(train_langs, params)
-    criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters())
-    model     = train(ds, model, optimizer, criterion, device, params)
+    with experiment.record(name='sample', exp_conf=params):
+        device    = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        model     = Model(params); model.to(device) # get model and give to device
+        ds        = Dataset(train_langs, params)
+        criterion = nn.MSELoss()
+        optimizer = optim.Adam(model.parameters())
+        model     = train(ds, model, optimizer, criterion, device, params)
 
 
 # call stack
