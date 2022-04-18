@@ -17,37 +17,32 @@ def train(ds, model, optimizer, criterion, device, params):
         train_loader, valid_iter = k_fold(ds, lang, params, device)
         for step, (X, W, Y) in enumerate(train_loader):
 
-            # train batch
             optimizer.zero_grad()
-            x_pred, y_pred = model(X, W)
-            x_loss         = criterion(y_pred, Y)
-            y_loss         = criterion(x_pred, X)
 
-            # valid batch
-            X_val, W_val, Y_val    = next(valid_iter)
-            x_val_pred, y_val_pred = model(X_val, W_val)
-            x_val_loss             = criterion(x_val_pred, X_val)
-            ess_loss               = criterion(y_val_pred, Y_val)
+            x_pred, y_pred = model(X, W) # predict on train data
+            x_loss, y_loss = criterion(x_pred, X), criterion(y_pred, Y)
 
-            # backward
-            wiki_loss = x_loss + x_val_loss
-            loss      = wiki_loss + ess_loss
-            loss.backward()
-            optimizer.step()
+            X_val, W_val, Y_val    = next(valid_iter) # val data
+            x_pred_val, y_pred_val = model(X_val, W_val) 
+            x_loss_val, y_loss_val = criterion(x_pred_val, X_val), criterion(y_pred_val, Y_val)
 
-            # report
-            tracker.save(step, {'wiki mse': wiki_loss.item() / params["Batch Size"],
+            tracker.save(step, {'wiki mse': x_loss.item() / params["Batch Size"],
                 'ess train mse': y_loss.item() / params["Batch Size"],
-                'ess valid mse': ess_loss.item() / params["Batch Size"]})
+                'ess valid mse': y_loss_val.item() / params["Batch Size"]})
+
+            loss = x_loss + y_loss + x_loss_val
+            loss.backward()
+
+            optimizer.step()
 
     return model
 
 
 # make k fold loaders
 def k_fold(ds, lang, params, device):
-    t_idx, v_idx  = ds.k_fold(lang)
-    train_sampler = SubsetRandomSampler(t_idx)
-    valid_sampler = SubsetRandomSampler(v_idx)
+    train_idx, valid_idx  = ds.k_fold(lang)
+    train_sampler = SubsetRandomSampler(train_idx)
+    valid_sampler = SubsetRandomSampler(valid_idx)
     train_loader  = get_loader(ds, params['Batch Size'], train_sampler, device)
     valid_loader  = get_loader(ds, params['Batch Size'], valid_sampler, device)
     valid_iter    = cycle(valid_loader)

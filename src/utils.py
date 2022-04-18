@@ -43,11 +43,13 @@ def get_args():
 
 # get traning parameters
 def get_params(args):
+    langs  = lang_splits['train'][:3] if args.local else lang_splits['train']
     params = { "Batch Size": args.batch_size,
                "Sample Size": args.sample_size,
                "Vocab Size" : args.vocab_size,
                "Embedding Dim" : args.embedding_dim,
-               "Learning Rate": args.lr }
+               "Learning Rate": args.lr,
+               "Languages": langs}
     return params
 
 

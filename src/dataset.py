@@ -38,14 +38,14 @@ class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         lang = self.keys[idx][:2]
         date = self.keys[idx][3:]
-        return self._construct(lang, date, self.days[self.keys[idx]])
+        return self.construct(lang, date, self.days[self.keys[idx]])
         
     def k_fold(self, lang):
         val_idx   = [idx for idx, sample in enumerate(self.keys) if sample[:2] == lang] # TODO: ++ val langs
         train_idx = [idx for idx in range(len(self.keys)) if idx not in val_idx]
         return train_idx, val_idx
 
-    def _construct(self, lang, date, days_text):
+    def construct(self, lang, date, days_text):
         X = self._titles_to_tensor(lang, days_text)
         W = tensor([text['views'] for text in days_text])
         W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.max(W)
