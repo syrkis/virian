@@ -71,3 +71,35 @@ def cycle(seq):
             yield X, W, Y
 
 
+# make k fold loaders
+def cross_validate(ds, lang, params, device):
+    train_idx, valid_idx  = ds.k_fold(lang)
+    train_sampler = SubsetRandomSampler(train_idx)
+    valid_sampler = SubsetRandomSampler(valid_idx)
+    train_loader  = get_loader(ds, params['Batch Size'], train_sampler, device)
+    valid_loader  = get_loader(ds, params['Batch Size'], valid_sampler, device)
+    valid_iter    = cycle(valid_loader)
+    return train_loader, valid_iter
+
+
+# get loader for train and valid (and test) data sets
+def get_loader(ds, batch_size, sampler, device):
+    loader = DataLoader(dataset=ds, batch_size=batch_size, sampler=sampler, drop_last=True,
+             collate_fn=lambda x: list(map(lambda x: x.to(device), default_collate(x))))
+    return loader
+
+
+# put tensors to device
+def to_device(x, w, y, device):
+    x = default_collate(x).to(device)
+    w = default_collate(w).to(device)
+    y = default_collate(y).to(device)
+    return x, w, y
+
+def get_metrics(x_loss, y_loss, x_loss_val, y_loss_val):
+    D = {'wiki mse': x_loss.item() / params["Batch Size"],
+            'ess train mse': y_loss.item() / params["Batch Size"],
+            'ess valid mse': y_loss_val.item() / params["Batch Size"]})
+    return D
+
+

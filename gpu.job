@@ -16,4 +16,4 @@ module --ignore-cache load Python/3.7.4-GCCcore-8.3.0
 
 source env/bin/activate
 
-python main.py --train
+python main.py --train --batch-size=8 --sample_size=32

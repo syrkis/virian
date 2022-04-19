@@ -35,6 +35,12 @@ class ESS:
         var       = self.fact_var.loc[country, ess_round]
         Y         = torch.from_numpy(np.array((avg.to_numpy(), var.to_numpy()))).float()
         return Y
+    
+    def base_model(self):
+        avg = self.fact_avg
+        var = self.fact_var
+        print(avg.mean())
+        print(var.mean())
 
     def _date_to_round(self, country, date):
         date   = datetime.strptime(date, "%Y_%m_%d")
