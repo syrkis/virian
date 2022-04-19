@@ -24,7 +24,7 @@ def main():
             model     = Model(params); model.to(device) # get model and give to device
             ds        = Dataset(params['Languages'], params)
             criterion = nn.MSELoss()
-            optimizer = optim.Adam(model.parameters())
+            optimizer = optim.Adam(model.parameters(), lr=params['Learning Rate'])
             model     = train(ds, model, optimizer, criterion, device, params)
 
     if args.dataset:

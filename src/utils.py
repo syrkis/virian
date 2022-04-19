@@ -3,13 +3,14 @@
 # by: Noah Syrkis
 
 # imports
+from typing import List, Callable, Union, Any, TypeVar, Tuple
 from boto3.session import Session
 import argparse
 import os
 
 
 # global variables
-variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_dir': '../data', 'data_dirs': ['wiki', 'ess'] }
+variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess'] }
 
 lang_splits     = { 'train': ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','si','es','sv'],
                     'test': ['bg','hr','da','is','he','it','lv','ru','sk'] }

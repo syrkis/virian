@@ -8,6 +8,7 @@ import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch.utils.data.dataloader import default_collate
 
+from tqdm import tqdm
 from labml import tracker
 
 
@@ -15,7 +16,7 @@ from labml import tracker
 def train(ds, model, optimizer, criterion, device, params):
     for fold, lang in enumerate(ds.langs):
         train_loader, valid_iter = k_fold(ds, lang, params, device)
-        for step, (X, W, Y) in enumerate(train_loader):
+        for step, (X, W, Y) in tqdm(enumerate(train_loader)):
 
             optimizer.zero_grad()
 

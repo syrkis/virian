@@ -19,10 +19,9 @@ class Model(nn.Module):
         self.dec    = nn.Linear(50, self.params["Embedding Dim"])
 
     def forward(self, x, w):
-        x = self.encode(x)
-        y = self.infer(x, w)
-        x = self.decode(x)
-        return x, y
+        mu, log_var = self.encode(x)
+        z = self.reparameterize(mu, log_var)
+        return  [self.decode(z), x, mu, log_var]
 
     def encode(self, x):
         x = self.enc(x)
@@ -40,6 +39,7 @@ class Model(nn.Module):
         y = y.reshape((self.params["Batch Size"], 2, 5))
         return y
 
+    
 
 # dev calls
 def main():
