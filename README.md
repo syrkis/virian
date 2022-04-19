@@ -1,4 +1,4 @@
-# The Virian Project
+# Inferring Cultural States from Population Reading Activity
 
 ## todo
 - [] fix dailies for reproducubility and future wiki data.

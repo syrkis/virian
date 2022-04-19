@@ -7,6 +7,7 @@
 #SBATCH --partition=red          # Run on either the Red or Brown queue
 #SBATCH --gres=gpu:v100:1        # Schedule a GPU
 #SBATCH --mem=32000              # memory per cpu
+#SBATCH --array=1-6              # run multiple jobs in parallel
 
 
 module --ignore-cache load CUDA/10.2.89-GCC-8.3.0
