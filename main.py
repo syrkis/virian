@@ -22,7 +22,7 @@ def main():
         exp_name = 'local' if args.local else 'bsc'
         params   = get_params(args)
         device   = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        ds = Dataset(params['Languages'], params)
+        ds       = Dataset(params['Languages'], params)
         for fold, lang in enumerate(ds.langs):
             with experiment.record(name=exp_name, exp_conf=params):
                 train_loader, valid_iter = cross_validate(ds, lang, params, device)

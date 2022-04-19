@@ -20,7 +20,9 @@ class Model(nn.Module):
 
     def forward(self, x, w):
         x = self.enc(x)
-        return x
+        y = self.infer(x, w)
+        x = self.dec(x)
+        return x, y
 
     def encode(self, x):
         x = self.enc(x)

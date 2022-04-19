@@ -3,10 +3,11 @@
 # by: Noah Syrkis
 
 # imports
-from typing import List, Callable, Union, Any, TypeVar, Tuple
 from boto3.session import Session
 import argparse
 import os
+from torch.utils.data import DataLoader, SubsetRandomSampler
+from torch.utils.data.dataloader import default_collate
 
 
 # global variables
@@ -58,9 +59,9 @@ def get_params(args):
 def get_s3():
     session = Session()
     client = session.client('s3', region_name='AMS3',
-                            endpoint_url='https://virian.ams3.digitaloceanspaces.com',
-                            aws_access_key_id=os.getenv("DIGITAL_OCEAN_SPACES_KEY"),
-                            aws_secret_access_key=os.getenv("DIGITAL_OCEAN_SPACES_SECRET"))
+        endpoint_url='https://virian.ams3.digitaloceanspaces.com',
+        aws_access_key_id=os.getenv("DIGITAL_OCEAN_SPACES_KEY"),
+        aws_secret_access_key=os.getenv("DIGITAL_OCEAN_SPACES_SECRET"))
     return client
 
 
@@ -85,7 +86,7 @@ def cross_validate(ds, lang, params, device):
 # get loader for train and valid (and test) data sets
 def get_loader(ds, batch_size, sampler, device):
     loader = DataLoader(dataset=ds, batch_size=batch_size, sampler=sampler, drop_last=True,
-             collate_fn=lambda x: list(map(lambda x: x.to(device), default_collate(x))))
+        collate_fn=lambda x: list(map(lambda x: x.to(device), default_collate(x))))
     return loader
 
 
@@ -96,10 +97,13 @@ def to_device(x, w, y, device):
     y = default_collate(y).to(device)
     return x, w, y
 
-def get_metrics(x_loss, y_loss, x_loss_val, y_loss_val):
-    D = {'wiki mse': x_loss.item() / params["Batch Size"],
-            'ess train mse': y_loss.item() / params["Batch Size"],
-            'ess valid mse': y_loss_val.item() / params["Batch Size"]})
-    return D
 
+# get metrics for labml (accuracy and MSE)
+def get_metrics(x_loss, y_loss, x_loss_val, y_loss_val, train_acc, valid_acc, params):
+    metrics = {'wiki train mse': x_loss.item() / params["Batch Size"],
+         'wiki valid mse': x_loss_val.item() / params["Batch Size"],
+         'ess train mse': y_loss.item() / params["Batch Size"],
+         'ess valid mse': y_loss_val.item() / params["Batch Size"],
+         'ess train acc': train_acc, 'ess valid acc': valid_acc}
+    return metrics
 

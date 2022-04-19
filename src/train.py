@@ -6,8 +6,6 @@
 from src.utils import cycle, get_metrics
 
 import torch
-from torch.utils.data import DataLoader, SubsetRandomSampler
-from torch.utils.data.dataloader import default_collate
 
 from tqdm import tqdm
 from labml import tracker
@@ -30,9 +28,10 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params):
         y_loss_val             = criterion(y_pred_val, Y_val)
 
         # report and evluate
-        train_acc = torch.numel((y_pred > 0) == (Y > 0))
-        valid_acc = torch.numel((y_pred_val > 0) == (Y_val > 0))
-        tracker.save(idx, get_metrics(x_loss, y_loss, y_loss_val, x_loss_val, train_acc, valid_acc))
+        train_acc = torch.sum((y_pred > 0) == (Y > 0)) / torch.numel(Y)
+        valid_acc = torch.sum((y_pred_val > 0) == (Y_val > 0)) / torch.numel(Y_val)
+        metrics   = get_metrics(x_loss, y_loss, y_loss_val, x_loss_val, train_acc, valid_acc, params)
+        tracker.save(idx, metrics)
 
         # backpropagate and update weights
         loss = x_loss + y_loss
