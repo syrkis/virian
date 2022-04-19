@@ -1,0 +1,14 @@
+A neural model was trained to predict the average and the variance of the distributions to the five most principal components of the \texttt{ESS} data for each country in the training set..
+
+Countries present in all three ESS rounds where in the training data on which k-fold cross caliadation trauiug was used.
+Countries present in less than three rounds were included in the training set. This was done so as to
+ensure the applicability of the model on countries not seen before.
+
+The experiment attempts to predict the mean and variance of five factors of ESS human value survey responses grouped by round and country from the wikipedia REeading activity within the associaed project.
+The wikipedia summaries are represented by topics extracted through the use of variational auto encoders. The topic vectors along with their assocaited weights blah blah.
+On notable desciosnb choice: The ESS data and the wikipedia data are on vastly different time scales. Also I want be able to place both a month or a year in Value space. Therefor I opted towards not using month matricies as trining input, but rather, similar to embedding, just look at weighted co occuruance. One sample during training is then: This articles was read this much while this was the cultural state (ESS)
+We want to get at what things are uniquely heppening in this country, blah blah, thus subtracting the average country state from each country, and watching how the evolution of the factors something sometig.
+Pretrained multinlingual embedding from mBERT was used to represent words \cite{artetxe-etal-2017-learning}. Langauge agnostics, semantic oriented.
+\cite{kingma2013auto} i also used as topic modelling
+\cite{DBLP:journals/corr/abs-1810-04805}
+\cite{Wu2020}

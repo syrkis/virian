@@ -19,3 +19,10 @@ mlruns/
 wandb/
 .env
 .labml.yaml
+bib/
+**/*.aux
+**/*.bbl
+**/*.blg
+**/*.log
+**/*.out
+**/*.pdf

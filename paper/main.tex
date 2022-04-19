@@ -1,0 +1,90 @@
+% This must be in the first 5 lines to tell arXiv to use pdfLaTeX, which is strongly recommended.
+\pdfoutput=1
+% In particular, the hyperref package requires pdfLaTeX in order to break URLs across lines.
+
+\documentclass[11pt]{article}
+
+% Remove the "review" option to generate the final version.
+\usepackage{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\title{Mapping Population Reading Activity to Human Value Survey Responses}
+\title{Inferring Cultural States from Population Reading Activity}
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a seperate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+\author{Noah Syrkis \\
+  IT University of Copenhagen \\
+  \texttt{noah@syrkis.com} \\}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+    International social surveys are conducted by various institutions\footnote{The European Social Survey and the World Value Survey releases rounds every two and seven years respectively.} with yearly time granularity.
+    Here a method for inferring nation-specifc distributions of answers to European Social Survey (\texttt{ESS}) from view-count weigthed Wikipedia (\texttt{Wiki}) reading activity is proposed.
+    Specifically a neural model is train to predict the mean and variance of the five most doninant factors to to the subset of questions seen in Appendeix A for the countries seen in Appendix B.
+    The method is designed to be time scale agnostic, though the experiemental setup is only able to evaluate biu-yearly accuracy (the \texttt{ESS} is conduced every second year).
+    The mean and variance of the distribution of the most relevant factors of the responese matrix these can \emph{1)} be predcited for unknown countries, and \emph{2)} assign means and variance to these factors at arbitaray time scales—be it with decreasing certaitnty.
+    The experiment can be replicated with \texttt{docker run syrkis/bsc} (code available at \href{https://github.com/syrkis/bsc}{\texttt{github.com/syrkis/bsc}}).
+
+\end{abstract}
+
+\section{Introduction}
+\input{intro}
+
+\section{Data}
+\input{data}
+
+\section{Method}
+\input{method}
+
+\section{Results}
+\input{results}
+
+\section{Discussion}
+\input{discussion}
+
+\section{Conclusion}
+\input{conclusion}
+
+% Entries for the entire Anthology, followed by custom entries
+\bibliography{anthology,custom}
+
+\end{document}
