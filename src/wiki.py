@@ -19,7 +19,6 @@ class Wiki:
     data_dir    = variables['data_dir']
     wiki_api    = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     headers     = {"User-Agent": "nobr@itu.dk"}
-    # tokenizer   = BPEmb(lang="multi", vs=10 ** 6, dim=300)
     
     def __init__(self, langs):
         self.langs      = langs
@@ -34,9 +33,22 @@ class Wiki:
         with Pool(len(self.langs)) as p:
             p.map(self._get_texts_lang, self.langs)
 
-    def texts_to_toks(self):
+    def texts_to_toks(self, vocab_size):
+        tokenizer = BPEmb(lang="multi", vs=vocab_size, dim=300)
         for lang in tqdm(self.langs):
-            self._texts_to_toks_lang(lang)
+            self._texts_to_toks_lang(lang, tokenizer, vocab_size)
+
+    def _texts_to_toks_lang(self, lang, tokenizer, vocab_size): # one of migration func
+        D = {"texts" : {}, "fails" : set()}
+        hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
+        with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
+            texts = json.load(f)
+        for _hash in tqdm(hashes):
+            if _hash in texts:
+                D[texts[_hash]['title']] = tokenizer.encode_ids(texts[_hash]['text'])
+        D['fails'] = texts['__failed__']
+        with open(f"{self.data_dir}/wiki/toks_{lang}_{vocab_size}.json", 'w') as f:
+            json.dump(D, f)
 
     def _get_texts_lang(self, lang, fails = 0): # TODO: support cont.
         D = {"texts" : {}, "fails" : set()}
@@ -68,21 +80,10 @@ class Wiki:
         with open(f"{self.data_dir}/wiki/days_{lang}.json", 'w') as f:
             f.write(json.dumps(D, ensure_ascii=False) + "\n")
 
-    def _texts_to_toks_lang(self, lang): # one of migration func
-        D = {"texts" : {}, "fails" : set()}
-        hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
-        with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
-            texts = json.load(f)
-        for _hash in tqdm(hashes):
-            if _hash in texts:
-                D[texts[_hash]['title']] = self.tokenizer.encode_ids(texts[_hash]['text'])
-        D['fails'] = texts['__failed__']
-        with open(f"{self.data_dir}/wiki/toks_{lang}.json", 'w') as f:
-            json.dump(D, f)
-
     def _get_titles(self, lang):
         with open(f'{self.data_dir}/wiki/days_{lang}.json', 'r') as f:
-            return set([text['article'] for day in f for text in json.loads(day)['data']]) # old schem
+            titles = set([entry['article'] for day in json.load(f).values() for entry in day])
+        return titles
 
     def _titles_to_hash(self, titles):
         return {titles: titles_hash(title) for title in list(titles)}

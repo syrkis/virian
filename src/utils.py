@@ -32,24 +32,27 @@ def get_args():
     parser.add_argument('--wiki',  action='store_true')
     parser.add_argument('--ess', action='store_true')
     parser.add_argument('--train', action='store_true')
+    parser.add_argument('--model', action='store_true')
     parser.add_argument('--dataset', action='store_true')
     parser.add_argument('--local', action='store_true')
-
+    # model params
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--sample-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--vocab-size", type=int, default=10 ** 6)
+    parser.add_argument("--latent-dim", type=int, default=100)
     parser.add_argument("--embedding-dim", type=int, default=300)
     return parser.parse_args()
 
 
 # get traning parameters
 def get_params(args):
-    langs  = lang_splits['train'][:3] if args.local else lang_splits['train']
+    langs  = lang_splits['train'][:3] if args.local else lang_splits['train'] + lang_splits['test']
     params = { "Batch Size": args.batch_size,
                "Sample Size": args.sample_size,
                "Vocab Size" : args.vocab_size,
                "Embedding Dim" : args.embedding_dim,
+               "Latent Dim" : args.latent_dim,
                "Learning Rate": args.lr,
                "Languages": langs}
     return params
