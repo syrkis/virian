@@ -26,3 +26,4 @@ bib/
 **/*.log
 **/*.out
 **/*.pdf
+venv/

@@ -103,10 +103,14 @@ def to_device(x, w, y, device):
 
 # get metrics for labml (accuracy and MSE)
 def get_metrics(x_loss, y_loss, x_loss_val, y_loss_val, train_acc, valid_acc, params):
+
     metrics = {'wiki train mse': x_loss.item() / params["Batch Size"],
-         'wiki valid mse': x_loss_val.item() / params["Batch Size"],
-         'ess train mse': y_loss.item() / params["Batch Size"],
-         'ess valid mse': y_loss_val.item() / params["Batch Size"],
-         'ess train acc': train_acc, 'ess valid acc': valid_acc}
+               'wiki valid mse': x_loss_val.item() / params["Batch Size"],
+
+                'ess train mse': y_loss.item() / params["Batch Size"],
+                'ess valid mse': y_loss_val.item() / params["Batch Size"],
+
+                'ess train acc': train_acc,
+                'ess valid acc': valid_acc}
     return metrics
 
