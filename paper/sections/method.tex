@@ -12,3 +12,14 @@ Pretrained multinlingual embedding from mBERT was used to represent words \cite{
 \cite{kingma2013auto} i also used as topic modelling
 \cite{DBLP:journals/corr/abs-1810-04805}
 \cite{Wu2020}
+
+The archtecture consists of an encoder $f$, a decoder $g$ and an inferer $h$:
+$$
+z  = f(x) \qquad
+x' = g(z) \qquad
+y' = h(z, w)
+$$
+Both $x'$ and $y'$ are optmised for by minimising the mean sqaured error between these and $x$ and $y$.
+Using variational autoencoders for topic modelling is hardly new. What is slightly unique about the aproch is the utilising of the compressed representattion to infer our $y$.
+This compressed representation aspirationally enocdes for something akin to text theme, and is weigthed by t´how much the articles in focus was read the day in question.
+
