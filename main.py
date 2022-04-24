@@ -24,7 +24,7 @@ def main():
         loader = DataLoader(dataset=ds, batch_size=2)
         model  = Model(params)
         for X, W, _ in tqdm(loader):
-            x_pred, y_pred = model(X, W)
+            x_pred = model(X, W)
 
     if args.train:
         exp_name = 'local' if args.local else 'bsc'

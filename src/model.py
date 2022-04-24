@@ -1,6 +1,6 @@
 # model.py
-#   virian model
 # by: Noah Syrkis
+#   virian model
 
 # imports
 import torch
@@ -17,11 +17,17 @@ class Model(nn.Module):
         self.infer   = Infer(params)
         self.decoder = Decoder(params) 
 
+    def reparam(self, mu, sigma):
+        sigma = torch.exp(sigma / 2)  # sigma or var?
+        eps   = torch.randn_like(sigma) # why?
+        return mu + sigma * eps
+    
     def forward(self, x, w):
-        z = self.encoder(x)
-        y = self.infer(z, w)
-        x = self.decoder(z)
-        return x, y
+        mu, sigma = self.encoder(x)
+        z         = self.reparam(mu, sigma)
+        # y         = self.infer(z, w)
+        x         = self.decoder(z)
+        return x
 
 
 # compress text into "themes"
@@ -33,44 +39,43 @@ class Encoder(nn.Module):
     """
     def __init__(self, params):
         super(Encoder, self).__init__()
-        self.conv1 = nn.Conv2d(1, 3, 4)
-        self.pool1 = nn.MaxPool2d(4)
-        self.conv2 = nn.Conv2d(3, 1, 3)
-        self.pool2 = nn.MaxPool2d(4)
-        self.drop  = nn.Dropout(0.7)
-        self.fc1   = nn.Linear(18, 10)
+        self.params = params
+        self.conv1  = nn.Conv2d(1, 3, 4) # one color -> 3 color (kernel size 4)
+        self.conv2  = nn.Conv2d(3, 1, 3) # 3 color -> 1 color (kernel size 3)
+        self.fc1    = nn.Linear(18, 10)  # reduce to 10 d
+        self.fc2    = nn.Linear(18, 10)  # reduce to 10 d
+        self.pool   = nn.MaxPool2d(4)    # kernel size 4
+        self.drop   = nn.Dropout(0.5)    # dropout .7
 
     def forward(self, x):
-        x = x.reshape(-1, 1, x.shape[2], x.shape[3])
-        x = self.conv1(x)
-        x = self.pool1(x)
-        x = self.conv2(x)
-        x = self.pool2(x)
-        x = x.reshape(-1, 18) # floor(300 / 4 / 4)
-        x = self.fc1(x)
-        x = self.drop(x)
-        return x
+        x     = x.reshape(-1, 1, x.shape[-2], x.shape[-1]) # debatch
+        x     = self.pool(F.relu(self.conv1(x)))
+        x     = self.pool(F.relu(self.conv2(x)))
+        x     = x.reshape(-1, 18) # remove empty dimensions
+        print(x.shape)
+        exit()
+        mu    = self.drop(self.fc1(x))
+        sigma = self.drop(self.fc2(x))
+        return mu, sigma
 
 
 # decode text from "themes"
 class Decoder(nn.Module):
     def __init__(self, params):
         super(Decoder, self).__init__()
-
-        # layers
-        self.fc1  = nn.Linear(10, 300)
-        self.fc2  = nn.Linear(300, 300 * params['Sample Size'])
-        self.drop = nn.Dropout(0.7)
-
-        # parameters
-        self.sample_size = params['Sample Size']
-        self.emb_dim     = params['Embedding Dim']
+        self.params = params
+        self.conv1  = nn.Conv2d(1, 3, 4) # one color -> 3 color (kernel size 4)
+        self.conv2  = nn.Conv2d(3, 1, 3) # 3 color -> 1 color (kernel size 3)
+        self.fc1    = nn.Linear(10, 300)
+        self.drop   = nn.Dropout(0.5)
 
     def forward(self, z):
-        z = F.relu(self.fc1(z))
-        z = self.drop(z)
-        z = F.relu(self.fc2(z))
-        z = z.reshape(-1, 1000, self.sample_size, self.emb_dim)
+        z = self.drop(F.relu(self.fc1(z)))
+        z = z.reshape(1, 1, z.shape[-1])
+        z = F.relu(self.conv1(z))
+        z = F.relu(self.conv2(z))
+        z = F.tanh(z)
+        z = z.reshape(-1, 1000, self.params['Sample Size'], self.params['Embedding Dim'])
         return z
 
 
@@ -79,9 +84,9 @@ class Infer(nn.Module):
     def __init__(self, params):
         super(Infer, self).__init__()
         self.weight = nn.Linear(1000, 1000)
-        self.conv1 = nn.Conv2d(1, 1, 4)
-        self.pool1 = nn.MaxPool2d(4)
-        self.fc1   = nn.Linear(249, 10)
+        self.conv1  = nn.Conv2d(1, 1, 4)
+        self.pool1  = nn.MaxPool2d(4)
+        self.fc1    = nn.Linear(249, 10)
          
 
     def forward(self, z, w):

@@ -58,6 +58,7 @@ class Dataset(torch.utils.data.Dataset):
         X = [self.toks[lang][title][:self.params["Sample Size"]] for title in X]
         X = tensor([self._extend(article) for article in X])
         X = self.emb(F.pad(X, value=self.params['Vocab Size'], pad=(0,0,0,1000 - X.shape[0]))).detach()
+        # consider averaging vectors in sentence to disregard order
         return X
 
     def _load_emb(self, params):
