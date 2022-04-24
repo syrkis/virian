@@ -9,6 +9,7 @@
 
 % Standard package includes
 \usepackage{times}
+\usepackage{float}
 \usepackage{latexsym}
 
 % For proper rendering and hyphenation of words containing Latin characters (including in bib files)
@@ -67,22 +68,28 @@
 \end{abstract}
 
 \section{Introduction}
-\input{intro}
+\input{sections/intro}
+
+\section{Background}
+\input{sections/background}
 
 \section{Data}
-\input{data}
+\input{sections/data}
 
-\section{Method}
-\input{method}
+\section{Methodology}
+\input{sections/method}
 
 \section{Results}
-\input{results}
+\input{sections/results}
 
 \section{Discussion}
-\input{discussion}
+\input{sections/discussion}
+
+\section{Future Work}
+\input{sections/future}
 
 \section{Conclusion}
-\input{conclusion}
+\input{sections/conclusion}
 
 % Entries for the entire Anthology, followed by custom entries
 \bibliography{anthology,custom}

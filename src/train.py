@@ -34,7 +34,7 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params):
         tracker.save(idx, metrics)
 
         # backpropagate and update weights
-        loss = x_loss + y_loss + x_loss_val
+        loss = x_loss + y_loss
         loss.backward()
         optimizer.step()
     return model
