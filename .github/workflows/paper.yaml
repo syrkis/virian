@@ -11,8 +11,9 @@ jobs:
         with:
           root_file: paper/main.tex
           work_in_root_file_dir: true
-      - name: upload pdf
+          post_compile: "latexmk -c"
+      - name: Upload PDF
         uses: actions/upload-artifact@v2
         with:
           name: PDF
-          path: main.pdf
+          path: paper/main.pdf
