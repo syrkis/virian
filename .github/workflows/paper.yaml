@@ -11,8 +11,12 @@ jobs:
         with:
           root_file: paper/main.tex
           work_in_root_file_dir: true
-      - name: Upload PDF
-        uses: actions/upload-artifact@v2
+      - name: Publish
+        uses: nogsantos/scp-deploy@master
         with:
-          name: PDF
-          path: paper/main.pdf
+          src: paper/main.pdf
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
