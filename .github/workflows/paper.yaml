@@ -9,4 +9,9 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: paper/mapaper/in.tex
+          root_file: paper/main.tex
+      - name: upload pdf
+        uses: actions/upload-artifact@v2
+        with:
+          name: PDF
+          path: main.pdf
