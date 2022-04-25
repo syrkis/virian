@@ -9,7 +9,7 @@ Samples are constructed on demand by from the two sources above.
 The text is tokenized using BPEmb, and the tokens are further converted into multilingual embeddigns.
 An iterator is then constructed outputting a tuple $(x_i, w_i, y_i)$.
 
-\subsection*{Model}
+\subsection*{Model Architecture}
 The experiment attempts to predict the mean and variance of five factors of ESS human value survey responses grouped by round and country from the wikipedia REeading activity within the associaed project.
 The wikipedia summaries are represented by topics extracted through the use of variational auto encoders. The topic vectors along with their assocaited weights blah blah.
 On notable desciosnb choice: The ESS data and the wikipedia data are on vastly different time scales. Also I want be able to place both a month or a year in Value space. Therefor I opted towards not using month matricies as trining input, but rather, similar to embedding, just look at weighted co occuruance. One sample during training is then: This articles was read this much while this was the cultural state (ESS)
