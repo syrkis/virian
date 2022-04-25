@@ -1,12 +1,3 @@
-The experiment evaluated the folow hypothesis:
-\\
-\\
-$H_0$ : \emph{Cultural states cannot be infered from population reading activty.}
-\\
-\\
-$H_A$ : \emph{Cultural states can be inferred from population reading activity.}
-\\
-\\
 A neural model was trained to predict the average and the variance of the distributions to the five most principal components of the \texttt{ESS} data for each country in the training set..
 
 Countries present in all three ESS rounds where in the training data on which k-fold cross caliadation trauiug was used.
@@ -33,5 +24,5 @@ $f$, $g$ and $h$ are all neural models, with $f$ and $g$ together being a stadar
 Using variational autoencoders for topic modelling is hardly new. What is slightly unique about the aproch is the utilising of the compressed representattion to infer our $y$.
 This compressed representation aspirationally enocdes for something akin to text theme, and is weigthed by how much the articles in focus was read the day in question.
 $h$, similar to $g$, conists of a two linear layers and two convelutional layers, so as to stay as convential as possible.
-Notably $w \odot v$ is computed, with $w$ being the matrix representing pages views for given articles, and $v$ being a weigth optimised for.
+Notably $z \odot w \odot v$ is computed, with $w$ being the matrix representing pages views for given articles, and $v$ being a weigth optimised for.
 

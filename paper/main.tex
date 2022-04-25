@@ -59,11 +59,11 @@
 \maketitle
 \begin{abstract}
     International social surveys are conducted by various institutions\footnote{The European Social Survey and the World Value Survey releases rounds every two and seven years respectively.} with yearly time granularity.
-    Here a method for inferring nation-specifc distributions of answers to European Social Survey (\texttt{ESS}) from view-count weigthed Wikipedia (\texttt{Wiki}) reading activity is proposed.
+    Here a method for inferring nation-specifc distributions of answers to the European Social Survey from view-count weigthed Wikipedia reading activity is proposed.
     Specifically a neural model is train to predict the mean and variance of the five most doninant factors to to the subset of questions seen in Appendeix A for the countries seen in Appendix B.
     The method is designed to be time scale agnostic, though the experiemental setup is only able to evaluate biu-yearly accuracy (the \texttt{ESS} is conduced every second year).
     The mean and variance of the distribution of the most relevant factors of the responese matrix these can \emph{1)} be predcited for unknown countries, and \emph{2)} assign means and variance to these factors at arbitaray time scales—be it with decreasing certaitnty.
-    The experiment can be replicated with \texttt{docker run syrkis/bsc} (code available at \href{https://github.com/syrkis/bsc}{\texttt{github.com/syrkis/bsc}}).
+    Code and replication instructions are available at \href{https://github.com/syrkis/bsc}{\texttt{github.com/syrkis/bsc}}.
 
 \end{abstract}
 
