@@ -1,3 +1,5 @@
+The hyper parameters found to perform the best on the validation are a batch size of 32, a sample size (how many of the first words of a Wiki article summary are included) of 16, Adam as optimizer. Training on how to weight $w$ improved accuracy by 0.5. Inspection of $v$ seems to indicate that the msot informative articles are in the long tail.
+
 The model achives an accuracy of 0.60, which with $N=120$ yield a $p$-value of 0.01.
 Splitting by variacne and average (N=60) for each yields accuracies of 0.62 ($p$ 0.04) and 0.58 ($p$ 0.004).
 
@@ -24,19 +26,6 @@ Though the $p$-values of the individual factors are below the significance thres
 Assuming equal probability of being right within wach factor guess, are the observerd difference in accuracy unlikely.
 With a $p$-value of 0.004 this is indeed found to be th case.
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|l|l|l|l|} 
-\hline
-parameter & batch size & sample size & learning rate &  & f5 \\ 
-\hline
-weight & 0.5 & 0.2 & 0.1 & 0.1 & 0.1 \\ 
-\hline
-average &  &  &  &  &   \\
-\hline
-variance &  &  &  &  &   \\
-\hline
-\end{tabular}
-\end{table}
+
 
 These resulsts can be replicated by runnning \texttt{docker run syrkis/bsc}.
