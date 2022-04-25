@@ -1,4 +1,4 @@
-The experiment, focusing on 23 European countries (see Appendix A) between 2014 and 2020, relias on samples
+The experiment, focusing on 23 European countries (see Appendix A) between 2014 and 2019, relias on samples
 
 
 The experiment infering cultural states from population reading activity utilizes data representing both. The experiment, infering cultural states from population reading activity, rests on two data sets—one representing cutlural states; the European Social Survey, the other representing population reading activity; Wikiepdia.
@@ -6,16 +6,16 @@ ygg
 
 \subsection*{Wikipedia Projects}
 
-\footnote{\url{https://wikimedia.org/api/rest_v1/}}
-The Wikipedia (Wiki) data consists of daily lists of summaries of the most viewed articles for each of the 23 Wikipedia Projects.
+The Wikipedia\footnote{\url{https://wikimedia.org/api/rest_v1/}} (Wiki) data consists of daily lists of summaries of the most viewed articles for each of the 23 Wikipedia Projects, from July 1st 2015 to December 31st 2019.
+This ammounts to 1,645 days times 23 countries yileding 37,835 examples of daily Wikipedia activity.
+The summaries of these articles serves as input $X$ for the model, while a vector $W$ representing how many times a given article was read represents serves as another input.
 
+The data and an assocaited data statement is available at \href{https://data.bsc.syrkis.com}{\texttt{data.bsc.syrkis.com}}.
 
-
-
-Summaries of daily top 1000 read aricles for Wikipedia projects from july 1st 2015 untill 2020.
 
 \subsection*{European Social Survey}
 
 The European Social Survey\footnote{\url{https://europeansocialsurvey.org/downloadwizard/}} (ESS) is a survey conducted in various European countries every second year from 2000 (round 1) to 2018 (round 9). It is conducted in person and consits of hundreds country agnostic and country specific questions. This exerpiment uses rounds 7, 8 and 9, as these overlap with the avaiable Wikipedia data.
 Only questions asked in all countries were comnsidered for inclusion. A list of includefed questions can be seen in Appendix C.
+
 
