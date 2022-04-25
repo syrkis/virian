@@ -20,6 +20,9 @@ x' = g(z) \qquad
 y' = h(z, w)
 $$
 Both $x'$ and $y'$ are optmised for by minimising the mean sqaured error between these and $x$ and $y$.
+$f$, $g$ and $h$ are all neural models, with $f$ and $g$ together being a stadard neural variational autoencoder, which has proven to do well for topic modelling.
 Using variational autoencoders for topic modelling is hardly new. What is slightly unique about the aproch is the utilising of the compressed representattion to infer our $y$.
-This compressed representation aspirationally enocdes for something akin to text theme, and is weigthed by t´how much the articles in focus was read the day in question.
+This compressed representation aspirationally enocdes for something akin to text theme, and is weigthed by how much the articles in focus was read the day in question.
+$h$, similar to $g$, conists of a two linear layers and two convelutional layers, so as to stay as convential as possible.
+Notably $w \odot v$ is computed, with $w$ being the matrix representing pages views for given articles, and $v$ being a weigth optimised for.
 
