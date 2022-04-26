@@ -27,3 +27,4 @@ bib/
 **/*.out
 **/*.pdf
 venv/
+**/*.svg

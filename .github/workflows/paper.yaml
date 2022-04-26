@@ -9,12 +9,12 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: paper/paper.tex
+          root_file: paper/bsc.tex
           work_in_root_file_dir: true
       - name: Publish
         uses: nogsantos/scp-deploy@master
         with:
-          src: paper/paper.pdf
+          src: paper/bsc.pdf
           host: ${{ secrets.SSH_HOST }}
           remote: ${{ secrets.SSH_DIR }}
           port: ${{ secrets.SSH_PORT }}
