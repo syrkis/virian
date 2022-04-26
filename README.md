@@ -1,4 +1,4 @@
-# Inferring Cultural States from Population Reading Activity
+# Inferring Cultural Values from Population Reading Activity
 
 ## todo
 - [] fix dailies for reproducubility and future wiki data.
