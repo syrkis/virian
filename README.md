@@ -10,6 +10,7 @@
 --------------------------------------------------------------------
 
 Research project into inferring cultural values (European Social Survey response distributions) from population reading activity (daily 1000 most read articles in associated Wikipedia project).
+As algorithmically curated content consumption proliferates, a mapping between content and values is increasingly important. This an exploration of the feasibility of a particular such mapping.
 
 ### Replication
 ```bash
