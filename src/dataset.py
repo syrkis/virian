@@ -24,7 +24,7 @@ class Dataset(torch.utils.data.Dataset):
 
     def __init__(self, langs, params):
         self.params = params
-        self.emb    = self._load_emb(params)
+        self.emb    = self._load_emb(params) # make dict of embs for langs
         self.langs  = langs
         self.ess    = ESS() 
         self.days   = self._load_days(self.langs)
@@ -62,7 +62,9 @@ class Dataset(torch.utils.data.Dataset):
         return X
 
     def _load_emb(self, params):
-        emb = BPEmb(lang="multi", vs=params['Vocab Size'], dim=params['Embedding Dim'], add_pad_emb=True)
+        embed = {}
+        for lang in params['Languages']:
+            embed[lang] = BPEmb(lang="lang", dim=params['Embedding Dim'], add_pad_emb=True)
         emb = nn.Embedding.from_pretrained(tensor(emb.vectors), padding_idx=self.params['Vocab Size'])
         return emb
         

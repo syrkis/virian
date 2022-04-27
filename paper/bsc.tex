@@ -11,6 +11,7 @@
 \usepackage{times}
 \usepackage{float}
 \usepackage{latexsym}
+\usepackage[title]{appendix}
 
 \usepackage[
 % set width and height to a4 width and height + 6mm
@@ -38,13 +39,14 @@ center
 % and will typically save some space.
 \usepackage{microtype}
 
+
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
 %
 % and set <dim> to something 5cm or larger.
 
-\title{Inferring Cultural States from Population Reading Activity}
+\title{Inferring Cultural Values from Population Reading Activity\\ \texttt{\\rough working draft}\texttt{\\please don't read\\}—}
 
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -104,5 +106,18 @@ center
 
 % Entries for the entire Anthology, followed by custom entries
 \bibliography{anthology,custom}
+
+\onecolumn
+\begin{appendices}
+
+\label{values:appendix}
+\input{appendix/values}
+\clearpage
+
+\label{values:appendix}
+\input{appendix/values}
+
+\end{appendices}
+
 
 \end{document}

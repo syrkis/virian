@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=virian        # Job name
 #SBATCH --output=logs/hpc/%j.out # Name of output file
-#SBATCH --cpus-per-task=4        # Schedule one core
+#SBATCH --cpus-per-task=1        # Schedule one core
 #SBATCH --time=06:00:00          # Run time (hh:mm:ss)
 #SBATCH --partition=red          # Run on either the Red or Brown queue
 #SBATCH --gres=gpu:v100:1        # Schedule a GPU
-#SBATCH --mem=32000              # memory per cpu
+#SBATCH --mem=128000000          # total memory (store embeddings for all languges)
 #SBATCH --array=1-6              # run multiple jobs in parallel
 
 
@@ -17,3 +17,4 @@ module --ignore-cache load Python/3.7.4-GCCcore-8.3.0
 source env/bin/activate
 
 python main.py --train --batch-size=8 --sample_size=32
+# for file in data/wiki/days_*.json ; do cat $file | jq '.[][]["article"]' | sort | uniq -c | wc -l ; done | paste -sd+ - | bc # counnt number of unique articles in focus
