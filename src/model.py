@@ -25,14 +25,14 @@ class Model(nn.Module):
         self.fc0   = nn.Linear(self.emb // self.kern ** 2, self.emb // self.kern ** 2)
 
         # dec
-        self.fc1   = nn.Linear(self.n // self.kern ** 2, self.n // self.kern)
-        self.fc2   = nn.Linear(self.n // self.kern, self.n)
-        self.fc3   = nn.Linear(self.emb // self.kern ** 2, self.emb // self.kern)
-        self.fc4   = nn.Linear(self.emb // self.kern, self.emb)
+        self.fc1   = nn.Linear(self.emb // self.kern ** 2, self.emb // self.kern)
+        self.fc2   = nn.Linear(self.emb // self.kern, self.emb)
+        self.fc3   = nn.Linear(self.n // self.kern ** 2, self.n // self.kern)
+        self.fc4   = nn.Linear(self.n // self.kern, self.n)
 
         # inf
-        self.fc5   = nn.Linear(self.emb // self.kern ** 2, 2)
-        self.fc6   = nn.Linear(self.n // self.kern ** 2, 5)
+        self.fc5   = nn.Linear(self.emb // self.kern ** 2, 2) # depends on Y
+        self.fc6   = nn.Linear(self.n // self.kern ** 2, 5) # depends on Y
 
     def encode(self, x, w):
         x = x * w[:, :, None]
@@ -43,13 +43,14 @@ class Model(nn.Module):
         x = F.relu(self.fc0(x))
         return x
 
-    def decode(self, z): # make 2self.kern times bigger
-        z = z.reshape(z.shape[0], z.shape[2], -1) # get rid of reshape
+    def decode(self, z):
         z = F.relu(self.fc1(z))
         z = F.relu(self.fc2(z))
         z = z.reshape(z.shape[0], z.shape[2], -1)
         z = F.relu(self.fc3(z))
-        z = F.relu(self.fc4(z))
+        z = torch.tanh(self.fc4(z))
+        z = z.reshape(z.shape[0], z.shape[2], -1)
+        # z = F.normalize(z)
         return z
 
     def infer(self, z):

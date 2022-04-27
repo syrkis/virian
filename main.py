@@ -1,7 +1,7 @@
 # main.py
 #   runs (and trains) virian NLP analytics
 # by: Noah Syrkis
-q
+
 # imports
 from src import Dataset, Model, Wiki, ESS, train, utils
 import torch
