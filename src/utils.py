@@ -18,7 +18,7 @@ langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','si','
 
 lang_splits     = { 'train': langs[:14], 'test': langs[14:] }
 
-local_langs     = ['et', 'no', 'fi']
+local_langs     = ['et', 'no']
 
 lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi','fr':'fr','de':'de',
                     'hu':'hu','is':'is','he':'il','it':'it','lv':'lv','lt':'lt','nl':'nl','no':'no',

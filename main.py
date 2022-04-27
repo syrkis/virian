@@ -20,11 +20,11 @@ def main():
     langs  = params['Languages']
 
     if args.model:
-        ds     = Dataset(params['Languages'], params)
-        loader = DataLoader(dataset=ds, batch_size=2)
+        ds     = Dataset(params)
+        loader = DataLoader(dataset=ds, batch_size=params["Batch Size"])
         model  = Model(params)
-        for X, W, _ in tqdm(loader):
-            x_pred = model(X, W)
+        for X, W, Y in tqdm(loader):
+            x_pred, y_pred = model(X, W)
 
     if args.train:
         exp_name = 'local' if args.local else 'bsc'
