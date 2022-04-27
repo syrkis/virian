@@ -42,9 +42,9 @@ def main():
     if args.dataset:
         ds = Dataset(params)
     if args.wiki:
-        wiki = Wiki(langs)
+        wiki = Wiki(params)
         # wiki.texts_to_toks(params['Vocab Size'])
-        wiki.text_to_vec(params['Vocab Size'])
+        wiki.text_to_vec()
     if args.ess:
         ess = ESS()
         ess.base_model()

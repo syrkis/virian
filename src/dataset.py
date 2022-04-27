@@ -64,13 +64,14 @@ class Dataset(torch.utils.data.Dataset):
         # consider averaging vectors in sentence to disregard order
         return X
 
-    def _load_emb(self, params):
-        embed = {}
+    def _load_embs(self, params):
+        embs = {}
         for lang in params['Languages']:
-            vec_file = f"data/models/wiki.{lang}.align.vec"
-            embed[lang] = gensim.models.KeyedVectors.load_word2vec_format(vec_file, limit=self.params['Vocab Size'])
-        return embed
-        
+            with open(f"{self.data_dir}/wiki/embs_{lang}.json", 'r') as f:
+                embs[lang] = defaultdict(lambda: np.zeros(300), json.load(f)['texts'])
+        return embs
+
+
     def _load_toks(self, langs):
         toks = {}
         for lang in langs:

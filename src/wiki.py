@@ -23,8 +23,9 @@ class Wiki:
     wiki_api    = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     headers     = {"User-Agent": "nobr@itu.dk"}
     
-    def __init__(self, langs):
-        self.langs      = langs
+    def __init__(self, params):
+        self.params     = params
+        self.langs      = params['Languages']
         self.start_date = "2015_07_01"
         self.end_date   = "2020_01_01"
 
@@ -42,13 +43,13 @@ class Wiki:
         for lang in tqdm(self.langs):
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
-    def text_to_vec(self, vocab_size): # fasttext and gensim converts article to mean vector embed rep
-        for lang in tqdm(self.langs):
-            vec_file = f"data/embs/wiki.{lang}.align.vec"
-            embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file, limit=vocab_size)
-            self.text_to_vec_lang(lang, embed, vocab_size)
+    def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
+        with Pool(len(self.langs)) as p:
+            p.map(self.text_to_vec_lang, self.langs)
 
-    def text_to_vec_lang(self, lang, embed, vocab_size):
+    def text_to_vec_lang(self, lang):
+        vec_file = f"data/embs/wiki.{lang}.align.vec"
+        embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file, limit=self.params['Vocab Size'])
         D = {"texts" : {}, "fails" : set()}
         hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
         with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
@@ -60,10 +61,10 @@ class Wiki:
                 embs = np.zeros(300)
                 for tok in toks:
                     if tok in embed:
-                        embs += embed[tok] # add all embeddings
-                D['texts'][texts[_hash]['title']] = (embs / (len(toks) + 0.0000002)).tolist() # mean embeddings
+                        embs += embed[tok] / len(toks) # add all embeddings
+                D['texts'][texts[_hash]['title']] = embs.tolist() # mean embeddings
         D['fails'] = texts['__failed__']
-        with open(f"{self.data_dir}/wiki/embs_{lang}_{vocab_size}.json", 'w') as f:
+        with open(f"{self.data_dir}/wiki/embs_{lang}_{self.params['Vocab Size']}.json", 'w') as f:
             json.dump(D, f)
 
     def _texts_to_toks_lang(self, lang, tokenizer, vocab_size): # one of migration function
