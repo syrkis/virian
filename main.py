@@ -41,6 +41,9 @@ def main():
 
     if args.dataset:
         ds = Dataset(params)
+        shapes = []
+        for X, W, Y in tqdm(ds):
+            shapes.append((X.shape, W.shape, Y.shape))
     if args.wiki:
         wiki = Wiki(params)
         # wiki.texts_to_toks(params['Vocab Size'])

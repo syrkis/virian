@@ -45,7 +45,7 @@ def get_args():
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--vocab-size", type=int, default=10 ** 4)
     parser.add_argument("--latent-dim", type=int, default=100)
-    parser.add_argument("--embedding-dim", type=int, default=50)
+    parser.add_argument("--embedding-dim", type=int, default=300)
     return parser.parse_args()
 
 

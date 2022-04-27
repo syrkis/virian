@@ -12,6 +12,7 @@ import torch.nn.functional as F
 
 import gensim
 import fasttext
+import numpy as np
 
 from collections import defaultdict
 import random
@@ -27,10 +28,8 @@ class Dataset(torch.utils.data.Dataset):
     def __init__(self, params):
         self.params = params
         self.langs  = params['Languages']
-        self.emb    = self._load_emb(params) # make dict of embs for langs
+        self.embs   = self._load_embs(params) # make dict of embs for langs
         self.days   = self._load_days(self.langs)
-        exit()
-        self.toks   = self._load_toks(self.langs)
         self.keys   = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
         self.ess    = ESS() 
         random.shuffle(self.keys)
@@ -56,19 +55,17 @@ class Dataset(torch.utils.data.Dataset):
         Y = self.ess.get_target(lang, date)
         return X, W, Y
 
-    def _titles_to_tensor(self, lang, days_text):
-        X = [text['article'] for text in days_text] 
-        X = [self.toks[lang][title][:self.params["Sample Size"]] for title in X]
-        X = tensor([self._extend(article) for article in X])
-        X = self.emb(F.pad(X, value=self.params['Vocab Size'], pad=(0,0,0,1000 - X.shape[0]))).detach()
+    def _titles_to_tensor(self, lang, texts):
+        X = tensor([self.embs[lang][title] for title in [t['article'] for t in texts]])
+        X = F.pad(X, value=self.params['Vocab Size'], pad=(0,0,0,1000 - X.shape[0]))
         # consider averaging vectors in sentence to disregard order
         return X
 
     def _load_embs(self, params):
         embs = {}
         for lang in params['Languages']:
-            with open(f"{self.data_dir}/wiki/embs_{lang}.json", 'r') as f:
-                embs[lang] = defaultdict(lambda: np.zeros(300), json.load(f)['texts'])
+            with open(f"{self.data_dir}/wiki/embs_{lang}_{self.params['Vocab Size']}.json", 'r') as f:
+                embs[lang] = defaultdict(lambda: [0 for _ in range(params['Embedding Dim'])], json.load(f)['texts'])
         return embs
 
 

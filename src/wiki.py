@@ -50,6 +50,7 @@ class Wiki:
     def text_to_vec_lang(self, lang):
         vec_file = f"data/embs/wiki.{lang}.align.vec"
         embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file, limit=self.params['Vocab Size'])
+
         D = {"texts" : {}, "fails" : set()}
         hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
         with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
