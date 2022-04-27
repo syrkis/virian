@@ -9,7 +9,9 @@ from src.ess import ESS
 import torch
 from torch import nn, tensor
 import torch.nn.functional as F
-from bpemb import BPEmb
+
+import gensim
+import fasttext
 
 from collections import defaultdict
 import random
@@ -22,14 +24,15 @@ class Dataset(torch.utils.data.Dataset):
 
     data_dir = variables['data_dir']
 
-    def __init__(self, langs, params):
+    def __init__(self, params):
         self.params = params
+        self.langs  = params['Languages']
         self.emb    = self._load_emb(params) # make dict of embs for langs
-        self.langs  = langs
-        self.ess    = ESS() 
         self.days   = self._load_days(self.langs)
+        exit()
         self.toks   = self._load_toks(self.langs)
         self.keys   = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
+        self.ess    = ESS() 
         random.shuffle(self.keys)
 
     def __len__(self):
@@ -64,9 +67,9 @@ class Dataset(torch.utils.data.Dataset):
     def _load_emb(self, params):
         embed = {}
         for lang in params['Languages']:
-            embed[lang] = BPEmb(lang="lang", dim=params['Embedding Dim'], add_pad_emb=True)
-        emb = nn.Embedding.from_pretrained(tensor(emb.vectors), padding_idx=self.params['Vocab Size'])
-        return emb
+            vec_file = f"data/models/wiki.{lang}.align.vec"
+            embed[lang] = gensim.models.KeyedVectors.load_word2vec_format(vec_file, limit=self.params['Vocab Size'])
+        return embed
         
     def _load_toks(self, langs):
         toks = {}

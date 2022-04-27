@@ -13,8 +13,12 @@ from torch.utils.data.dataloader import default_collate
 # global variables
 variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess'] }
 
-lang_splits     = { 'train': ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','si','es','sv'],
-                    'test': ['bg','hr','da','is','he','it','lv','ru','sk'] }
+langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','si','es','sv',
+                   'bg','hr','da','is','he','it','lv','ru','sk']
+
+lang_splits     = { 'train': langs[:14], 'test': langs[14:] }
+
+local_langs     = ['et']
 
 lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi','fr':'fr','de':'de',
                     'hu':'hu','is':'is','he':'il','it':'it','lv':'lv','lt':'lt','nl':'nl','no':'no',
@@ -47,7 +51,7 @@ def get_args():
 
 # get traning parameters
 def get_params(args):
-    langs  = lang_splits['train'][:3] if args.local else lang_splits['train'] + lang_splits['test']
+    langs  = local_langs if args.local else lang_splits['train']
     params = { "Batch Size": args.batch_size,
                "Sample Size": args.sample_size,
                "Vocab Size" : args.vocab_size,

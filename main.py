@@ -40,10 +40,11 @@ def main():
                 train(train_loader, valid_iter, model, optimizer, criterion, params)
 
     if args.dataset:
-        pass # ds = Dataset(langs)
+        ds = Dataset(params)
     if args.wiki:
         wiki = Wiki(langs)
-        wiki.texts_to_toks(params['Vocab Size'])
+        # wiki.texts_to_toks(params['Vocab Size'])
+        wiki.text_to_vec(params['Vocab Size'])
     if args.ess:
         ess = ESS()
         ess.base_model()
