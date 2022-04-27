@@ -1,7 +1,7 @@
 # main.py
 #   runs (and trains) virian NLP analytics
 # by: Noah Syrkis
-
+q
 # imports
 from src import Dataset, Model, Wiki, ESS, train, utils
 import torch
@@ -29,7 +29,7 @@ def main():
     if args.train:
         exp_name = 'local' if args.local else 'bsc'
         device   = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        ds       = Dataset(params['Languages'], params)
+        ds       = Dataset(params)
         for fold, lang in enumerate(ds.langs):
             with experiment.record(name=exp_name, exp_conf=params):
                 train_loader, valid_iter = utils.cross_validate(ds, lang, params, device)
