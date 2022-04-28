@@ -45,8 +45,8 @@ class ESS:
         ess_round = self._date_to_round(country, date)
         out_avg   = avg.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
         out_var   = var.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
-        return tensor(out_avg), tensor(out_var) # make numbers have same scale as emebddings
-    
+        return tensor([out_avg, out_var]) # make numbers have same scale as emebddings
+   
     def base_model(self):
         avg = self.fact_avg
         var = self.fact_var
