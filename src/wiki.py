@@ -31,25 +31,24 @@ class Wiki:
 
     def get_dailies(self):
         for lang in self.langs:
-            self._get_dailies_lang(lang)
+            self.get_dailies_lang(lang)
 
     def get_texts(self):
         with Pool(len(self.langs)) as p:
-            p.map(self._get_texts_lang, self.langs)
+            p.map(self.get_texts_lang, self.langs)
 
     def texts_to_toks(self, vocab_size): # bpemb (saves tokens)
-        print('hello')
         tokenizer = BPEmb(lang="multi", vs=vocab_size, dim=300)
         for lang in tqdm(self.langs):
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        with Pool(len(self.langs)) as p:
+        with Pool(2) as p:
             p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
-        vec_file = f"data/embs/wiki.{lang}.align.vec"
-        embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file, limit=self.params['Vocab Size'])
+        vec_file = f"data/embs/wiki.{lang}.vec"
+        embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file) # limit=self.params['Vocab Size'])
 
         D = {"texts" : {}, "fails" : set()}
         hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
@@ -62,10 +61,11 @@ class Wiki:
                 embs = np.zeros(300)
                 for tok in toks:
                     if tok in embed:
-                        embs += embed[tok] / len(toks) # add all embeddings
+                        embs += embed[tok] # add all embeddings
+                embs = embs / np.linalg.norm(embs) if np.sum(np.abs(embs)) > 0 else embs
                 D['texts'][texts[_hash]['title']] = embs.tolist() # mean embeddings
         D['fails'] = texts['__failed__']
-        with open(f"{self.data_dir}/wiki/embs_{lang}_{self.params['Vocab Size']}.json", 'w') as f:
+        with open(f"{self.data_dir}/wiki/embs_{lang}.json", 'w') as f:
             json.dump(D, f)
 
     def _texts_to_toks_lang(self, lang, tokenizer, vocab_size): # one of migration function
@@ -80,26 +80,28 @@ class Wiki:
         with open(f"{self.data_dir}/wiki/toks_{lang}_{vocab_size}.json", 'w') as f:
             json.dump(D, f)
 
-    def _get_texts_lang(self, lang, fails = 0): # TODO: support cont.
-        D = {"texts" : {}, "fails" : set()}
+    def get_texts_lang(self, lang, fails = 0): # TODO: support cont.
+        D = {"__failed__" : []}
         wikipedia.set_lang(lang)
-        titles = self._get_titles(lang)
-        with tqdm(titles) as title_iter:
-            for title in title_iter: # add fail found to tqdm
-                if title not in D['fails']:
-                    try:
-                        D['texts'][title] = self.tokenizer.encode(wikipedia.page(title).summary)
-                    except (wikipedia.exceptions.PageError, KeyError,
-                            wikipedia.exceptions.DisambiguationError,
-                            wikipedia.exceptions.WikipediaException,
-                            json.decoder.JSONDecodeError) as e:
-                        D['fails'].add(title)
-                        title_iter.postfix(fail_ratio=len(D['fails']) / len(D['texts']))
-                        continue
-        with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
+        titles = list(self._get_titles(lang))
+        for i in tqdm(range(len(titles))): # add fail found to tqdm
+            title = titles[i]
+            if title not in D['__failed__']:
+                try:
+                    D[title] = wikipedia.page(title).summary
+                except (wikipedia.exceptions.PageError, KeyError,
+                        wikipedia.exceptions.DisambiguationError,
+                        wikipedia.exceptions.WikipediaException,
+                        json.decoder.JSONDecodeError) as e:
+                    D['__failed__'].append(title)
+                    continue
+            if i % 1000 == 0:
+                with open(f"{self.data_dir}/wiki/text_{lang}.json", 'w') as f:
+                    json.dump(D, f, ensure_ascii=False)
+        with open(f"{self.data_dir}/wiki/text_{lang}.json", 'w') as f:
             json.dump(D, f, ensure_ascii=False)
 
-    def _get_dailies_lang(self, lang): # TODO: support cont.
+    def get_dailies_lang(self, lang): # TODO: support cont.
         D = {}
         for i in tqdm(range(self._str_to_delta(self.start_date, self.end_date))):
             date = self._add_days(self._to_date(self.start_date), i)

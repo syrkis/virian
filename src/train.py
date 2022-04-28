@@ -8,7 +8,8 @@ from src.utils import cycle, get_metrics
 import torch
 
 from tqdm import tqdm
-from labml import tracker
+import wandb
+#from labml import tracker
 
 
 # train function
@@ -31,10 +32,10 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params):
         train_acc = torch.sum((y_pred > 0) == (Y > 0)) / torch.numel(Y)
         valid_acc = torch.sum((y_pred_val > 0) == (Y_val > 0)) / torch.numel(Y_val)
         metrics   = get_metrics(x_loss, y_loss, x_loss_val, y_loss_val, train_acc, valid_acc, params)
-        tracker.save(idx, metrics)
+        wandb.log(metrics)
 
         # backpropagate and update weights
-        loss = x_loss + y_loss
+        loss = x_loss + y_loss / 10
         loss.backward()
         optimizer.step()
     return model

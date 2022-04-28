@@ -13,22 +13,28 @@ from torch.utils.data.dataloader import default_collate
 # global variables
 variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess'] }
 
-langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','si','es','sv',
-                   'bg','hr','da','is','he','it','lv','ru','sk']
+langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','es','sv', 'sl', 'ru',
+                   'bg','hr','da','he','it','lv','sk'] # redo sl (slovenia) (accedentally though lang was si)
 
-lang_splits     = { 'train': langs[:14], 'test': langs[14:] }
+lang_splits     = { 'train': langs[:15], 'test': langs[15:] }
 
-local_langs     = ['et', 'no', 'fi']
+local_langs     = ['et', 'no', 'fi', 'de', 'cs']
 
 lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi','fr':'fr','de':'de',
-                    'hu':'hu','is':'is','he':'il','it':'it','lv':'lv','lt':'lt','nl':'nl','no':'no',
-                    'pl':'pl','pt':'pt','ru':'ru','sk':'sk','si':'si','es':'es','sv':'se' }
+                    'hu':'hu','he':'il','it':'it','lv':'lv','lt':'lt','nl':'nl','no':'no',
+                    'pl':'pl','pt':'pt','ru':'ru','sk':'sk','si':'sl','es':'es','sv':'se' }
 
-ess_cols        = { 'meta' : ['essround','cntry'], 'questions': ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge",
+ess_cols        = { 'meta' : ['essround','cntry'], 'rest': ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge",
                     "rlgdnme", "rlgdgr", "rlgatnd", "pray", "happy", "sclmeet", "inprdsc", "sclact", "crmvct",
-                    "aesfdrk", "ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule",
+                    "aesfdrk"], "human_values": ["ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule",
                     "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt",
                     "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun"] }
+
+batch_sizes     = [1, 2, 4, 8, 16, 32, 64, 128]
+
+pooling_sizes   = [2, 3, 5, 10]
+
+# optimizers      = [Adam, blah, blah, blah]
 
 # get args
 def get_args():
@@ -43,20 +49,20 @@ def get_args():
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--sample-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--vocab-size", type=int, default=10 ** 4)
     parser.add_argument("--latent-dim", type=int, default=100)
     parser.add_argument("--embedding-dim", type=int, default=300)
+    parser.add_argument("--target", type=str, default="values")
     return parser.parse_args()
 
 
 # get traning parameters
 def get_params(args):
     langs  = local_langs if args.local else lang_splits['train']
-    params = { "Batch Size": args.batch_size,
+    params = { "Batch Size": args.batch_size, # rename to config
                # "Sample Size": args.sample_size,
-               "Vocab Size" : args.vocab_size,
                "Embedding Dim" : args.embedding_dim,
                "Learning Rate": args.lr,
+               "Target" : args.target,
                "Languages": langs}
     return params
 

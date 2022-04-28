@@ -3,10 +3,12 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import variables, lang_to_country
+from src.utils import variables, lang_to_country, ess_cols
+from scipy.stats import zscore
 from datetime import datetime, timedelta
 
 import torch
+from torch import tensor
 import pandas as pd
 import numpy as np
 
@@ -28,13 +30,22 @@ class ESS:
         self.fact_avg, self.fact_var = self._make_factors()
         self.rounds                  = self._make_rounds()
 
-    def get_target(self, lang, date, factor=True):
+    def get_target_fact(self, lang, date):
         country   = lang_to_country[lang]
         ess_round = self._date_to_round(country, date)
         avg       = self.fact_avg.loc[country, ess_round]
         var       = self.fact_var.loc[country, ess_round]
         Y         = torch.from_numpy(np.array((avg.to_numpy(), var.to_numpy()))).float()
         return Y
+
+    def get_human_values(self, lang, date):
+        avg       = zscore(self.raw_avg, axis=0)
+        var       = zscore(self.raw_var, axis=0)
+        country   = lang_to_country[lang]
+        ess_round = self._date_to_round(country, date)
+        out_avg   = avg.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
+        out_var   = var.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
+        return tensor(out_avg), tensor(out_var) # make numbers have same scale as emebddings
     
     def base_model(self):
         avg = self.fact_avg

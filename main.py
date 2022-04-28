@@ -8,7 +8,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from labml import experiment
+# from labml import experiment
+import wandb
 from tqdm import tqdm
 
 
@@ -27,30 +28,38 @@ def main():
             x_pred, y_pred = model(X, W)
 
     if args.train:
-        exp_name = 'local' if args.local else 'bsc'
-        device   = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        ds       = Dataset(params)
-        for fold, lang in enumerate(ds.langs):
-            with experiment.record(name=exp_name, exp_conf=params):
-                train_loader, valid_iter = utils.cross_validate(ds, lang, params, device)
-                model = Model(params)
-                model.to(device)
-                criterion = nn.MSELoss()
-                optimizer = optim.Adam(model.parameters(), lr=params['Learning Rate'])
-                train(train_loader, valid_iter, model, optimizer, criterion, params)
+        wandb.init(project='bsc', entity="syrkis")
+        wandb.config = params
+        exp_name     = 'local' if args.local else 'bsc'
+        device       = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        ds           = Dataset(params)
+        fold_size    = len(ds.langs) // 5
+        for fold, i in enumerate(range(0, len(ds.langs), fold_size)):
+            langs = ds.langs[i:i+fold_size] 
+            # with experiment.record(name=exp_name, exp_conf=params): # from lambml days
+            train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
+            model                    = Model(params); model.to(device); wandb.watch(model)
+            criterion                = nn.MSELoss()
+            optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
+            train(train_loader, valid_iter, model, optimizer, criterion, params)
 
     if args.dataset:
         ds = Dataset(params)
         shapes = []
         for X, W, Y in tqdm(ds):
             shapes.append((X.shape, W.shape, Y.shape))
+
     if args.wiki:
         wiki = Wiki(params)
         # wiki.texts_to_toks(params['Vocab Size'])
-        wiki.text_to_vec()
+        # wiki.get_dailies_lang('sl')
+        # wiki.get_texts_lang('sl')
+        # wiki.text_to_vec() # recompute vector representation of summaries
+
     if args.ess:
         ess = ESS()
-        ess.base_model()
+        out = ess.get_human_values("fi", "2019_01_10")
+        print(out)
 
 
 if __name__ == "__main__":
