@@ -28,13 +28,13 @@ def main():
             x_pred, y_pred = model(X, W)
 
     if args.train:
-        wandb.init(project='bsc', entity="syrkis")
-        wandb.config = params
         exp_name     = 'local' if args.local else 'bsc'
         device       = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         ds           = Dataset(params)
         fold_size    = len(ds.langs) // 5
         for fold, i in enumerate(range(0, len(ds.langs), fold_size)):
+            wandb.init(entity='syrkis', project='bsc', job_type='train', name=f'fold_{fold}')
+            wandb.config = params
             langs = ds.langs[i:i+fold_size] 
             # with experiment.record(name=exp_name, exp_conf=params): # from lambml days
             train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
@@ -59,7 +59,6 @@ def main():
     if args.ess:
         ess = ESS()
         out = ess.get_human_values("fi", "2019_01_10")
-        print(out)
 
 
 if __name__ == "__main__":

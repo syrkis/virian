@@ -31,8 +31,8 @@ class Model(nn.Module):
         self.fc4   = nn.Linear(self.n // self.kern, self.n)
 
         # inf
-        self.fc5   = nn.Linear(self.emb // self.kern ** 2, 2) # depends on Y
-        self.fc6   = nn.Linear(self.n // self.kern ** 2, 5) # depends on Y
+        self.fc5   = nn.Linear(self.emb // self.kern ** 2, 21) # esss cols (or facts) (make variable)
+        self.fc6   = nn.Linear(self.n // self.kern ** 2, 2) # average nd variance
 
     def encode(self, x, w):
         x = x * w[:, :, None]

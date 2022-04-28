@@ -51,7 +51,7 @@ def get_args():
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--latent-dim", type=int, default=100)
     parser.add_argument("--embedding-dim", type=int, default=300)
-    parser.add_argument("--target", type=str, default="values")
+    parser.add_argument("--target", type=str, default="Values")
     return parser.parse_args()
 
 

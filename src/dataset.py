@@ -59,9 +59,10 @@ class Dataset(torch.utils.data.Dataset):
         if self.params['Target'] == "Factors":
             Y = self.ess.get_target_fact(lang, date)
         elif self.params['Target'] == 'Values':
-            Y = self.ess_get_values(lang, date)
+            Y = self.ess.get_human_values(lang, date)
         else:
-            Y = self.ess_get_all(lang, date)
+            pass
+            # Y = self.ess_get_all(lang, date)
         return Y
 
     def _titles_to_tensor(self, lang, texts):
