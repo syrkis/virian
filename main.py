@@ -8,8 +8,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-# from labml import experiment
-import wandb
 from tqdm import tqdm
 
 
@@ -33,15 +31,12 @@ def main():
         ds           = Dataset(params)
         fold_size    = len(ds.langs) // 5
         for fold, i in enumerate(range(0, len(ds.langs), fold_size)):
-            wandb.init(entity='syrkis', project='bsc', job_type='train', name=f'fold_{fold}')
-            wandb.config = params
-            langs = ds.langs[i:i+fold_size] 
-            # with experiment.record(name=exp_name, exp_conf=params): # from lambml days
+            langs                    = ds.langs[i:i+fold_size] 
             train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
-            model                    = Model(params); model.to(device); wandb.watch(model)
+            model                    = Model(params); model.to(device);
             criterion                = nn.MSELoss()
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
-            train(train_loader, valid_iter, model, optimizer, criterion, params)
+            train(train_loader, valid_iter, model, optimizer, criterion, params, fold)
 
     if args.dataset:
         ds = Dataset(params)
@@ -57,8 +52,9 @@ def main():
         # wiki.text_to_vec() # recompute vector representation of summaries
 
     if args.ess:
-        ess = ESS()
+        ess = ESS(params) # country subset from params
         out = ess.get_human_values("fi", "2019_01_10")
+        print(out)
 
 
 if __name__ == "__main__":

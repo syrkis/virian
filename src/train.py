@@ -9,11 +9,13 @@ import torch
 
 from tqdm import tqdm
 import wandb
-#from labml import tracker
 
 
 # train function
-def train(train_loader, valid_iter, model, optimizer, criterion, params):
+def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
+    wandb.init(entity='syrkis', project='bsc', job_type='train',
+               name=f'fold_{fold}', config=params, reinit=True)
+    wandb.watch(model)
     for idx, (X, W, Y) in enumerate(train_loader):
         optimizer.zero_grad()
 

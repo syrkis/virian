@@ -31,7 +31,7 @@ class Dataset(torch.utils.data.Dataset):
         self.embs   = self._load_embs(params) # make dict of embs for langs
         self.days   = self._load_days(self.langs)
         self.keys   = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
-        self.ess    = ESS() 
+        self.ess    = ESS(params) 
         random.shuffle(self.keys)
         random.shuffle(self.langs)
 

@@ -22,7 +22,7 @@ local_langs     = ['et', 'no', 'fi', 'de', 'cs']
 
 lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi','fr':'fr','de':'de',
                     'hu':'hu','he':'il','it':'it','lv':'lv','lt':'lt','nl':'nl','no':'no',
-                    'pl':'pl','pt':'pt','ru':'ru','sk':'sk','si':'sl','es':'es','sv':'se' }
+                    'pl':'pl','pt':'pt','ru':'ru','sk':'sk','sl':'si','es':'es','sv':'se' }
 
 ess_cols        = { 'meta' : ['essround','cntry'], 'rest': ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge",
                     "rlgdnme", "rlgdgr", "rlgatnd", "pray", "happy", "sclmeet", "inprdsc", "sclact", "crmvct",

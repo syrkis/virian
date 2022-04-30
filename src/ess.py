@@ -22,7 +22,9 @@ class ESS:
     facts    = 'a b c d e'.split()
     ess_file = f"{variables['data_dir']}/ess/ESS1-9e01_1.csv"
 
-    def __init__(self):
+    def __init__(self, params):
+        self.langs                   = params['Languages']
+        self.countries               = [lang_to_country[lang] for lang in self.langs]
         self.raw                     = pd.read_csv(self.ess_file, usecols=meta+data)
         self.raw                     = self.raw.replace(self.nans, np.NaN) # 99 etc. to NaN
         self.raw['cntry']            = self.raw['cntry'].str.lower()
@@ -42,6 +44,9 @@ class ESS:
         avg       = zscore(self.raw_avg, axis=0)
         var       = zscore(self.raw_var, axis=0)
         country   = lang_to_country[lang]
+        # a = np.mean(np.sum(avg > 0) / avg.shape[0])
+        # b = np.mean(np.sum(var > 0) / var.shape[0])
+        # print(1 - (a +  b)/ 2) # baseline correctness
         ess_round = self._date_to_round(country, date)
         out_avg   = avg.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
         out_var   = var.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
@@ -74,6 +79,8 @@ class ESS:
     def _make_summary(self):
         groups           = self.raw.groupby(['cntry', 'essround'])
         raw_avg, raw_var = groups.mean(), groups.var()
+        raw_avg = raw_avg.loc[self.countries] # remove countries not in focus
+        raw_var = raw_var.loc[self.countries] # remove countries not in focus
         return raw_avg, raw_var
 
     def _make_factors(self):
