@@ -2,9 +2,7 @@
     "params" : {
 
         "pooling_size"  : [2, 3, 5, 10],
-        "batch_size"    : [1, 2, 4, 8, 16, 32, 64, 128]
-
-    },
+        "batch_size"    : [1, 2, 4, 8, 16, 32, 64, 128] },
 
     "langs" : {
 
@@ -13,23 +11,16 @@
                     "pt" : "pt", "es" : "es", "sv" : "se", "ru" : "ru", "sl" : "si" },
 
         "test" :  { "bg" : "bg", "hr" : "hr", "da" : "dk", "he" : "il", "it" : "it",
-                    "lv" : "lv", "sk" : "sk" }
-
-    },
+                    "lv" : "lv", "sk" : "sk" } },
 
     "cols" : {
 
         "meta" : [ "cntry", "essround", "pspwght" ],
 
-        "values" : { "ipcrtiv" : 6, "imprich" : 6, "ipeqopt" : 6, "ipshabt" : 6,
-                     "impsafe" : 6, "impdiff" : 6, "ipfrule" : 6, "ipudrst" : 6,
-                     "ipmodst" : 6, "ipgdtim" : 6, "impfree" : 6, "iphlppl" : 6,
-                     "ipsuces" : 6, "ipstrgv" : 6, "ipadvnt" : 6, "ipbhprp" : 6,
-                     "iprspot" : 6, "iplylfr" : 6, "impenv"  : 6, "imptrad" : 6,
-                     "impfun"  : 6 },
+        "religion" : { "rlgdgr"  : 10, "rlgatnd" : 7, "pray" : 7 },
 
-        "trust" : { "polintr" : 4, "trstprl" : 10, "trstlgl" : 10, "trstplc" : 10,
-                    "trstplt" : 10, "trstprt" : 10, "trstep" : 10, "trstun"  : 10 },
+        "trust" : { "polintr" : 4,  "trstprl" : 10, "trstlgl" : 10, "trstplc" : 10,
+                    "trstplt" : 10, "trstprt" : 10, "trstep"  : 10, "trstun"  : 10 },
 
         "action": { "vote"    : 2, "contplt" : 2, "ptit"    : 2, "pbldmn"  : 2,
                     "bctprd"  : 2, "polintr" : 4 },
@@ -40,7 +31,11 @@
         "immigration" : { "imsmetn" : 4, "imdfetn" : 4, "impcntr" : 4, "bgeco"   : 10,
                           "imueclt" : 10 },
 
-        "religion" : { "rlgdgr"  : 10, "rlgatnd" : 7, "pray" : 7 }
+        "values" : { "ipcrtiv" : 6, "imprich" : 6, "ipeqopt" : 6, "ipshabt" : 6,
+                     "impsafe" : 6, "impdiff" : 6, "ipfrule" : 6, "ipudrst" : 6,
+                     "ipmodst" : 6, "ipgdtim" : 6, "impfree" : 6, "iphlppl" : 6,
+                     "ipsuces" : 6, "ipstrgv" : 6, "ipadvnt" : 6, "ipbhprp" : 6,
+                     "iprspot" : 6, "iplylfr" : 6, "impenv"  : 6, "imptrad" : 6,
+                     "impfun"  : 6 } }
 
-    }
 }
