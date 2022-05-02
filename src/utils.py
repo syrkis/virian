@@ -13,7 +13,7 @@ from torch.utils.data.dataloader import default_collate
 # global variables
 variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess'] }
 
-langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','es','sv', 'sl', 'ru',
+langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','es','sv', 'ru',
                    'bg','hr','da','he','it','lv','sk']
 
 lang_splits     = { 'train': langs[:15], 'test': langs[15:] }

@@ -43,7 +43,7 @@ class Wiki:
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        with Pool(4) as p:
+        with Pool(len(self.langs)) as p:
             p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
