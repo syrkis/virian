@@ -15,5 +15,6 @@ This an exploration of that.
 
 ### Replication
 ```bash
-docker run syrkis/bsc
+docker run syrkis/bsc setup
+docker run syrkis/bsc train
 ```
