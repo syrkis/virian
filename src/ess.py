@@ -21,40 +21,45 @@ from statsmodels.stats.weightstats import DescrStatsW
 # make values
 class ESS:
 
-    nans     = [66,77,88,99]
-    facts    = 'a b c d e'.split()
-    ess_file = f"{variables['data_dir']}/ess/ESS1-9e01_1.csv"
+    ess_file = f"data/ess/ESS1-9e01_1.csv"
 
-    def __init__(self, params):
-        self.data = self.precompute(params)
-        exit()
-        self.raw                     = self.raw.replace(self.nans, np.NaN) # 99 etc. to NaN
-        self.raw['cntry']            = self.raw['cntry'].str.lower()
-        self.raw_avg, self.raw_var   = self._make_summary()
-        self.fact_avg, self.fact_var = self._make_factors()
-        self.rounds                  = self._make_rounds()
+    def __init__(self, conf):
+        self.conf          = conf
+        self.df            = self.get_df(conf)
+        self.avg, self.std = self.get_avg_std(conf)
+        self.rounds        = self._make_rounds()
 
-    def precompute(self, params):
-        print(ess_cols[params['Target']])
-        cols   = ess_cols[params['Target']] + ess_cols['meta']
-        nats   = [lang_to_country[lang].upper() for lang in params['Languages']]
-        df     = pd.read_csv(self.ess_file, usecols=cols)
-        groups = df.groupby(["cntry", "essround"]).groups
-        avg    = pd.DataFrame({col: [0.0] * len(groups) for col in ess_cols[params['Target']]}, index=groups.keys())
-        var    = pd.DataFrame({col: [0.0] * len(groups) for col in ess_cols[params['Target']]}, index=groups.keys())
+    def get_df(self, conf):
+        countries   = list(conf['langs']['train'].values())
+        df          = pd.read_csv(self.ess_file)
+        df['cntry'] = df['cntry'].str.lower()
+        df          = df.loc[df['cntry'].isin(countries)]
+        return df
+
+    def get_avg_std(self, conf):
+        target = conf['cols']['values']
+        cols   = list(target.keys()) + conf['cols']['meta']
+        groups = self.df.groupby(["cntry", "essround"]).groups
+        avg    = pd.DataFrame({col: [0.0] * len(groups) for col in target}, index=groups.keys())
+        std    = pd.DataFrame({col: [0.0] * len(groups) for col in target}, index=groups.keys())
         for k, group in groups.items():
-            group = df.iloc[group].dropna()
-            for col in ess_cols[params['Target']]:
-                data  = group.where(group[col] <= 10).dropna()
+            group = self.df.loc[group] # loc or iloc??
+            for col in target:
+                data  = group.where(group[col] <= target[col])
                 stats = DescrStatsW(data[col], weights=data['pspwght'])
-                avg.loc[k][col] = stats.mean
-                var.loc[k][col] = stats.std
-        print(avg.std())
-        print(var.std())
-        return avg, var
-        # avg.to_csv('data/avg.csv', index=False)
-        # var.to_csv('data/var.csv', index=False)
+                avg.loc[k][col] = data[col].mean()
+                std.loc[k][col] = data[col].std()
+        avg = (avg > avg.median()).astype(int)
+        std = (std > std.median()).astype(int)
+        return avg, std
 
+    def get_target(self, lang, date):
+        country   = self.conf['langs']['train'][lang]
+        ess_round = self._date_to_round(country, date)
+        avg = self.avg.loc[country, ess_round].tolist()
+        std = self.std.loc[country, ess_round].tolist()
+        Y = tensor([avg, std])
+        return Y
 
     def get_target_fact(self, lang, date):
         country   = lang_to_country[lang]
@@ -91,7 +96,7 @@ class ESS:
     def _make_rounds(self):
         round_dates   = [(7, "2014"), (8, "2016"), (9, "2018")]
         round_to_date = {k: (self._to_date(f'{v}_12_31'), k) for k, v in round_dates}
-        keys          = self.raw.groupby(['cntry', 'essround']).groups.keys()
+        keys          = self.df.groupby(['cntry', 'essround']).groups.keys()
         rounds        = {k: [] for k, _ in keys}
         for k, v in keys: # (country, round)
             rounds[k].append(round_to_date[v])

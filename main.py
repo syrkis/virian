@@ -13,10 +13,26 @@ from tqdm import tqdm
 
 # call stack
 def main():
+    args = utils.get_args()
+    conf = utils.get_conf()
 
-    args   = utils.get_args()
+    if args.ess:
+        ess = ESS(conf)
+
+    if args.dataset:
+        ds = Dataset(conf)
+        for i in range(5):
+            print(ds[i][-1])
+
+    if args.model:
+        model = Model(params)
+        
+
     params = utils.get_params(args)
     langs  = params['Languages']
+
+
+
 
     if args.model:
         ds     = Dataset(params)
@@ -38,23 +54,12 @@ def main():
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
             train(train_loader, valid_iter, model, optimizer, criterion, params, fold)
 
-    if args.dataset:
-        ds = Dataset(params)
-        shapes = []
-        for X, W, Y in tqdm(ds):
-            shapes.append((X.shape, W.shape, Y.shape))
-
     if args.wiki:
         wiki = Wiki(params)
         wiki.texts_to_toks(params['Vocab Size'])
         # wiki.get_dailies_lang('sl')
         # wiki.get_texts_lang('sl') # TODO: FIX SL text file (no hash)
         wiki.text_to_vec() # recompute vector representation of summaries
-
-    if args.ess:
-        ess = ESS(params) # country subset from params
-        out = ess.precompute(langs)
-        print(out)
 
 
 if __name__ == "__main__":

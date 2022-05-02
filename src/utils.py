@@ -6,6 +6,7 @@
 from boto3.session import Session
 import argparse
 import os
+import json
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch.utils.data.dataloader import default_collate
 
@@ -51,6 +52,7 @@ def get_args():
     parser.add_argument('--model', action='store_true')
     parser.add_argument('--dataset', action='store_true')
     parser.add_argument('--local', action='store_true')
+    parser.add_argument('--config', action='store_true')
     # model params
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--sample-size", type=int, default=32)
@@ -71,6 +73,11 @@ def get_params(args):
                "Target" : args.target,
                "Languages": langs}
     return params
+
+
+def get_conf():
+    with open('config.json', 'r') as f:
+        return json.load(f)
 
 
 # connect to digital ocean spaces

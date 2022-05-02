@@ -25,13 +25,13 @@ class Dataset(torch.utils.data.Dataset):
 
     data_dir = variables['data_dir']
 
-    def __init__(self, params):
-        self.params = params
-        self.langs  = params['Languages']
-        self.embs   = self._load_embs(params) # make dict of embs for langs
+    def __init__(self, conf):
+        self.conf   = conf
+        self.ess    = ESS(conf) 
+        self.langs  = list(conf['langs']['train'].keys())[:3]
+        self.embs   = self.load_embs() # make dict of embs for lang
         self.days   = self._load_days(self.langs)
         self.keys   = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
-        self.ess    = ESS(params) 
         random.shuffle(self.keys)
         random.shuffle(self.langs)
 
@@ -48,34 +48,19 @@ class Dataset(torch.utils.data.Dataset):
         train_idx = [idx for idx in range(len(self.keys)) if idx not in val_idx]
         return train_idx, val_idx
 
-    def construct(self, lang, date, days_text):
-        X = self._titles_to_tensor(lang, days_text)
-        W = tensor([text['views'] for text in days_text])
-        W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.max(W)
-        Y = self.get_target(lang, date)
-        return X, W, Y
-
-    def get_target(self, lang, date):
-        if self.params['Target'] == "Factors":
-            Y = self.ess.get_target_fact(lang, date)
-        elif self.params['Target'] == 'Values':
-            Y = self.ess.get_human_values(lang, date)
-        else:
-            pass
-            # Y = self.ess_get_all(lang, date)
-        return Y
-
-    def _titles_to_tensor(self, lang, texts):
+    def construct(self, lang, date, texts):
         X = tensor([self.embs[lang][title] for title in [t['article'] for t in texts]])
         X = F.pad(X, value=0, pad=(0,0,0,1000 - X.shape[0]))
-        # consider averaging vectors in sentence to disregard order
-        return X
+        W = tensor([text['views'] for text in texts])
+        W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.max(W)
+        Y = self.ess.get_target(lang, date)
+        return X, W, Y
 
-    def _load_embs(self, params):
+    def load_embs(self):
         embs = {}
-        for lang in params['Languages']:
+        for lang in self.langs:
             with open(f"{self.data_dir}/wiki/embs_{lang}.json", 'r') as f:
-                embs[lang] = defaultdict(lambda: [0 for _ in range(params['Embedding Dim'])], json.load(f)['texts'])
+                embs[lang] = defaultdict(lambda: [0] * 300, json.load(f)['texts'])
         return embs
 
     def _load_toks(self, langs): # from when samples were 1000 x 32 x 300 (BPEmb)
@@ -92,9 +77,6 @@ class Dataset(torch.utils.data.Dataset):
                 for date, days_text in json.load(f).items():
                     days[f"{lang}_{date}"] = days_text
         return days
-
-    def _extend(self, sample): # from the days of BPEmb
-        return sample + [self.params['Vocab Size'] for _ in range(self.params["Sample Size"] - len(sample))]
 
 
 # dev stack
