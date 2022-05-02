@@ -29,9 +29,12 @@ ess_cols        = {
         'rest' : ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge", "rlgdnme", "rlgdgr",
                   "rlgatnd", "pray", "happy", "sclmeet", "inprdsc", "sclact", "crmvct", "aesfdrk"],
         'noah' : ['happy', 'rlgdgr'],
-        "human_values": ["ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule",
-                         "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv",
-                         "ipadvnt", "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun"] }
+
+        'politics' :
+            [ {key: [i   for i in range(11)]} for key in ["imwbcnt", "imueclt", "imwbcnt", "imbgeco"] ],
+
+        "human_values":
+            [ {key: [i+1 for i in range(6)] } for key in ["ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule", "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt", "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun"]] }
 
 batch_sizes     = [1, 2, 4, 8, 16, 32, 64, 128]
 
