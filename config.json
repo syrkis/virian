@@ -31,31 +31,16 @@
         "trust" : { "polintr" : 4, "trstprl" : 10, "trstlgl" : 10, "trstplc" : 10,
                     "trstplt" : 10, "trstprt" : 10, "trstep" : 10, "trstun"  : 10 },
 
-        "action": { "vote"    : 2,
-                    "contplt" : 2,
-                    "ptit"    : 2,
-                    "pbldmn"  : 2,
-                    "bctprd"  : 2,
-                    "polintr" : 4 },
+        "action": { "vote"    : 2, "contplt" : 2, "ptit"    : 2, "pbldmn"  : 2,
+                    "bctprd"  : 2, "polintr" : 4 },
 
-        "satisfaction" : { "lrscale" : 10,
-                           "stflife" : 10,
-                           "stfeco"  : 10,
-                           "stfgov"  : 10,
-                           "stfdem"  : 10,
-                           "stfedu"  : 10,
-                           "stfhlth" : 10,
-                           "euftf"   : 10 },
+        "satisfaction" : { "lrscale" : 10, "stflife" : 10, "stfeco"  : 10, "stfgov"  : 10,
+                           "stfdem"  : 10, "stfedu"  : 10, "stfhlth" : 10, "euftf"   : 10 },
 
-        "immigration" : { "imsmetn" : 4,
-                          "imdfetn" : 4,
-                          "impcntr" : 4,
-                          "bgeco"   : 10,
+        "immigration" : { "imsmetn" : 4, "imdfetn" : 4, "impcntr" : 4, "bgeco"   : 10,
                           "imueclt" : 10 },
 
-        "religion" : { "rlgdgr"  : 10,
-                       "rlgatnd" : 7,
-                       "pray"    : 7 }
+        "religion" : { "rlgdgr"  : 10, "rlgatnd" : 7, "pray" : 7 }
 
     }
 }
