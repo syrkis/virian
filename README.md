@@ -3,7 +3,7 @@
         Inferring Cultural Values from Population Reading Activity
     </h1>
     <i>
-        This repository is under active development and things will break
+        This repository is under active development and things will break / might not work
     </i>
 </div>
 
