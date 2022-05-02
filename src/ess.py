@@ -3,8 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import variables, lang_to_country, ess_cols
-from scipy.stats import zscore
+from src.utils import variables
 from datetime import datetime, timedelta
 
 import torch
@@ -58,7 +57,7 @@ class ESS:
         ess_round = self._date_to_round(country, date)
         avg = self.avg.loc[country, ess_round].tolist()
         std = self.std.loc[country, ess_round].tolist()
-        Y = tensor([avg, std])
+        Y = tensor([avg, std]).T.float()
         return Y
 
     def get_target_fact(self, lang, date):

@@ -15,7 +15,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.n     = 10 ** 3
         self.emb   = params["Embedding Dim"]
-        self.kern  = 10 # divisible twice by 1000 and 300
+        self.kern  = 5 # divisible twice by 1000 and 300
         self.pool  = nn.MaxPool2d(self.kern, padding=self.kern//2) 
         self.drop  = nn.Dropout(0.5)
 
@@ -36,7 +36,8 @@ class Model(nn.Module):
         self.fc7   = nn.Linear(self.n // self.kern ** 2, 2) # average nd variance
 
     def encode(self, x, w):
-        x = x * self.fc0(w)[:, :, None] # how to weight the weigths
+        w = self.fc0(w)[:, :, None]
+        x = torch.mul(x, w)
         x = x.reshape(x.shape[0], 1, x.shape[-2], x.shape[-1])
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
@@ -60,7 +61,7 @@ class Model(nn.Module):
         z = F.relu(self.fc6(z))
         z = self.drop(z)
         z = z.reshape(z.shape[0], z.shape[-1], -1)
-        z = torch.tanh(self.fc7(z))
+        z = torch.sigmoid(self.fc7(z))
         return z
     
     def forward(self, x, w):

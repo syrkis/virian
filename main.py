@@ -5,16 +5,15 @@
 # imports
 from src import Dataset, Model, Wiki, ESS, train, utils
 import torch
-import torch.nn as nn
-import torch.optim as optim
+from torch import nn, optim
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 
 # call stack
 def main():
-    args = utils.get_args()
-    conf = utils.get_conf()
+    args   = utils.get_args()
+    conf   = utils.get_conf()
+    params = utils.get_params(args)
 
     if args.ess:
         ess = ESS(conf)
@@ -26,33 +25,22 @@ def main():
 
     if args.model:
         model = Model(params)
-        
-
-    params = utils.get_params(args)
-    langs  = params['Languages']
-
-
-
-
-    if args.model:
-        ds     = Dataset(params)
-        loader = DataLoader(dataset=ds, batch_size=params["Batch Size"])
-        model  = Model(params)
-        for X, W, Y in tqdm(loader):
-            x_pred, y_pred = model(X, W)
+        ds = Dataset(conf)
+        for i in range(5):
+            print(model(ds[i]))
 
     if args.train:
-        exp_name     = 'local' if args.local else 'bsc'
         device       = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        ds           = Dataset(params)
+        ds           = Dataset(conf)
         fold_size    = len(ds.langs) // 5
         for fold, i in enumerate(range(0, len(ds.langs), fold_size)):
-            langs                    = ds.langs[i:i+fold_size] 
+            langs                    = ds.langs[i: i + fold_size] 
             train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
             model                    = Model(params); model.to(device);
-            criterion                = nn.MSELoss()
+            wiki_criterion           = nn.MSELoss()
+            ess_criterion            = nn.BCELoss()
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
-            train(train_loader, valid_iter, model, optimizer, criterion, params, fold)
+            train(train_loader, valid_iter, model, optimizer, wiki_criterion, ess_criterion, params, fold)
 
     if args.wiki:
         wiki = Wiki(params)

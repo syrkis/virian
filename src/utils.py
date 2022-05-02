@@ -12,36 +12,7 @@ from torch.utils.data.dataloader import default_collate
 
 
 # global variables
-variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess'] }
-
-langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','es','sv', 'ru',
-                   'bg','hr','da','he','it','lv','sk']
-
-lang_splits     = { 'train': langs[:15], 'test': langs[15:] }
-
-local_langs     = ['et', 'no', 'fi', 'de', 'cs']
-
-lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi','fr':'fr','de':'de',
-                    'hu':'hu','he':'il','it':'it','lv':'lv','lt':'lt','nl':'nl','no':'no',
-                    'pl':'pl','pt':'pt','ru':'ru','sk':'sk','sl':'si','es':'es','sv':'se' }
-
-ess_cols        = {
-        'meta' : ['essround','cntry', 'pspwght'],
-        'rest' : ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge", "rlgdnme", "rlgdgr",
-                  "rlgatnd", "pray", "happy", "sclmeet", "inprdsc", "sclact", "crmvct", "aesfdrk"],
-        'noah' : ['happy', 'rlgdgr'],
-
-        'politics' :
-            [ {key: [i   for i in range(11)]} for key in ["imwbcnt", "imueclt", "imwbcnt", "imbgeco"] ],
-
-        "human_values":
-            [ {key: [i+1 for i in range(6)] } for key in ["ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule", "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt", "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun"]] }
-
-batch_sizes     = [1, 2, 4, 8, 16, 32, 64, 128]
-
-pooling_sizes   = [2, 3, 5, 10]
-
-# optimizers      = [Adam, blah, blah, blah]
+variables       = {'pad':10 **6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess']}
 
 # get args
 def get_args():
@@ -65,13 +36,13 @@ def get_args():
 
 # get traning parameters
 def get_params(args):
-    langs  = local_langs if args.local else lang_splits['train']
+    # langs  = local_langs if args.local else lang_splits['train']
     params = { "Batch Size": args.batch_size, # rename to config
                # "Sample Size": args.sample_size,
                "Embedding Dim" : args.embedding_dim,
                "Learning Rate": args.lr,
-               "Target" : args.target,
-               "Languages": langs}
+               "Target" : args.target}
+               # "Languages": langs}
     return params
 
 

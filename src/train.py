@@ -12,7 +12,7 @@ import wandb
 
 
 # train function
-def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
+def train(train_loader, valid_iter, model, optimizer, wiki_criterion, ess_criterion, params, fold):
     wandb.init(entity='syrkis', project='bsc', job_type='train', name=f'fold_{fold}',
             config=params, reinit=True, group="full data")
     wandb.watch(model)
@@ -22,26 +22,22 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
         # train set
         model.train()
         x_pred, y_pred = model(X, W)
-        x_loss         = criterion(x_pred, X)
-        y_loss         = criterion(y_pred, Y)
+        x_loss         = wiki_criterion(x_pred, X)
+        y_loss         = ess_criterion(y_pred, Y)
 
         # validation set
         model.eval()
         X_val, W_val, Y_val    = next(valid_iter)
         x_pred_val, y_pred_val = model(X_val, W_val) 
-        x_loss_val             = criterion(x_pred_val, X_val)
-        y_loss_val             = criterion(y_pred_val, Y_val)
-
-        # report and evluate
-        train_acc = torch.sum((y_pred > 0) == (Y > 0)) / torch.numel(Y)
-        valid_acc = torch.sum((y_pred_val > 0) == (Y_val > 0)) / torch.numel(Y_val)
-        metrics   = get_metrics(x_loss, y_loss, x_loss_val, y_loss_val, train_acc, valid_acc, params)
-        wandb.log(metrics)
+        x_loss_val             = wiki_criterion(x_pred_val, X_val)
+        y_loss_val             = ess_criterion(y_pred_val, Y_val)
 
         # backpropagate and update weights
         loss = x_loss + y_loss
         loss.backward()
         optimizer.step()
+        wandb.log({"wiki_train": x_loss, "wiki_valid": x_loss_val,
+                   "ess_train" : y_loss, "ess_valid" : y_loss_val})
     return model
 
 
