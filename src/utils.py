@@ -14,7 +14,7 @@ from torch.utils.data.dataloader import default_collate
 variables       = { 'pad': 10 ** 6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess'] }
 
 langs           = ['cs','et','fi','fr','de','hu','lt','nl','no','pl','pt','es','sv', 'sl', 'ru',
-                   'bg','hr','da','he','it','lv','sk'] # redo sl (slovenia) (accedentally though lang was si)
+                   'bg','hr','da','he','it','lv','sk']
 
 lang_splits     = { 'train': langs[:15], 'test': langs[15:] }
 
@@ -24,11 +24,14 @@ lang_to_country = { 'bg':'bg','hr':'hr','cs':'cz','da':'dk','et':'ee','fi':'fi',
                     'hu':'hu','he':'il','it':'it','lv':'lv','lt':'lt','nl':'nl','no':'no',
                     'pl':'pl','pt':'pt','ru':'ru','sk':'sk','sl':'si','es':'es','sv':'se' }
 
-ess_cols        = { 'meta' : ['essround','cntry'], 'rest': ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge",
-                    "rlgdnme", "rlgdgr", "rlgatnd", "pray", "happy", "sclmeet", "inprdsc", "sclact", "crmvct",
-                    "aesfdrk"], "human_values": ["ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule",
-                    "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv", "ipadvnt",
-                    "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun"] }
+ess_cols        = {
+        'meta' : ['essround','cntry', 'pspwght'],
+        'rest' : ["health", "hlthhmp", "rlgblg", "rlgdnm", "rlgblge", "rlgdnme", "rlgdgr",
+                  "rlgatnd", "pray", "happy", "sclmeet", "inprdsc", "sclact", "crmvct", "aesfdrk"],
+        'noah' : ['happy', 'rlgdgr'],
+        "human_values": ["ipcrtiv", "imprich", "ipeqopt", "ipshabt", "impsafe", "impdiff", "ipfrule",
+                         "ipudrst", "ipmodst", "ipgdtim", "impfree", "iphlppl", "ipsuces", "ipstrgv",
+                         "ipadvnt", "ipbhprp", "iprspot", "iplylfr", "impenv", "imptrad", "impfun"] }
 
 batch_sizes     = [1, 2, 4, 8, 16, 32, 64, 128]
 
@@ -51,7 +54,7 @@ def get_args():
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--latent-dim", type=int, default=100)
     parser.add_argument("--embedding-dim", type=int, default=300)
-    parser.add_argument("--target", type=str, default="Values")
+    parser.add_argument("--target", type=str, default="human_values")
     return parser.parse_args()
 
 

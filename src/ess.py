@@ -13,6 +13,9 @@ import pandas as pd
 import numpy as np
 
 from factor_analyzer import FactorAnalyzer as FA
+from matplotlib import pyplot as plt
+from statsmodels.stats.weightstats import DescrStatsW
+
 
 
 # make values
@@ -23,14 +26,35 @@ class ESS:
     ess_file = f"{variables['data_dir']}/ess/ESS1-9e01_1.csv"
 
     def __init__(self, params):
-        self.langs                   = params['Languages']
-        self.countries               = [lang_to_country[lang] for lang in self.langs]
-        self.raw                     = pd.read_csv(self.ess_file, usecols=meta+data)
+        self.data = self.precompute(params)
+        exit()
         self.raw                     = self.raw.replace(self.nans, np.NaN) # 99 etc. to NaN
         self.raw['cntry']            = self.raw['cntry'].str.lower()
         self.raw_avg, self.raw_var   = self._make_summary()
         self.fact_avg, self.fact_var = self._make_factors()
         self.rounds                  = self._make_rounds()
+
+    def precompute(self, params):
+        print(ess_cols[params['Target']])
+        cols   = ess_cols[params['Target']] + ess_cols['meta']
+        nats   = [lang_to_country[lang].upper() for lang in params['Languages']]
+        df     = pd.read_csv(self.ess_file, usecols=cols)
+        groups = df.groupby(["cntry", "essround"]).groups
+        avg    = pd.DataFrame({col: [0.0] * len(groups) for col in ess_cols[params['Target']]}, index=groups.keys())
+        var    = pd.DataFrame({col: [0.0] * len(groups) for col in ess_cols[params['Target']]}, index=groups.keys())
+        for k, group in groups.items():
+            group = df.iloc[group].dropna()
+            for col in ess_cols[params['Target']]:
+                data  = group.where(group[col] <= 10).dropna()
+                stats = DescrStatsW(data[col], weights=data['pspwght'])
+                avg.loc[k][col] = stats.mean
+                var.loc[k][col] = stats.std
+        print(avg.std())
+        print(var.std())
+        return avg, var
+        # avg.to_csv('data/avg.csv', index=False)
+        # var.to_csv('data/var.csv', index=False)
+
 
     def get_target_fact(self, lang, date):
         country   = lang_to_country[lang]

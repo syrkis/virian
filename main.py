@@ -47,13 +47,13 @@ def main():
     if args.wiki:
         wiki = Wiki(params)
         # wiki.texts_to_toks(params['Vocab Size'])
-        # wiki.get_dailies_lang('sl')
+        wiki.get_dailies_lang('sl')
         # wiki.get_texts_lang('sl')
         # wiki.text_to_vec() # recompute vector representation of summaries
 
     if args.ess:
         ess = ESS(params) # country subset from params
-        out = ess.get_human_values("fi", "2019_01_10")
+        out = ess.precompute(langs)
         print(out)
 
 

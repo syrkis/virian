@@ -43,7 +43,7 @@ class Wiki:
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        with Pool(2) as p:
+        with Pool(4) as p:
             p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
@@ -130,7 +130,7 @@ class Wiki:
         return date + timedelta(days = days)
 
     def _to_str(self, date, sep='_'):
-        return str(date).split()[0].replace('-', '/')
+        return str(date).split()[0].replace('-', sep)
 
     def _get_url(self, date, lang):
         return f'{self.wiki_api}/{lang}.wikipedia.org/all-access/{self._to_str(date, "/")}'

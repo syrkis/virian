@@ -17,46 +17,50 @@ class Model(nn.Module):
         self.emb   = params["Embedding Dim"]
         self.kern  = 10 # divisible twice by 1000 and 300
         self.pool  = nn.MaxPool2d(self.kern, padding=self.kern//2) 
-        self.drop  = nn.Dropout(0.6)
+        self.drop  = nn.Dropout(0.5)
 
         # enc
         self.conv1 = nn.Conv2d(1, 3, self.kern)
         self.conv2 = nn.Conv2d(3, 1, self.kern)
-        self.fc0   = nn.Linear(self.emb // self.kern ** 2, self.emb // self.kern ** 2)
+        self.fc0   = nn.Linear(1000, 1000)
+        self.fc1   = nn.Linear(self.emb // self.kern ** 2, self.emb // self.kern ** 2)
 
         # dec
-        self.fc1   = nn.Linear(self.emb // self.kern ** 2, self.emb // self.kern)
-        self.fc2   = nn.Linear(self.emb // self.kern, self.emb)
-        self.fc3   = nn.Linear(self.n // self.kern ** 2, self.n // self.kern)
-        self.fc4   = nn.Linear(self.n // self.kern, self.n)
+        self.fc2   = nn.Linear(self.emb // self.kern ** 2, self.emb // self.kern)
+        self.fc3   = nn.Linear(self.emb // self.kern, self.emb)
+        self.fc4   = nn.Linear(self.n // self.kern ** 2, self.n // self.kern)
+        self.fc5   = nn.Linear(self.n // self.kern, self.n)
 
         # inf
-        self.fc5   = nn.Linear(self.emb // self.kern ** 2, 21) # esss cols (or facts) (make variable)
-        self.fc6   = nn.Linear(self.n // self.kern ** 2, 2) # average nd variance
+        self.fc6   = nn.Linear(self.emb // self.kern ** 2, 21) # esss cols (or facts) (make variable)
+        self.fc7   = nn.Linear(self.n // self.kern ** 2, 2) # average nd variance
 
     def encode(self, x, w):
-        x = x * w[:, :, None]
+        x = x * self.fc0(w)[:, :, None] # how to weight the weigths
         x = x.reshape(x.shape[0], 1, x.shape[-2], x.shape[-1])
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = x.reshape(x.shape[0], x.shape[-2], x.shape[-1])
-        x = F.relu(self.fc0(x))
+        x = F.relu(self.fc1(x))
+        x = self.drop(x)
         return x
 
     def decode(self, z):
-        z = F.relu(self.fc1(z))
         z = F.relu(self.fc2(z))
-        z = z.reshape(z.shape[0], z.shape[2], -1)
+        z = self.drop(z)
         z = F.relu(self.fc3(z))
-        z = torch.tanh(self.fc4(z))
+        z = z.reshape(z.shape[0], z.shape[2], -1)
+        z = F.relu(self.fc4(z))
+        z = torch.tanh(self.fc5(z))
         z = z.reshape(z.shape[0], z.shape[2], -1)
         # z = F.normalize(z)
         return z
 
     def infer(self, z):
-        z = F.relu(self.fc5(z))
+        z = F.relu(self.fc6(z))
+        z = self.drop(z)
         z = z.reshape(z.shape[0], z.shape[-1], -1)
-        z = torch.tanh(self.fc6(z))
+        z = torch.tanh(self.fc7(z))
         return z
     
     def forward(self, x, w):
