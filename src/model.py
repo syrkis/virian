@@ -35,9 +35,7 @@ class Model(nn.Module):
         self.fc6   = nn.Linear(self.emb // self.kern ** 2, 21) # esss cols (or facts) (make variable)
         self.fc7   = nn.Linear(self.n // self.kern ** 2, 2) # average nd variance
 
-    def encode(self, x, w):
-        w = self.fc0(w)[:, :, None]
-        x = torch.mul(x, w)
+    def encode(self, x):
         x = x.reshape(x.shape[0], 1, x.shape[-2], x.shape[-1])
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
@@ -57,7 +55,9 @@ class Model(nn.Module):
         # z = F.normalize(z)
         return z
 
-    def infer(self, z):
+    def infer(self, z, w):
+        # w = self.fc0(w)[:, :, None]
+        # x = torch.mul(x, w)
         z = F.relu(self.fc6(z))
         z = self.drop(z)
         z = z.reshape(z.shape[0], z.shape[-1], -1)
@@ -65,8 +65,8 @@ class Model(nn.Module):
         return z
     
     def forward(self, x, w):
-        z = self.encode(x, w)
-        y = self.infer(z)
+        z = self.encode(x)
+        y = self.infer(z, w)
         x = self.decode(z)
         return x, y 
 
