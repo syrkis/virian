@@ -24,10 +24,14 @@ def main():
             print(ds[i][-1])
 
     if args.model:
-        model = Model(params)
-        ds = Dataset(conf)
-        for i in range(5):
-            print(model(ds[i]))
+        model  = Model(params)
+        ds     = Dataset(conf)
+        loader = DataLoader(dataset=ds, batch_size=16)
+        for x_true, w_true, y_true in loader:
+            x_pred, y_pred = model(x_true, w_true)
+            acc = (y_true == (y_pred > 0.5).int()).int().sum() / torch.numel(y_true)
+            print(acc)
+            break
 
     if args.train:
         device       = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

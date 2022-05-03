@@ -26,12 +26,12 @@ class Dataset(torch.utils.data.Dataset):
     data_dir = variables['data_dir']
 
     def __init__(self, conf):
-        self.conf   = conf
-        self.ess    = ESS(conf) 
-        self.langs  = list(conf['langs']['train'].keys())
-        self.embs   = self.load_embs() # make dict of embs for lang
-        self.days   = self._load_days(self.langs)
-        self.keys   = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
+        self.conf  = conf
+        self.ess   = ESS(conf) 
+        self.langs = list(conf['langs']['train'].keys())[:1]
+        self.embs  = self.load_embs() # make dict of embs for lang
+        self.days  = self._load_days(self.langs)
+        self.keys  = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
         random.shuffle(self.keys)
         random.shuffle(self.langs)
 
