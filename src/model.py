@@ -15,7 +15,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.n     = 10 ** 3
         self.emb   = params["Embedding Dim"]
-        self.kern  = 5 # divisible twice by 1000 and 300
+        self.kern  = 10 # divisible twice by 1000 and 300
         self.pool  = nn.MaxPool2d(self.kern, padding=self.kern//2) 
         self.drop  = nn.Dropout(0.5)
 
