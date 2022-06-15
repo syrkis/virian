@@ -23,9 +23,9 @@ class Wiki:
     wiki_api    = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     headers     = {"User-Agent": "nobr@itu.dk"}
     
-    def __init__(self, params):
-        self.params     = params
-        self.langs      = params['Languages']
+    def __init__(self, conf):
+        self.conf       = conf
+        self.langs      = conf['langs']['train']
         self.start_date = "2015_07_01"
         self.end_date   = "2020_01_01"
 
@@ -43,13 +43,12 @@ class Wiki:
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        with Pool(len(self.langs)) as p:
+        with Pool(4) as p:
             p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
         vec_file = f"data/embs/wiki.{lang}.vec"
-        embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file) # limit=self.params['Vocab Size'])
-
+        embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file)
         D = {"texts" : {}, "fails" : set()}
         hashes = [self._get_title_hash(title) for title in self._get_titles(lang)]
         with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:

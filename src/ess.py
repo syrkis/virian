@@ -14,7 +14,7 @@ import numpy as np
 from factor_analyzer import FactorAnalyzer as FA
 from matplotlib import pyplot as plt
 from statsmodels.stats.weightstats import DescrStatsW
-
+from sklearn.cluster import KMeans
 
 
 # make values
@@ -27,6 +27,26 @@ class ESS:
         self.df            = self.get_df(conf)
         self.avg, self.std = self.get_avg_std(conf)
         self.rounds        = self._make_rounds()
+        self.cluster()     # edits self.avg and self.std
+
+    def cluster(self):
+        out = []
+        fig, axes = plt.subplots(2, 1, figsize=(5, 8))
+        for idx, df in enumerate([self.avg, self.std]):
+            out.append(self.get_cluster(df, axes[idx]))
+        # plt.show() # amazing plot (use in report)
+        self.avg = out[0]
+        self.std = out[1]
+
+    def get_cluster(self, df, ax):
+        df2 = df.copy()
+        for idx, col in enumerate(self.conf['cols']['values']):
+            cluster = KMeans(n_clusters=2).fit(df[col].values.reshape(-1, 1))
+            df2[col] = cluster.labels_ # TODO: calulcate cluster price
+            border = np.mean(cluster.cluster_centers_)
+            ax.scatter(df[col].values, [idx] * len(df), color='black', s=1)
+            ax.vlines(border, idx - 0.5, idx + 0.5, color='red', linewidth=1)
+        return df2
 
     def get_df(self, conf):
         countries   = list(conf['langs']['train'].values())
@@ -48,8 +68,6 @@ class ESS:
                 stats = DescrStatsW(data[col], weights=data['pspwght'])
                 avg.loc[k][col] = data[col].mean()
                 std.loc[k][col] = data[col].std()
-        avg = (avg > avg.median()).astype(int)
-        std = (std > std.median()).astype(int)
         return avg, std
 
     def get_target(self, lang, date):

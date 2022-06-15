@@ -11,7 +11,7 @@
 \usepackage{times}
 \usepackage{float}
 \usepackage{latexsym}
-\usepackage[title]{appendix}
+\usepackage[page]{appendix}
 
 \usepackage[
 % set width and height to a4 width and height + 6mm
@@ -71,13 +71,15 @@ center
 \begin{document}
 \maketitle
 \begin{abstract}
-    International social surveys are conducted by various institutions\footnote{The European Social Survey and the World Value Survey releases rounds every two and seven years respectively.} with yearly time granularity.
-    Here a method for inferring nation-specifc distributions of answers to the European Social Survey from view-count weigthed Wikipedia reading activity is proposed.
-    Specifically a neural model is train to predict the mean and variance of the five most doninant factors to to the subset of questions seen in Appendeix A for the countries seen in Appendix B.
-    The method is designed to be time scale agnostic, though the experiemental setup is only able to evaluate biu-yearly accuracy (the \texttt{ESS} is conduced every second year).
-    The mean and variance of the distribution of the most relevant factors of the responese matrix these can \emph{1)} be predcited for unknown countries, and \emph{2)} assign means and variance to these factors at arbitaray time scales—be it with decreasing certaitnty.
-    Code and replication instructions are available at \href{https://github.com/syrkis/bsc}{\texttt{github.com/syrkis/bsc}}.
-
+    Costly international social surveys are conducted by various institutions with yearly time granularity
+    \footnote{The European Social Survey and the World Value Survey release rounds every two and seven years, respectively.}.
+    Here a potential method for inferring summary statistics of a given country's response to a subset of the European Social Survey (ESS), from the reading activity in that country's associated Wikipedia project, is explored.
+    The ESS subset consists of 21 questions about human values, each answered by respondents on a scale from 1 to 6.
+    A one-to-one mapping between countries and Wikipedia projects is assumed, while a neural model is trained to predict if a given day's reading activity comes from a country with a high or low mean and standard deviation for the ESS questions.
+    The model thus attempts to answer the question ``\emph{given only a sample of a countries Wikipedia reading activity, can something be inferred about the cultural values that country?}''
+    The experiment does \emph{not} yield a positive result, indicating that the assumptions on which it rests are too incorrect.
+    Code and experiment replication instructions are available at
+    \href{https://github.com/syrkis/bsc}{\texttt{github.com/syrkis/bsc}}.
 \end{abstract}
 
 \section{Introduction}
@@ -110,14 +112,12 @@ center
 \onecolumn
 \begin{appendices}
 
-\label{values:appendix}
 \input{appendix/data}
+\label{appendix:data}
 \clearpage
 
-\label{values:appendix}
-\input{appendix/values}
-
 \end{appendices}
+
 
 
 \end{document}

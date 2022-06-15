@@ -17,6 +17,12 @@ def main():
 
     if args.ess:
         ess = ESS(conf)
+        ess.cluster()
+
+    if args.wiki:
+        wiki = Wiki(conf)
+        wiki.cluster()
+        wiki.text_to_vec()
 
     if args.dataset:
         ds = Dataset(conf)
@@ -45,13 +51,6 @@ def main():
             ess_criterion            = nn.BCELoss()
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
             train(train_loader, valid_iter, model, optimizer, wiki_criterion, ess_criterion, params, fold)
-
-    if args.wiki:
-        wiki = Wiki(params)
-        wiki.texts_to_toks(params['Vocab Size'])
-        # wiki.get_dailies_lang('sl')
-        # wiki.get_texts_lang('sl') # TODO: FIX SL text file (no hash)
-        wiki.text_to_vec() # recompute vector representation of summaries
 
 
 if __name__ == "__main__":

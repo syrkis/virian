@@ -30,7 +30,7 @@ class Model(nn.Module):
         self.fc3   = nn.Linear(self.emb // self.kern, self.emb)
         self.fc4   = nn.Linear(self.n // self.kern ** 2, self.n // self.kern)
         self.fc5   = nn.Linear(self.n // self.kern, self.n)
-
+        
         # inf
         self.fc6   = nn.Linear(self.emb // self.kern ** 2, 21) # esss cols (or facts) (make variable)
         self.fc7   = nn.Linear(self.n // self.kern ** 2, 2) # average nd variance
