@@ -66,6 +66,8 @@ class ESS:
                 stats = DescrStatsW(data[col], weights=data['pspwght'])
                 avg.loc[k][col] = data[col].mean()
                 std.loc[k][col] = data[col].std()
+        avg = (avg - np.mean(avg, axis=0)) / np.std(avg, axis=0)
+        std = (std - np.mean(std, axis=0)) / np.std(std, axis=0)
         return avg, std
 
     def get_target(self, lang, date):
