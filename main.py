@@ -17,7 +17,6 @@ def main():
 
     if args.ess:
         ess = ESS(conf)
-        ess.cluster()
 
     if args.wiki:
         wiki = Wiki(conf)
@@ -47,10 +46,9 @@ def main():
             langs                    = ds.langs[i: i + fold_size] 
             train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
             model                    = Model(params); model.to(device);
-            wiki_criterion           = nn.MSELoss()
-            ess_criterion            = nn.BCELoss()
+            criterion           = nn.MSELoss()
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
-            train(train_loader, valid_iter, model, optimizer, wiki_criterion, ess_criterion, params, fold)
+            train(train_loader, valid_iter, model, optimizer, criterion, params, fold)
 
 
 if __name__ == "__main__":

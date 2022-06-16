@@ -15,11 +15,12 @@ from factor_analyzer import FactorAnalyzer as FA
 from matplotlib import pyplot as plt
 from statsmodels.stats.weightstats import DescrStatsW
 from sklearn.cluster import KMeans
+from collections import Counter
 
 
 # make values
 class ESS:
-
+    # TODO: stop descretizng the data!
     ess_file = f"data/ess/ESS1-9e01_1.csv"
 
     def __init__(self, conf):
@@ -27,9 +28,9 @@ class ESS:
         self.df            = self.get_df(conf)
         self.avg, self.std = self.get_avg_std(conf)
         self.rounds        = self._make_rounds()
-        self.cluster()     # edits self.avg and self.std
+        # self.descrete()     # edits self.avg and self.std
 
-    def cluster(self):
+    def descrete(self):
         out = []
         fig, axes = plt.subplots(2, 1, figsize=(5, 8))
         for idx, df in enumerate([self.avg, self.std]):
@@ -37,16 +38,13 @@ class ESS:
         # plt.show() # amazing plot (use in report)
         self.avg = out[0]
         self.std = out[1]
+        print(out[0].value_counts().idxmax())
 
     def get_cluster(self, df, ax):
         df2 = df.copy()
         for idx, col in enumerate(self.conf['cols']['values']):
-            cluster = KMeans(n_clusters=2).fit(df[col].values.reshape(-1, 1))
-            df2[col] = cluster.labels_ # TODO: calulcate cluster price
-            border = np.mean(cluster.cluster_centers_)
-            ax.scatter(df[col].values, [idx] * len(df), color='black', s=1)
-            ax.vlines(border, idx - 0.5, idx + 0.5, color='red', linewidth=1)
-        return df2
+            df2[col] = pd.cut(df2[col], bins=3, labels=False)
+        return df2 - 1
 
     def get_df(self, conf):
         countries   = list(conf['langs']['train'].values())
