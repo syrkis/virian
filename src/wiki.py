@@ -13,6 +13,8 @@ from tqdm import tqdm
 import gensim
 import fasttext
 import numpy as np
+from nltk.corpus import stopwords
+import stopwordsiso as stopwords
 
 
 # wikipedia class (tokenizes and scarpes, etc.)
@@ -47,6 +49,7 @@ class Wiki:
             p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
+        lang_stop_words = stopwords.stopwords(lang)
         vec_file = f"data/embs/wiki.{lang}.vec"
         embed = gensim.models.KeyedVectors.load_word2vec_format(vec_file)
         D = {"texts" : {}, "fails" : set()}
@@ -59,7 +62,7 @@ class Wiki:
                 toks = fasttext.tokenize(text)
                 embs = np.zeros(300)
                 for tok in toks:
-                    if tok in embed:
+                    if tok in embed and tok not in lang_stop_words:
                         embs += embed[tok] # add all embeddings
                 embs = embs / np.linalg.norm(embs) if np.sum(np.abs(embs)) > 0 else embs
                 D['texts'][texts[_hash]['title']] = embs.tolist() # mean embeddings

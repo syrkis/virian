@@ -20,7 +20,6 @@ def main():
 
     if args.wiki:
         wiki = Wiki(conf)
-        wiki.cluster()
         wiki.text_to_vec()
 
     if args.dataset:
