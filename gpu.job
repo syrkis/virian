@@ -11,6 +11,8 @@
 
 module --ignore-cache load CUDA/10.2.89-GCC-8.3.0
 module --ignore-cache load libreadline/8.0-GCCcore-8.3.0 
+module --ignore-cache load libjpeg-turbo/2.0.3-GCCcore-8.3.0.lua
+module --ignore-cache load CMake/3.15.3-GCCcore-8.3.0.lua
 module --ignore-cache load SQLite/3.29.0-GCCcore-8.3.0
 module --ignore-cache load Python/3.7.4-GCCcore-8.3.0
 
