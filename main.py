@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src import Dataset, Model, Wiki, ESS, train, utils
+from src import Dataset, CNN, FNN, Wiki, ESS, train, utils
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
@@ -26,7 +26,7 @@ def main():
     if args.dataset:
         ds = Dataset(conf)
         for i in range(5):
-            print(ds[i][-1])
+            print(ds[i])
 
     if args.model:
         model  = Model(params)
@@ -45,8 +45,8 @@ def main():
         for fold, i in enumerate(range(0, len(ds.langs), fold_size)):
             langs                    = ds.langs[i: i + fold_size] 
             train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
-            model                    = Model(params); model.to(device);
-            criterion           = nn.MSELoss()
+            model                    = CNN(params); model.to(device);
+            criterion                = nn.MSELoss()
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
             train(train_loader, valid_iter, model, optimizer, criterion, params, fold)
 

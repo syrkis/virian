@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from boto3.session import Session
+#from boto3.session import Session
 import argparse
 import os
 import json
@@ -52,6 +52,7 @@ def get_conf():
 
 
 # connect to digital ocean spaces
+"""
 def get_s3():
     session = Session()
     client = session.client('s3', region_name='AMS3',
@@ -59,6 +60,7 @@ def get_s3():
         aws_access_key_id=os.getenv("DIGITAL_OCEAN_SPACES_KEY"),
         aws_secret_access_key=os.getenv("DIGITAL_OCEAN_SPACES_SECRET"))
     return client
+"""
 
 
 # cycle through iterator (for validation)

@@ -28,7 +28,7 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
         # validation set
         model.eval()
         X_val, W_val, Y_val    = next(valid_iter)
-        x_pred_val, y_pred_val = model(X_val, W_val) 
+        x_pred_val, y_pred_val = model(X_val, W_val)
         x_loss_val             = criterion(x_pred_val, X_val)
         y_loss_val             = criterion(y_pred_val, Y_val)
 
