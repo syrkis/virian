@@ -11,6 +11,6 @@ from ._tnn import TNN
 __all__ = [
     'CNN',
     'FNN',
-    'TNN',
     'LSTM'
+    'TNN',
 ]
