@@ -33,8 +33,7 @@ def main():
         loader = DataLoader(dataset=ds, batch_size=16)
         for x_true, w_true, y_true in loader:
             x_pred, y_pred = model(x_true, w_true)
-            acc = (y_true == (y_pred > 0.5).int()).int().sum() / torch.numel(y_true)
-            print(acc)
+            print(y_pred.shape, x_pred.shape)
             break
 
     if args.train:
@@ -44,7 +43,7 @@ def main():
         for fold, i in enumerate(range(0, len(ds.langs), fold_size)):
             langs                    = ds.langs[i: i + fold_size] 
             train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
-            model                    = CNN(params); model.to(device);
+            model                    = Model(params); model.to(device);
             criterion                = nn.MSELoss()
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
             train(train_loader, valid_iter, model, optimizer, criterion, params, fold)
