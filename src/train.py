@@ -37,10 +37,11 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
         loss.backward()
         optimizer.step()
         wandb.log({
-            "ESS Train MSE"  : y_loss.item(),
-            "ESS Valid MSE"  : y_loss_val.item(),
-            "Wiki Train MSE" : x_loss.item(),
-            "Wiki Valid MSE" : x_loss_val.item(),
+            "ESS Baseline MSE" : y_loss_val
+            "ESS Train MSE"    : y_loss.item(),
+            "ESS Valid MSE"    : y_loss_val.item(),
+            "Wiki Train MSE"   : x_loss.item(),
+            "Wiki Valid MSE"   : x_loss_val.item(),
         })
     return model
 

@@ -42,7 +42,7 @@ class Dataset(torch.utils.data.Dataset):
         lang = self.keys[idx][:2]
         date = self.keys[idx][3:]
         return self.construct(lang, date, self.days[self.keys[idx]])
-        
+
     def k_fold(self, langs):
         val_idx   = [idx for idx, sample in enumerate(self.keys) if sample[:2] in langs] # TODO: ++ val langs
         train_idx = [idx for idx in range(len(self.keys)) if idx not in val_idx]
@@ -53,7 +53,7 @@ class Dataset(torch.utils.data.Dataset):
         X = F.pad(X, value=0, pad=(0,0,0,1000 - X.shape[0]))
         W = tensor([text['views'] for text in texts])
         W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.max(W)
-        Y = self.ess.get_target(lang, date)
+        Y = self.ess.get_target(lang, date).T
         return X, W, Y
 
     def load_embs(self):

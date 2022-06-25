@@ -30,6 +30,12 @@ class ESS:
         self.rounds        = self._make_rounds()
         # self.descrete()     # edits self.avg and self.std
 
+    def baseline(self):
+        avg_baseline  = np.mean(self.avg, axis = 0)
+        std_baseline  = np.mean(self.std, axis = 0)
+        baseline = np.concat([avg_baseline, std_baseline])
+        return baseline
+
     def descrete(self):
         out = []
         fig, axes = plt.subplots(2, 1, figsize=(5, 8))

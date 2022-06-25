@@ -26,7 +26,6 @@ class Model(nn.Module):
         return x, y
 
     def infer(self, z, w):
-        z = self.drop(z)  # dropout as we are overfitting
         w = self.weigh(w) # how should views be weighed?
         z = z * w         # weight articles by views
         z = self.fc3(z.mT)
@@ -35,6 +34,7 @@ class Model(nn.Module):
 
     def encode(self, x): # 1000 x 300 -> 1000 x 2
         x = self.fc1(x)
+        x = self.drop(x)
         x = F.relu(x)
         return x
 
