@@ -11,7 +11,7 @@ from torch import tensor
 import pandas as pd
 import numpy as np
 
-from factor_analyzer import FactorAnalyzer as FA
+# from factor_analyzer import FactorAnalyzer as FA
 from matplotlib import pyplot as plt
 from statsmodels.stats.weightstats import DescrStatsW
 from sklearn.cluster import KMeans

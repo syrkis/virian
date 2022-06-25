@@ -64,7 +64,7 @@ class Wiki:
                 for tok in toks:
                     if tok in embed and tok not in lang_stop_words:
                         embs += embed[tok] # add all embeddings
-                embs = embs / np.linalg.norm(embs) if np.sum(np.abs(embs)) > 0 else embs
+                embs = embs / np.max(embs) if np.sum(np.abs(embs)) > 0 else embs
                 D['texts'][texts[_hash]['title']] = embs.tolist() # mean embeddings
         D['fails'] = texts['__failed__']
         with open(f"{self.data_dir}/wiki/embs_{lang}.json", 'w') as f:

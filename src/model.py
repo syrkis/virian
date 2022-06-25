@@ -8,9 +8,9 @@ from torch import nn
 
 # define the model
 class Model(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, params):
+        self.params = params
         super(Model, self).__init__()
-        self.hidden_size = hidden_size
         self.lstm = nn.queueSTM(
             input_size,
             hidden_size,
@@ -25,7 +25,7 @@ class Model(nn.Module):
         x = self.decode(z)
         return x, y
 
-    def infer(self, z, w):
+    def infer(self, z, w): # make LSTM or attention
         return z
 
     def encode(self, x):

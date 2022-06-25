@@ -3,7 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src import Dataset, CNN, FNN, Wiki, ESS, train, utils
+from src import Dataset, Model, Wiki, ESS, train, utils
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
