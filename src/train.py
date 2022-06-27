@@ -3,10 +3,7 @@
 # by: Noah Syrkis
 
 # imports
-from src.utils import cycle, get_metrics
-
 import torch
-
 from tqdm import tqdm
 import wandb
 
@@ -31,13 +28,15 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
         x_pred_val, y_pred_val = model(X_val, W_val)
         x_loss_val             = criterion(x_pred_val, X_val)
         y_loss_val             = criterion(y_pred_val, Y_val)
+        baseline               = criterion(torch.zeros_like(Y_val), Y_val)
 
         # backpropagate and update weights
         loss = x_loss + y_loss
         loss.backward()
         optimizer.step()
         wandb.log({
-            "ESS Baseline MSE" : y_loss_val
+            # "ESS Baseline MSE" : y_loss_val
+            "ESS Baseline MSE" : torch.sum(baseline).item() / torch.numel(Y_val),
             "ESS Train MSE"    : y_loss.item(),
             "ESS Valid MSE"    : y_loss_val.item(),
             "Wiki Train MSE"   : x_loss.item(),

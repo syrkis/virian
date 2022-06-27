@@ -16,7 +16,7 @@ def main():
     params = utils.get_params(args)
 
     if args.ess:
-        ess = ESS(conf)
+        ess      = ESS(conf)
 
     if args.wiki:
         wiki = Wiki(conf)
