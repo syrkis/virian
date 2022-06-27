@@ -45,10 +45,8 @@ class Wiki:
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        for lang in self.langs:
-            self.text_to_vec_lang(lang)
-        # with Pool(4) as p:
-        #     p.map(self.text_to_vec_lang, self.langs)
+        with Pool(8) as p:
+            p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
         lang_stop_words = stopwords.stopwords(lang)
