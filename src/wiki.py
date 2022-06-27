@@ -37,7 +37,7 @@ class Wiki:
 
     def get_texts(self):
         with Pool(len(self.langs)) as p:
-            p.map(self.get_texts_lang, self.langs)
+          p.map(self.get_texts_lang, self.langs)
 
     def texts_to_toks(self, vocab_size): # bpemb (saves tokens)
         tokenizer = BPEmb(lang="multi", vs=vocab_size, dim=300)
@@ -45,8 +45,10 @@ class Wiki:
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        with Pool(4) as p:
-            p.map(self.text_to_vec_lang, self.langs)
+        for lang in self.langs:
+            self.text_to_vec_lang(lang)
+        # with Pool(4) as p:
+        #     p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
         lang_stop_words = stopwords.stopwords(lang)
@@ -60,15 +62,15 @@ class Wiki:
             if _hash in texts:
                 text = texts[_hash]['text']
                 toks = fasttext.tokenize(text)
-                embs = np.zeros((self.conf['sample_length'], 300))
+                embs = np.zeros((self.conf['params']['sample_length'], 300))
                 idx  = 0
                 for tok in toks:
-                    if idx < self.conf['sample_length'] and tok in embed and tok not in lang_stop_words:
-                        embs[idx] = embed[tok] # add all embeddings
+                    if idx < self.conf['params']['sample_length'] and tok in embed and tok not in lang_stop_words:
+                        embs[idx] = embed[tok] # add embedded word
                         idx += 1
-                D['texts'][texts[_hash]['title']] = embs.tolist() # mean embeddings
+                D['texts'][texts[_hash]['title']] = embs.tolist()
         D['fails'] = texts['__failed__']
-        with open(f"{self.data_dir}/wiki/embs_2d{lang}.json", 'w') as f:
+        with open(f"{self.data_dir}/wiki/embs_2d_{lang}.json", 'w') as f:
             json.dump(D, f)
 
     def _texts_to_toks_lang(self, lang, tokenizer, vocab_size): # one of migration function

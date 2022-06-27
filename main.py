@@ -19,7 +19,7 @@ def main():
         ess      = ESS(conf)
 
     if args.wiki:
-        wiki = Wiki(conf)
+        wiki = Wiki(conf, params)
         wiki.text_to_vec()
 
     if args.dataset:
