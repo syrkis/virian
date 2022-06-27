@@ -13,11 +13,19 @@ class Model(nn.Module):
     def __init__(self, params):
         super(Model, self).__init__()
         self.params = params
-        self.weight = nn.Parameter(torch.rand(1000))
         self.drop   = nn.Dropout()
-        self.fc1    = nn.Linear(300, 2)
-        self.fc2    = nn.Linear(2, 300)
-        self.fc3    = nn.Linear(1000, 21)
+
+        self.weight   = nn.Parameter(torch.rand(1000))
+        self.fc_inf_1 = nn.Linear(1000, 400)
+        self.fc_inf_2 = nn.Linear(400, 21)
+
+        self.fc_enc_1 = nn.Linear(300, 150)
+        self.fc_enc_2 = nn.Linear(150, 150)
+        self.fc_enc_3 = nn.Linear(150, 2)
+
+        self.fc_dec_1 = nn.Linear(2, 150)
+        self.fc_dec_2 = nn.Linear(150, 150)
+        self.fc_dec_3 = nn.Linear(150, 300)
 
     def forward(self, x, w):
         z = self.encode(x)
@@ -26,20 +34,32 @@ class Model(nn.Module):
         return x, y
 
     def infer(self, z, w):
-        z = self.drop(z)  # dropout as we are overfitting
         w = self.weigh(w) # how should views be weighed?
+        w = self.drop(w)  # drop half of all articles
         z = z * w         # weight articles by views
-        z = self.fc3(z.mT)
+        z = self.fc_inf_1(z.mT)
+        z = F.relu(z)
+        z = self.fc_inf_2(z)
         z = torch.tanh(z)
         return z
 
     def encode(self, x): # 1000 x 300 -> 1000 x 2
-        x = self.fc1(x)
+        x = self.fc_enc_1(x)
+        x = F.relu(x)
+        x = self.fc_enc_2(x)
+        x = F.relu(x)
+        xx = self.drop(x)
+        x = self.fc_enc_3(x)
         x = F.relu(x)
         return x
 
-    def decode(self, z):
-        z = self.fc2(z)
+    def decode(self, z): # 1000 x 2 -> 1000 x 300
+        z = self.fc_dec_1(z)
+        z = F.relu(z)
+        z = self.fc_dec_2(z)
+        z = F.relu(z)
+        z = self.drop(z)
+        z = self.fc_dec_3(z)
         z = torch.tanh(z)
         return z
 

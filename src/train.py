@@ -6,12 +6,14 @@
 import torch
 from tqdm import tqdm
 import wandb
+from src.utils import baseline
 
 
 # train function
 def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
-    wandb.init(entity='syrkis', project='bsc', job_type='train', name=f'fold_{fold}', config=params, reinit=True, group="full data")
+    wandb.init(entity='syrkis', project='virian', job_type='train', name=f'fold_{fold}', config=params, reinit=True, group="full data")
     wandb.watch(model)
+    idxs = len(train_loader.dataset) / params['Batch Size']
     for idx, (X, W, Y) in enumerate(train_loader):
         optimizer.zero_grad()
 
@@ -28,15 +30,14 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
         x_pred_val, y_pred_val = model(X_val, W_val)
         x_loss_val             = criterion(x_pred_val, X_val)
         y_loss_val             = criterion(y_pred_val, Y_val)
-        baseline               = criterion(torch.zeros_like(Y_val), Y_val)
 
         # backpropagate and update weights
-        loss = x_loss + y_loss
+        loss = x_loss * ((idxs - idx)/idxs) + y_loss * (idx/idxs)
         loss.backward()
         optimizer.step()
         wandb.log({
             # "ESS Baseline MSE" : y_loss_val
-            "ESS Baseline MSE" : torch.sum(baseline).item() / torch.numel(Y_val),
+            "ESS Baseline"     : baseline(y_pred_val, Y_val),
             "ESS Train MSE"    : y_loss.item(),
             "ESS Valid MSE"    : y_loss_val.item(),
             "Wiki Train MSE"   : x_loss.item(),

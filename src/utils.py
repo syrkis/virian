@@ -7,9 +7,9 @@
 import argparse
 import os
 import json
+import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch.utils.data.dataloader import default_collate
-
 
 # global variables
 variables       = {'pad':10 **6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess']}
@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument('--local', action='store_true')
     parser.add_argument('--config', action='store_true')
     # model params
-    parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--sample-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--latent-dim", type=int, default=100)
@@ -94,4 +94,16 @@ def to_device(x, w, y, device):
     w = default_collate(w).to(device)
     y = default_collate(y).to(device)
     return x, w, y
+
+# how often does model beat baseline?
+def baseline(y_val_pred, Y_val):
+    pred_dist = torch.abs(Y_val - y_val_pred)
+    base_dist = torch.abs(Y_val)
+    base      = torch.sum(pred_dist <= base_dist) / torch.numel(Y_val)
+    return base
+
+
+
+
+
 
