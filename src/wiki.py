@@ -13,7 +13,6 @@ from tqdm import tqdm
 import gensim
 import fasttext
 import numpy as np
-from nltk.corpus import stopwords
 import stopwordsiso as stopwords
 
 
@@ -32,8 +31,8 @@ class Wiki:
         self.end_date   = "2022_01_01"
 
     def get_dailies(self):
-        for lang in self.langs:
-            self.get_dailies_lang(lang)
+        with Pool(4) as p:
+          p.map(self.get_dailies_lang, self.langs)
 
     def get_texts(self):
         with Pool(len(self.langs)) as p:
