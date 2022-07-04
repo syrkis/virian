@@ -5,14 +5,11 @@
         "batch_size"    : [1, 2, 4, 8, 16, 32, 64, 128],
         "sample_length" : 32 },
 
-    "langs" : {
-
-        "train" : { "cs" : "cz", "et" : "ee", "fi" : "fi", "fr" : "fr", "de" : "de",
-                    "hu" : "hu", "lt" : "lt", "nl" : "nl", "no" : "no", "pl" : "pl",
-                    "pt" : "pt", "es" : "es", "sv" : "se", "ru" : "ru", "sl" : "si" },
-
-        "test" :  { "bg" : "bg", "hr" : "hr", "da" : "dk", "he" : "il", "it" : "it",
-                    "lv" : "lv", "sk" : "sk" } },
+    "langs" : { "cs" : "cz", "et" : "ee", "fi" : "fi", "fr" : "fr", "de" : "de",
+                "hu" : "hu", "lt" : "lt", "nl" : "nl", "no" : "no", "pl" : "pl",
+                "pt" : "pt", "es" : "es", "sv" : "se", "ru" : "ru", "sl" : "si",
+                "bg" : "bg", "hr" : "hr", "da" : "dk", "he" : "il", "it" : "it",
+                "lv" : "lv", "sk" : "sk" },
 
     "cols" : {
 

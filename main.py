@@ -20,7 +20,8 @@ def main():
 
     if args.wiki:
         wiki = Wiki(conf)
-        wiki.text_to_vec()
+        wiki.get_dailies()
+        # wiki.text_to_vec()
 
     if args.dataset:
         ds = Dataset(conf)

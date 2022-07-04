@@ -24,12 +24,12 @@ class Wiki:
     data_dir    = variables['data_dir']
     wiki_api    = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top"
     headers     = {"User-Agent": "nobr@itu.dk"}
-    
+
     def __init__(self, conf):
         self.conf       = conf
-        self.langs      = conf['langs']['train']
+        self.langs      = conf['langs']
         self.start_date = "2015_07_01"
-        self.end_date   = "2020_01_01"
+        self.end_date   = "2022_01_01"
 
     def get_dailies(self):
         for lang in self.langs:
@@ -45,8 +45,9 @@ class Wiki:
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        with Pool(8) as p:
-            p.map(self.text_to_vec_lang, self.langs)
+        # with Pool(4) as p:
+        #    p.map(self.text_to_vec_lang, self.langs)
+        self.text_to_vec_lang('sl')
 
     def text_to_vec_lang(self, lang):
         lang_stop_words = stopwords.stopwords(lang)
@@ -137,7 +138,7 @@ class Wiki:
 
     def _get_url(self, date, lang):
         return f'{self.wiki_api}/{lang}.wikipedia.org/all-access/{self._to_str(date, "/")}'
-        
+
     def _get_title_hash(self, title):
         return sha256((title).encode('utf-8')).hexdigest()
 
