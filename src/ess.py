@@ -47,7 +47,7 @@ class ESS:
         return df2 - 1
 
     def get_df(self, conf):
-        countries   = list(conf['langs']['train'].values())
+        countries   = list(conf['langs'].values())
         df          = pd.read_csv(self.ess_file)
         df['cntry'] = df['cntry'].str.lower()
         df          = df.loc[df['cntry'].isin(countries)]

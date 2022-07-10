@@ -28,7 +28,7 @@ class Dataset(torch.utils.data.Dataset):
     def __init__(self, conf):
         self.conf  = conf
         self.ess   = ESS(conf) 
-        self.langs = list(conf['langs']['train'].keys())
+        self.langs = list(conf['langs'].keys())
         self.embs  = self.load_embs() # make dict of embs for lang
         self.days  = self._load_days(self.langs)
         self.keys  = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
