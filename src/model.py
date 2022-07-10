@@ -34,7 +34,7 @@ class Model(nn.Module):
         return x, y
 
     def infer(self, z, w):
-        w = self.weigh(w) # how should views be weighed?
+        # w = self.weigh(w) # how should views be weighed?
         w = self.drop(w)  # drop half of all articles
         z = z * w         # weight articles by views
         z = self.fc_inf_1(z.mT)

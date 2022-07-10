@@ -101,7 +101,7 @@ class ESS:
         return avg, std
 
     def get_target(self, lang, date):
-        country   = self.conf['langs']['train'][lang]
+        country   = self.conf['langs'][lang]
         ess_round = self._date_to_round(country, date)
         avg = self.avg.loc[country, ess_round].tolist()
         std = self.std.loc[country, ess_round].tolist()

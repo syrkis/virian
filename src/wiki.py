@@ -44,9 +44,8 @@ class Wiki:
             self._texts_to_toks_lang(lang, tokenizer, vocab_size)
 
     def text_to_vec(self): # fasttext and gensim converts article to mean vector embed rep
-        # with Pool(4) as p:
-        #    p.map(self.text_to_vec_lang, self.langs)
-        self.text_to_vec_lang('sl')
+        with Pool(8) as p:
+           p.map(self.text_to_vec_lang, self.langs)
 
     def text_to_vec_lang(self, lang):
         lang_stop_words = stopwords.stopwords(lang)
@@ -66,6 +65,7 @@ class Wiki:
                     if idx < self.conf['params']['sample_length'] and tok in embed and tok not in lang_stop_words:
                         embs[idx] = embed[tok] # add embedded word
                         idx += 1
+                # embs = np.sum(embs, axis=0)
                 D['texts'][texts[_hash]['title']] = embs.tolist()
         D['fails'] = texts['__failed__']
         with open(f"{self.data_dir}/wiki/embs_2d_{lang}.json", 'w') as f:

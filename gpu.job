@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #SBATCH --job-name=virian        # Job name
-#SBATCH --output=log.out         # Name of output file
-#SBATCH --cpus-per-task=4        # Schedule one core
+#SBATCH --output=wiki.log        # Name of output file
+#SBATCH --cpus-per-task=22        # Schedule one core
 #SBATCH --time=06:00:00          # Run time (hh:mm:ss)
 #SBATCH --partition=red          # Run on either the Red or Brown queue
 # #SBATCH --gres=gpu:v100:1        # Schedule a GPU
-#SBATCH --mem=180000
+#SBATCH --mem=128000
 
 
 module --ignore-cache load CUDA/10.2.89-GCC-8.3.0
