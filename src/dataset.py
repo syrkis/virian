@@ -27,11 +27,12 @@ class Dataset(torch.utils.data.Dataset):
 
     def __init__(self, conf):
         self.conf  = conf
-        self.ess   = ESS(conf) 
+        self.ess   = ESS(conf)
         self.langs = list(conf['langs'].keys())
         self.embs  = self.load_embs() # make dict of embs for lang
         self.days  = self._load_days(self.langs)
-        self.keys  = list(self.days.keys()) # ["da_2020_10_30", ..., "..."]
+        self.keys  = self.filter_ranges(list(self.days.keys())) # lang_date
+        self.embs  = self.load_embs() # make dict of embs for lang
         random.shuffle(self.keys)
         random.shuffle(self.langs)
 
@@ -42,6 +43,20 @@ class Dataset(torch.utils.data.Dataset):
         lang = self.keys[idx][:2]
         date = self.keys[idx][3:]
         return self.construct(lang, date, self.days[self.keys[idx]])
+
+    def filter_ranges(self, keys):
+        out = []
+        for key in keys:
+            lang = key[:2]
+            cntry = self.conf['langs'][lang]
+            date = key[3:].replace('_', '-')
+            for lo, hi in self.ess.ranges[cntry].values():
+                if date <= hi and date >= lo:
+                    out.append(key)
+        return out
+
+    def construct(self, lang, date, days):
+        return out
 
     def k_fold(self, langs):
         val_idx   = [idx for idx, sample in enumerate(self.keys) if sample[:2] in langs] # TODO: ++ val langs

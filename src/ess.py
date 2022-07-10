@@ -21,13 +21,14 @@ from collections import Counter
 # make values
 class ESS:
     # TODO: stop descretizng the data!
-    ess_file = f"data/ess/ESS1-9e01_1.csv"
+    ess_file = f"data/ess/ESS8e02_2-ESS9e03_1-ESS10.csv"
 
     def __init__(self, conf):
         self.conf          = conf
         self.df            = self.get_df(conf)
         self.avg, self.std = self.get_avg_std(conf)
         self.rounds        = self._make_rounds()
+        self.ranges        = self.get_country_date_ranges()
         # self.descrete()     # edits self.avg and self.std
 
     def descrete(self):
@@ -46,12 +47,41 @@ class ESS:
             df2[col] = pd.cut(df2[col], bins=3, labels=False)
         return df2 - 1
 
+    def get_country_date_ranges(self):
+        ranges = {cntry : {} for cntry in set(self.df.cntry)} # list of length 1 to 3 of tuples with round, dates
+        groups = self.df.groupby(['essround', 'cntry']).groups
+        for k, v in groups.items():
+            group = self.df.loc[v]
+            _range = self.get_date_range(k[0], group)
+            if _range:
+                ranges[k[1]][k[0]] = _range
+        return ranges
+
+    def get_date_range(self, _round, df):
+        if _round == 10:
+            date = pd.to_datetime(df['inwds'])
+            date = date.dropna()
+            min_date = min(date)
+            max_date = max(date)
+        else:
+            date = df[['inwyys', 'inwmms', 'inwdds']]
+            date.columns = ['year', 'month', 'day']
+            date = date[(date.year < 2022) & (date.year >= 2015) & (date.month < 13) & (date.day != 31)]
+            date = pd.to_datetime(date)
+            date = date.dropna()
+            if len(date) == 0:
+                return False
+            min_date = min(date)
+            max_date = max(date)
+        return (min_date.strftime('%Y-%m-%d'), max_date.strftime('%Y-%m-%d'))
+
     def get_df(self, conf):
         countries   = list(conf['langs'].values())
-        df          = pd.read_csv(self.ess_file)
+        df          = pd.read_csv(self.ess_file, low_memory=False)
         df['cntry'] = df['cntry'].str.lower()
         df          = df.loc[df['cntry'].isin(countries)]
         return df
+
 
     def get_avg_std(self, conf):
         target = conf['cols']['values']
@@ -97,7 +127,7 @@ class ESS:
         out_avg   = avg.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
         out_var   = var.loc[country].loc[float(ess_round)][ess_cols["human_values"]].tolist()
         return tensor([out_avg, out_var]).T # make numbers have same scale as emebddings
-   
+
     def base_model(self):
         avg = self.fact_avg
         var = self.fact_var
@@ -109,9 +139,9 @@ class ESS:
         rounds = self.rounds[country]
         pos    = np.argmin([abs(r[0] - date) for r in rounds])
         return rounds[pos][1]
-        
+
     def _make_rounds(self):
-        round_dates   = [(7, "2014"), (8, "2016"), (9, "2018")]
+        round_dates   = [(7,"2014"),(8,"2016"),(9,"2018"),(10,"2020")]
         round_to_date = {k: (self._to_date(f'{v}_12_31'), k) for k, v in round_dates}
         keys          = self.df.groupby(['cntry', 'essround']).groups.keys()
         rounds        = {k: [] for k, _ in keys}
