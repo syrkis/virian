@@ -35,12 +35,12 @@ class Model(nn.Module):
 
     def infer(self, z, w):
         # w = self.weigh(w) # how should views be weighed?
-        w = self.drop(w)  # drop half of all articles
-        z = z * w         # weight articles by views
+        # w = self.drop(w)  # drop half of all articles
+        # z = z * w         # weight articles by views
+        z = self.drop(z)
         z = self.fc_inf_1(z.mT)
-        z = F.relu(z)
-        z = self.fc_inf_2(z)
         z = torch.tanh(z)
+        z = self.fc_inf_2(z)
         return z
 
     def encode(self, x): # 1000 x 300 -> 1000 x 2
@@ -48,7 +48,7 @@ class Model(nn.Module):
         x = F.relu(x)
         x = self.fc_enc_2(x)
         x = F.relu(x)
-        xx = self.drop(x)
+        x = self.drop(x)
         x = self.fc_enc_3(x)
         x = F.relu(x)
         return x

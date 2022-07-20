@@ -8,12 +8,13 @@ from datetime import datetime, timedelta
 from bpemb import BPEmb
 from multiprocessing import Pool
 from hashlib import sha256
-import os, json, requests, wikipedia
+import os, json, requests, wikipediaapi
 from tqdm import tqdm
 import gensim
 import fasttext
 import numpy as np
 import stopwordsiso as stopwords
+import time
 
 
 # wikipedia class (tokenizes and scarpes, etc.)
@@ -35,7 +36,7 @@ class Wiki:
           p.map(self.get_dailies_lang, self.langs)
 
     def get_texts(self):
-        with Pool(len(self.langs)) as p:
+        with Pool(2) as p:
           p.map(self.get_texts_lang, self.langs)
 
     def texts_to_toks(self, vocab_size): # bpemb (saves tokens)
@@ -84,18 +85,18 @@ class Wiki:
             json.dump(D, f)
 
     def get_texts_lang(self, lang, fails = 0): # TODO: support cont.
-        D = {"__failed__" : []}
-        wikipedia.set_lang(lang)
+        with open(f"{self.data_dir}/wiki/text_{lang}.json", 'r') as f:
+            D = json.load(f)
+        wiki = wikipediaapi.Wikipedia(language=lang)
         titles = list(self._get_titles(lang))
         for i in tqdm(range(len(titles))): # add fail found to tqdm
             title = titles[i]
             if title not in D['__failed__']:
-                try:
-                    D[title] = wikipedia.page(title).summary
-                except (wikipedia.exceptions.PageError, KeyError,
-                        wikipedia.exceptions.DisambiguationError,
-                        wikipedia.exceptions.WikipediaException,
-                        json.decoder.JSONDecodeError) as e:
+                page = wiki.page(title)
+                if page.exists():
+                    D[title] = page.summary
+                    time.sleep(0.02)
+                else:
                     D['__failed__'].append(title)
                     continue
             if i % 1000 == 0:
