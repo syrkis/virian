@@ -16,8 +16,9 @@ class Model(nn.Module):
         self.drop   = nn.Dropout()
 
         self.weight   = nn.Parameter(torch.rand(1000))
-        self.fc_inf_1 = nn.Linear(1000, 400)
-        self.fc_inf_2 = nn.Linear(400, 21)
+        self.fc_inf_1 = nn.Linear(1000, 21)
+        # self.fc_inf_1 = nn.Linear(1000, 400)
+        # self.fc_inf_2 = nn.Linear(400, 21)
 
         self.fc_enc_1 = nn.Linear(300, 150)
         self.fc_enc_2 = nn.Linear(150, 150)
@@ -39,8 +40,8 @@ class Model(nn.Module):
         # z = z * w         # weight articles by views
         z = self.drop(z)
         z = self.fc_inf_1(z.mT)
-        z = torch.tanh(z)
-        z = self.fc_inf_2(z)
+        # z = torch.tanh(z)
+        # z = self.fc_inf_2(z)
         return z
 
     def encode(self, x): # 1000 x 300 -> 1000 x 2
