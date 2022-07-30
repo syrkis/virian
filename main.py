@@ -7,12 +7,16 @@ from src import Dataset, Model, Wiki, ESS, train, utils
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
+import random; random.seed(0)
 
 
 # call stack
 def main():
-    args   = utils.get_args()
-    conf   = utils.get_conf()
+    args        = utils.get_args()
+    conf        = utils.get_conf()
+    train_langs, test_langs = utils.train_test_split(list(conf['langs'].keys()))
+    conf['train_langs'] = train_langs
+    conf['test_langs'] = test_langs
     params = utils.get_params(args)
 
     if args.ess:
@@ -25,14 +29,14 @@ def main():
         wiki.text_to_vec()
 
     if args.dataset:
-        ds = Dataset(conf)
+        ds = Dataset(conf, False) # False for test
         for i in range(5):
             print(ds[i])
 
     if args.model:
-        model  = Model(params)
-        ds     = Dataset(conf)
-        loader = DataLoader(dataset=ds, batch_size=16)
+        model    = Model(params)
+        train_ds = Dataset(conf)
+        loader = DataLoader(dataset=train_ds, batch_size=16)
         for x_true, w_true, y_true in loader:
             x_pred, y_pred = model(x_true, w_true)
             print(y_pred.shape, x_pred.shape)

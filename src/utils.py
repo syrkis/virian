@@ -10,6 +10,7 @@ import json
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch.utils.data.dataloader import default_collate
+import random
 
 # global variables
 variables       = {'pad':10 **6, 'date_format': "%Y_%m_%d", 'data_dir': 'data', 'data_dirs': ['wiki', 'ess']}
@@ -102,7 +103,11 @@ def baseline(y_val_pred, Y_val):
     base      = torch.sum(pred_dist <= base_dist) / torch.numel(Y_val)
     return base
 
-
+def train_test_split(langs):
+    random.shuffle(langs)
+    train_langs = langs[:int(len(langs) * 0.8)]
+    test_langs  = langs[int(len(langs) * 0.8):]
+    return train_langs, test_langs
 
 
 
