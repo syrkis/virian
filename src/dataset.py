@@ -64,12 +64,12 @@ class Dataset(torch.utils.data.Dataset):
         return train_idx, val_idx
 
     def construct(self, lang, date, texts):
-        # X = tensor([self.embs[lang][title] for title in [t['article'] for t in texts]])
-        # X = F.pad(X, value=0, pad=(0,0,0,1000 - X.shape[0]))
+        X = tensor([self.embs[lang][title] for title in [t['article'] for t in texts]])
+        X = F.pad(X, value=0, pad=(0,0,0,1000 - X.shape[0]))
         W = tensor([text['views'] for text in texts])
         W = F.pad(W, pad=(0,1000-W.shape[0])) / torch.max(W)
         Y = self.ess.get_target(lang, date).T
-        return Y
+        return X, W, Y
 
     def load_embs(self):
         embs = {}
