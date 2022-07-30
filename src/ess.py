@@ -20,16 +20,28 @@ from collections import Counter
 
 # make values
 class ESS:
-    # TODO: stop descretizng the data!
     ess_file = f"data/ess/ESS8e02_2-ESS9e03_1-ESS10.csv"
 
     def __init__(self, conf):
         self.conf          = conf
+        self.construct()
+        exit()
         self.df            = self.get_df(conf)
         self.avg, self.std = self.get_avg_std(conf)
         self.rounds        = self._make_rounds()
         self.ranges        = self.get_country_date_ranges()
         # self.descrete()     # edits self.avg and self.std
+
+    def construct(self):
+        vals = list(self.conf['cols']['values'].keys())
+        meta = self.conf['cols']['meta']
+        cols = vals + meta
+        ess          = pd.read_csv(self.ess_file, dtype='object', usecols=cols)
+        ess          = ess[ess['dweight'].notna()]
+        ess['cntry'] = ess['cntry'].apply(lambda x: x.lower())
+        groups       = ess.groupby(['cntry', 'essround']).groups
+
+
 
     def descrete(self):
         out = []
