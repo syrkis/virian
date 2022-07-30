@@ -31,7 +31,11 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
         y_loss_val             = criterion(y_pred_val, Y_val)
 
         # backpropagate and update weights
-        loss = x_loss * ((idxs - idx)/idxs) + y_loss * (idx/idxs)
+        if idx / idxs < 0.33:
+            # x_loss * ((idxs - idx)/idxs) + y_loss * (idx/idxs)
+            loss = x_loss + y_loss
+        else:
+            loss = y_loss
         loss.backward()
         optimizer.step()
         wandb.log({

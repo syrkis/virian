@@ -39,7 +39,7 @@ class Model(nn.Module):
         # w = self.weigh(w) # how should views be weighed?
         # w = self.drop(w)  # drop half of all articles
         # z = z * w         # weight articles by views
-        z = self.drop_2(z)
+        # z = self.drop_2(z)
         z = self.fc_inf_1(z.mT)
         # z = torch.tanh(z)
         # z = self.fc_inf_2(z)
