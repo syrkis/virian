@@ -8,6 +8,7 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 import random; random.seed(0)
+from datetime import datetime
 
 
 # call stack
@@ -43,16 +44,17 @@ def main():
             break
 
     if args.train:
-        device       = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        ds           = Dataset(conf)
-        fold_size    = len(ds.langs) // 5
+        now       = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        device    = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        ds        = Dataset(conf)
+        fold_size = len(ds.langs) // 5
         for fold, i in enumerate(range(0, len(ds.langs), fold_size)):
             langs                    = ds.langs[i: i + fold_size] 
             train_loader, valid_iter = utils.cross_validate(ds, langs, params, device)
             model                    = Model(params); model.to(device);
             criterion                = nn.MSELoss()
             optimizer                = optim.Adam(model.parameters(), lr=params['Learning Rate'])
-            train(train_loader, valid_iter, model, optimizer, criterion, params, fold)
+            train(train_loader, valid_iter, model, optimizer, criterion, params, fold, now)
 
 
 if __name__ == "__main__":
