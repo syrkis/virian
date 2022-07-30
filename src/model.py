@@ -13,7 +13,8 @@ class Model(nn.Module):
     def __init__(self, params):
         super(Model, self).__init__()
         self.params = params
-        self.drop   = nn.Dropout()
+        self.drop_5 = nn.Dropout(0.5)
+        self.drop_2 = nn.Dropout(0.2)
 
         self.weight   = nn.Parameter(torch.rand(1000))
         self.fc_inf_1 = nn.Linear(1000, 21)
@@ -38,7 +39,7 @@ class Model(nn.Module):
         # w = self.weigh(w) # how should views be weighed?
         # w = self.drop(w)  # drop half of all articles
         # z = z * w         # weight articles by views
-        z = self.drop(z)
+        z = self.drop_2(z)
         z = self.fc_inf_1(z.mT)
         # z = torch.tanh(z)
         # z = self.fc_inf_2(z)
@@ -46,20 +47,20 @@ class Model(nn.Module):
 
     def encode(self, x): # 1000 x 300 -> 1000 x 2
         x = self.fc_enc_1(x)
-        x = F.relu(x)
+        x = F.gelu(x)
         x = self.fc_enc_2(x)
-        x = F.relu(x)
-        x = self.drop(x)
+        x = F.gelu(x)
+        x = self.drop_5(x)
         x = self.fc_enc_3(x)
-        x = F.relu(x)
+        x = F.gelu(x)
         return x
 
     def decode(self, z): # 1000 x 2 -> 1000 x 300
         z = self.fc_dec_1(z)
-        z = F.relu(z)
+        z = F.gelu(z)
         z = self.fc_dec_2(z)
-        z = F.relu(z)
-        z = self.drop(z)
+        z = F.gelu(z)
+        z = self.drop_5(z)
         z = self.fc_dec_3(z)
         z = torch.tanh(z)
         return z
