@@ -6,7 +6,7 @@
 import torch
 from tqdm import tqdm
 import wandb
-from src.utils import baseline
+from src import utils
 from datetime import datetime
 
 
@@ -30,22 +30,19 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold, n
         x_pred_val, y_pred_val = model(X_val, W_val)
         x_loss_val             = criterion(x_pred_val, X_val)
         y_loss_val             = criterion(y_pred_val, Y_val)
+        base_mse               = criterion(torch.zeros_like(Y_val), Y_val)
 
         # backpropagate and update weights
-        if idx / idxs < 0.33:
-            # x_loss * ((idxs - idx)/idxs) + y_loss * (idx/idxs)
-            loss = x_loss + y_loss
-        else:
-            loss = y_loss
+        loss = x_loss * ((idxs - idx)/idxs) + y_loss * (idx/idxs)
         loss.backward()
         optimizer.step()
         wandb.log({
-            # "ESS Baseline MSE" : y_loss_val
-            "ESS Baseline"     : baseline(y_pred_val, Y_val),
-            "ESS Train MSE"    : y_loss.item(),
-            "ESS Valid MSE"    : y_loss_val.item(),
-            "Wiki Train MSE"   : x_loss.item(),
-            "Wiki Valid MSE"   : x_loss_val.item(),
+            "ESS Baseline binom" : utils.baseline(y_pred_val, Y_val),
+            "ESS Baseline MSE"   : base_mse.item(),
+            "ESS Train MSE"      : y_loss.item(),
+            "ESS Valid MSE"      : y_loss_val.item(),
+            "Wiki Train MSE"     : x_loss.item(),
+            "Wiki Valid MSE"     : x_loss_val.item(),
         })
     return model
 

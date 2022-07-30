@@ -28,7 +28,7 @@ def get_args():
     # model params
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--sample-size", type=int, default=32)
-    parser.add_argument("--lr", type=float, default=1e-2)
+    parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--latent-dim", type=int, default=100)
     parser.add_argument("--embedding-dim", type=int, default=300)
     parser.add_argument("--target", type=str, default="human_values")
