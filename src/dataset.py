@@ -73,7 +73,7 @@ class Dataset(torch.utils.data.Dataset):
 
     def load_embs(self):
         embs = {}
-        for lang in self.langs:
+        for lang in tqdm(self.langs):
             with open(f"{self.data_dir}/wiki/embs_1d_{lang}.json", 'r') as f:
                 embs[lang] = defaultdict(lambda: [0] * 300, json.load(f)['texts'])
         return embs

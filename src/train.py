@@ -22,7 +22,6 @@ def train(train_loader, valid_iter, model, optimizer, criterion, params, fold):
         x_pred, y_pred = model(X, W)
         x_loss         = criterion(x_pred, X)
         y_loss         = criterion(y_pred, Y)
-        predictions    = (y_pred > 0.5).long()
 
         # validation set
         model.eval()
